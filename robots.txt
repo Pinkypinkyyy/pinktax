@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://pinktax.com.au/sitemap.xml
