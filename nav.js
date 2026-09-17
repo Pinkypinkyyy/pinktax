@@ -22,47 +22,6 @@
     });
   }
 
-  var copy = {
-    hvac: "Air con and refrigeration. Quoted hours versus hours on the job.",
-    electrical: "Electrical. Hours on the tools versus the quote.",
-    construction: "Fit-out and maintenance. Not house builders."
-  };
-  var labels = { hvac: "HVAC", electrical: "Electrical", construction: "Construction services" };
-  var trades = document.querySelectorAll(".trade");
-  var live = document.getElementById("liveLine");
-  var shots = document.querySelectorAll("#stage img");
-  var cap = document.getElementById("stageCap");
-
-  function setTrade(key) {
-    trades.forEach(function (t) {
-      var on = t.getAttribute("data-trade") === key;
-      t.classList.toggle("is-on", on);
-      t.setAttribute("aria-pressed", on ? "true" : "false");
-    });
-    shots.forEach(function (img) {
-      var on = img.getAttribute("data-trade") === key;
-      img.classList.toggle("is-on", on);
-      if (on) {
-        img.removeAttribute("aria-hidden");
-        img.removeAttribute("inert");
-      } else {
-        img.setAttribute("aria-hidden", "true");
-        img.setAttribute("inert", "");
-      }
-    });
-    if (live && copy[key]) live.textContent = copy[key];
-    if (cap && labels[key]) cap.textContent = labels[key];
-  }
-
-  if (trades.length) {
-    setTrade("hvac");
-    trades.forEach(function (t) {
-      t.addEventListener("click", function () {
-        setTrade(t.getAttribute("data-trade"));
-      });
-    });
-  }
-
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (!reduce) {
     var nodes = document.querySelectorAll(".pcol, .feat, .tier, .stepc, .funnel .card, .meet");
@@ -163,7 +122,6 @@
       new FormData(form).forEach(function (value, key) {
         data[key] = value;
       });
-      data._subject = "Service Profit intake";
       data._template = "table";
       data._captcha = "false";
       fetch("https://formsubmit.co/ajax/admin@pinktax.com.au", {
@@ -183,15 +141,16 @@
             pick.classList.add("is-next");
             pick.scrollIntoView({ behavior: "smooth", block: "start" });
           }
-          if (typeof window.spLead === "function") window.spLead("form");
+          try {
+            if (typeof gtag === "function") gtag("event", "generate_lead", { method: "enquiry-form" });
+          } catch (err) {}
         })
         .catch(function () {
           var body =
             "Name: " + (data.name || "") +
-            "\nBusiness: " + (data.business || "") +
+            "\nVenue: " + (data.venue || "") +
             "\nEmail: " + (data.email || "") +
-            "\nPhone: " + (data.phone || "") +
-            "\nWork: " + (data.trade || "") +
+            "\nMobile: " + (data.mobile || "") +
             "\nRevenue: " + (data.revenue || "") +
             "\nStaff: " + (data.staff || "") +
             "\nHurting: " + (data.hurt || "") +
@@ -199,7 +158,7 @@
             "\n12-month vision: " + (data.vision || "");
           window.location.href =
             "mailto:admin@pinktax.com.au?subject=" +
-            encodeURIComponent("Service Profit intake") +
+            encodeURIComponent("Pink Accounting hospitality intake") +
             "&body=" +
             encodeURIComponent(body);
         })

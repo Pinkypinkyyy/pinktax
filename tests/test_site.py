@@ -54,6 +54,24 @@ def test_urls_exist():
         assert (ROOT / rel).exists(), rel
 
 
+def test_no_cross_brand_wording_anywhere():
+    # The site was built from a Service Profit template. Hospitality-only is a
+    # firm rule on every public Pink surface, so guard every page and script.
+    banned = ("Service Profit", "HVAC", "electrical, construction", "tradie")
+    for p in PAGES + list(ROOT.glob("*.js")):
+        text = p.read_text(encoding="utf-8")
+        for word in banned:
+            assert word not in text, f"{p}: {word}"
+
+
+def test_enquiry_form_fires_generate_lead():
+    # Google Ads' primary conversion is the GA4 generate_lead event. If the
+    # success path stops firing it, paid spend has no conversion signal.
+    nav = (ROOT / "nav.js").read_text(encoding="utf-8")
+    assert 'gtag("event", "generate_lead", { method: "enquiry-form" })' in nav
+    assert "spLead" not in nav
+
+
 def test_assets():
     assert (ROOT / "assets" / "logo.png").exists()
     assert (ROOT / "assets" / "logo-white.png").exists()
