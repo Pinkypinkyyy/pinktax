@@ -15,13 +15,17 @@ def test_hospitality_calendar_only():
             pass
 
 
-def test_book_has_filter_questions():
+def test_book_page_has_one_intake_only():
+    # Microsoft Bookings asks revenue, staff, what is hurting, where the
+    # business is now and where it is going, several of them mandatory. The
+    # site used to ask all of it again first, so a visitor wrote the same
+    # three paragraphs twice before they could pick a time.
     text = (ROOT / "book" / "index.html").read_text(encoding="utf-8")
-    assert HOSP in text
+    assert HOSP in text, "Bookings link missing"
     assert SP not in text
+    assert "enquiryForm" not in text, "duplicate intake form is back"
     for name in ("revenue", "staff", "hurt", "position", "vision"):
-        assert f'name="{name}"' in text
-    assert text.find("enquiryForm") < text.find("pick-time")
+        assert f'name="{name}"' not in text, f"{name} asked twice"
 
 
 def test_no_service_profit_offer():
@@ -71,11 +75,16 @@ def test_no_cross_brand_wording_anywhere():
             assert word not in text, f"{p}: {word}"
 
 
-def test_enquiry_form_fires_generate_lead():
-    # Google Ads' primary conversion is the GA4 generate_lead event. If the
-    # success path stops firing it, paid spend has no conversion signal.
+def test_booking_click_fires_generate_lead():
+    # Google Ads' primary conversion is the GA4 generate_lead event. Intake
+    # now happens on bookings.cloud.microsoft, an origin we cannot observe,
+    # so the click onto the calendar is the last event we own. If it stops
+    # firing, paid spend has no conversion signal at all.
     nav = (ROOT / "nav.js").read_text(encoding="utf-8")
-    assert 'gtag("event", "generate_lead", { method: "enquiry-form" })' in nav
+    book = (ROOT / "book" / "index.html").read_text(encoding="utf-8")
+    assert 'row.e === "book-calendar"' in nav
+    assert 'gtag("event", "generate_lead", { method: "booking-calendar" })' in nav
+    assert 'data-event="book-calendar"' in book
     assert "spLead" not in nav
 
 

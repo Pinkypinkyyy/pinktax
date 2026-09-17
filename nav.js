@@ -111,6 +111,12 @@
         sessionStorage.setItem("spEvents", JSON.stringify(prev.slice(-50)));
         if (typeof gtag === "function") {
           gtag("event", "select_content", { content_id: row.e });
+          // Intake moved wholly into Microsoft Bookings, which is another
+          // origin we cannot observe. The click onto the calendar is the last
+          // event we own, so it carries the Ads conversion.
+          if (row.e === "book-calendar") {
+            gtag("event", "generate_lead", { method: "booking-calendar" });
+          }
         }
       } catch (err) {}
     });

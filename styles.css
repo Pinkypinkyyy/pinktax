@@ -773,6 +773,19 @@ a:focus-visible,button:focus-visible,video:focus-visible,summary:focus-visible{
 }
 .handles-note{margin-top:22px;font-size:.84rem;color:var(--muted)}
 
+/* Booking page: what happens on the call. Same list treatment as the scope
+   section so the two read as one system. */
+.book-steps{list-style:none;margin:16px 0 22px;padding:0;max-width:60ch}
+.book-steps li{
+  position:relative;padding:11px 0 11px 26px;color:var(--soft);
+  font-size:1.02rem;line-height:1.5;border-top:1px solid var(--line)
+}
+.book-steps li:first-child{border-top:0}
+.book-steps li::before{
+  content:"";position:absolute;left:2px;top:19px;
+  width:9px;height:9px;border-radius:50%;background:var(--accent)
+}
+
 @media(max-width:940px){
   .handles .hire{grid-template-columns:1fr;gap:18px}
 }
