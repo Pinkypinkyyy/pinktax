@@ -219,7 +219,7 @@ h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.12;letter-spac
 .feat li{padding:12px 0;border-top:1px solid var(--line);color:var(--soft)}
 .feat li:first-child{border-top:0}
 .feat li b{color:var(--ink)}
-.psub{color:var(--soft);margin:32px auto 0;max-width:44em}
+.psub{color:var(--soft);margin:32px 0 0;max-width:44em}
 .tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:28px}
 .tier{
   display:block;background:#fff;border:1px solid var(--line);padding:24px;color:inherit;border-radius:var(--radius);
@@ -308,7 +308,7 @@ h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.12;letter-spac
 .final .micro a{color:#fff;text-decoration:underline;text-underline-offset:3px}
 
 .foot{background:var(--ink);color:rgba(255,255,255,.78);padding:56px 0 32px;font-size:.9rem}
-.foot .grid{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:36px}
+.foot .grid{display:grid;grid-template-columns:1.6fr 1fr 1.1fr 1.1fr;gap:36px}
 .foot img{height:30px;margin-bottom:14px;filter:none}
 .foot .blurb{max-width:28em;line-height:1.7;color:rgba(255,255,255,.78)}
 .foot h4{font-family:var(--mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:#fff;margin-bottom:12px}
@@ -341,8 +341,13 @@ h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.12;letter-spac
 .trade-links{margin-top:10px;font-size:.88rem;color:var(--muted)}
 .trade-links a{text-decoration:underline;text-underline-offset:3px;margin-right:12px}
 
-.reveal{opacity:0;transform:translateY(18px);transition:opacity .5s ease, transform .5s ease}
-.reveal.is-in{opacity:1;transform:none}
+/* Content is visible by default. The entrance animation only applies once
+   the script has confirmed it will run it (html.js-anim), so a script that
+   never fires, errors, or loses its observer cannot leave a section blank.
+   This hid the whole pricing block: 1 of 4 .reveal elements got .is-in. */
+.reveal{opacity:1;transform:none}
+.js-anim .reveal{opacity:0;transform:translateY(18px);transition:opacity .5s ease, transform .5s ease}
+.js-anim .reveal.is-in{opacity:1;transform:none}
 .sticky-book{
   position:fixed;left:24px;right:24px;bottom:20px;z-index:900;
   display:none;align-items:center;justify-content:space-between;gap:12px;
@@ -910,3 +915,16 @@ a:focus-visible,button:focus-visible,video:focus-visible,summary:focus-visible{
   .card p{font-size:1rem}
   .hero-lede .lead{font-size:1.05rem}
 }
+
+/* Long-form landing pages (tools/build_landing_pages.py). The earlier prose
+   rules are scoped to .page; these pages set their prose on a .band, so the
+   measure, paragraph rhythm and link colour are restated here. */
+.band .prose{max-width:44em;color:var(--soft)}
+.band .prose p,.band .prose li{margin:0 0 16px}
+.band .prose ul,.band .prose ol{padding-left:1.15em}
+.band .prose li{margin-bottom:10px}
+.band .prose a{color:var(--accent-deep);text-decoration:underline;text-underline-offset:3px}
+.band .prose a:hover{color:var(--ink)}
+.band .prose .table-scroll{margin:18px 0 10px}
+.band .prose .table-hint{margin-top:8px}
+.psub{margin:32px 0 0}

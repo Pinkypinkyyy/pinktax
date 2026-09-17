@@ -75,6 +75,8 @@
     var nodes = document.querySelectorAll(".pcol, .feat, .tier, .stepc, .funnel .card, .meet");
     nodes.forEach(function (el) { el.classList.add("reveal"); });
     if ("IntersectionObserver" in window) {
+      // Only now is it safe for CSS to hide anything.
+      document.documentElement.classList.add("js-anim");
       var io = new IntersectionObserver(function (entries) {
         entries.forEach(function (e) {
           if (e.isIntersecting) {
@@ -84,8 +86,12 @@
         });
       }, { threshold: 0.16 });
       document.querySelectorAll(".reveal").forEach(function (el) { io.observe(el); });
-    } else {
-      document.querySelectorAll(".reveal").forEach(function (el) { el.classList.add("is-in"); });
+      // Failsafe. Whatever happens to the observer, nothing stays invisible.
+      setTimeout(function () {
+        document.querySelectorAll(".reveal:not(.is-in)").forEach(function (el) {
+          el.classList.add("is-in");
+        });
+      }, 2500);
     }
   }
 
