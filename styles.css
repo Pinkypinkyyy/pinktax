@@ -10,7 +10,7 @@
   --pink:#ED1651;
   --gold:#B45309;
   --bone:#FBF8F4;
-  --display:'Fraunces',Georgia,serif;
+  --display:'Montserrat',-apple-system,'Segoe UI',system-ui,sans-serif;
   --body:Manrope,'Hanken Grotesk',-apple-system,'Segoe UI',system-ui,sans-serif;
   --mono:Manrope,-apple-system,'Segoe UI',system-ui,sans-serif;
   --wrap:1180px;
@@ -625,6 +625,13 @@ h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.12;letter-spac
    ===================================================================== */
 
 html{scroll-padding-top:calc(var(--nav-h) + 16px)}
+
+/* Headlines are Montserrat, the firm brand face, matching the logo lockup.
+   The serif that shipped with the template fought it. Montserrat needs more
+   weight and less negative tracking than a serif to hold at display size. */
+h1,h2,h3,.card .price{font-weight:700;letter-spacing:-.018em}
+h1{font-weight:800;letter-spacing:-.022em;line-height:1.08}
+.hero-lede h1{letter-spacing:-.025em}
 
 a:focus-visible,button:focus-visible,video:focus-visible,summary:focus-visible{
   outline:3px solid var(--accent);outline-offset:3px;border-radius:8px
