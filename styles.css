@@ -633,6 +633,26 @@ h1,h2,h3,.card .price{font-weight:700;letter-spacing:-.018em}
 h1{font-weight:800;letter-spacing:-.022em;line-height:1.08}
 .hero-lede h1{letter-spacing:-.025em}
 
+/* Type scale.
+   .problem, .sec-head, .final, .meet and .watch each style their own h2, but
+   plain `.page h2` — which carries both main sections of the home page — was
+   never styled at all and fell back to the browser default 1.5em (26px). That
+   left one loud h1 with everything under it at roughly body weight, and no
+   second tier to scan by. Scale is now 54 / 36 / 22 / 17. */
+.page h2{
+  font-size:clamp(1.75rem,2.2vw,2.15rem);
+  line-height:1.14;
+  max-width:24ch;
+  margin:10px 0 0;
+}
+.page .sec-head h2,.page .prose h2{max-width:none}
+
+/* Card sizing lives in the pricing block further down, which would otherwise
+   win on source order. Kept there, not duplicated here. */
+
+/* The opening paragraph reads as an intro, not as body. */
+.hero-lede .lead{font-size:1.14rem;line-height:1.62}
+
 a:focus-visible,button:focus-visible,video:focus-visible,summary:focus-visible{
   outline:3px solid var(--accent);outline-offset:3px;border-radius:8px
 }
@@ -671,7 +691,10 @@ a:focus-visible,button:focus-visible,video:focus-visible,summary:focus-visible{
 /* Pricing cards: even rhythm, and the tier most venues buy actually leads. */
 .grid3{gap:20px}
 .card{display:flex;flex-direction:column}
-.card h3{font-size:1.18rem;margin:6px 0 0}
+/* rem resolves against the 16px root, not the 17px body: 1.38rem = 22px,
+   1.06rem = 17px, so card copy matches body rather than sitting under it. */
+.card h3{font-size:1.38rem;line-height:1.25;margin:6px 0 0}
+.card p{font-size:1.06rem}
 .card .price{
   font-family:var(--display);font-size:1.5rem;letter-spacing:-.025em;
   margin:8px 0 12px;color:var(--ink);font-variant-numeric:tabular-nums
@@ -714,4 +737,13 @@ a:focus-visible,button:focus-visible,video:focus-visible,summary:focus-visible{
   .cta{flex-direction:column;align-items:stretch}
   .cta .btn-outline{display:inline-flex;width:100%;justify-content:center}
   .hero-lede .creds{margin-top:18px}
+
+  /* At 390px the desktop clamps bottomed out with h1 and h2 both at 28px,
+     so the hierarchy vanished on the device most of this traffic uses.
+     Mobile scale is 32 / 24 / 20 / 16. */
+  .hero-lede h1{font-size:clamp(1.95rem,8.2vw,2.25rem)}
+  .page h2{font-size:1.5rem;max-width:22ch}
+  .card h3{font-size:1.25rem}
+  .card p{font-size:1rem}
+  .hero-lede .lead{font-size:1.05rem}
 }
