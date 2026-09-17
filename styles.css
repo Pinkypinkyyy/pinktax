@@ -773,6 +773,43 @@ a:focus-visible,button:focus-visible,video:focus-visible,summary:focus-visible{
 }
 .handles-note{margin-top:22px;font-size:.84rem;color:var(--muted)}
 
+/* Home margin check. Reuses the calculator that already lives on
+   /margin-check/ — same ids, same script, so there is one implementation.
+   It was the only genuinely interactive thing on the site and it was sitting
+   on a page almost nobody reached. */
+.calcband .hours-check{margin:26px 0 0;max-width:none}
+.calcband .hours-check .fields{grid-template-columns:repeat(3,1fr)}
+.calcband #pmc-results{margin-top:30px}
+.calcband #pmc-results h2{margin:8px 0 6px}
+.calcband #pmc-metrics{margin-top:22px}
+.calcband #pmc-metrics .card p{font-size:.98rem;margin-top:6px}
+.calcband #pmc-metrics strong{font-family:var(--display);font-size:1.3rem;letter-spacing:-.02em}
+/* Benchmark state, so a leak is visible before it is read. */
+#pmc-metrics .card{border-top:3px solid var(--line)}
+#pmc-metrics .card.is-leak{border-top-color:var(--accent)}
+#pmc-metrics .card.is-watch{border-top-color:var(--gold)}
+#pmc-metrics .card.is-good{border-top-color:#1B7F4B}
+#pmc-metrics .pmc-val{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+#pmc-metrics .pmc-state{
+  font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+  padding:4px 9px;border-radius:999px;background:var(--paper-2);color:var(--muted)
+}
+#pmc-metrics .is-leak .pmc-state{background:rgba(237,22,81,.12);color:var(--accent-deep)}
+#pmc-metrics .is-watch .pmc-state{background:rgba(180,83,9,.12);color:var(--gold)}
+#pmc-metrics .is-good .pmc-state{background:rgba(27,127,75,.12);color:#1B7F4B}
+#pmc-metrics .pmc-bench{color:var(--muted);font-size:.9rem;margin-top:8px}
+
+.calcband .calc-note{margin-top:20px;font-size:.88rem;color:var(--muted);max-width:60ch}
+.calcband #pmc-results .btn{margin-top:18px}
+
+@media(max-width:940px){
+  .calcband .hours-check .fields{grid-template-columns:1fr 1fr}
+}
+@media(max-width:560px){
+  .calcband .hours-check{padding:22px 18px}
+  .calcband .hours-check .fields{grid-template-columns:1fr}
+}
+
 /* Booking page: what happens on the call. Same list treatment as the scope
    section so the two read as one system. */
 .book-steps{list-style:none;margin:16px 0 22px;padding:0;max-width:60ch}

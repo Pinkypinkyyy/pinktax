@@ -125,6 +125,19 @@ def test_no_synthesised_font_weights():
     assert used <= loaded, f"weights with no loaded face: {sorted(used - loaded)}"
 
 
+def test_home_carries_the_margin_check():
+    # The calculator was the only genuinely interactive thing on the site and
+    # it sat on a page almost nobody reached. Same ids and same script as
+    # /margin-check/, so there is one implementation, not two.
+    home = (ROOT / "index.html").read_text(encoding="utf-8")
+    assert 'id="pmc-calc"' in home
+    assert "margin-check.js" in home
+    for f in ("pmc-sales", "pmc-wages", "pmc-cogs", "pmc-rent", "pmc-other"):
+        assert f'id="{f}"' in home, f
+    js = (ROOT / "margin-check.js").read_text(encoding="utf-8")
+    assert "is-' + state" in js, "benchmark state class missing"
+
+
 def test_assets():
     assert (ROOT / "assets" / "logo.png").exists()
     assert (ROOT / "assets" / "logo-white.png").exists()

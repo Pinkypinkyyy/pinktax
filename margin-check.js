@@ -13,7 +13,10 @@
   function band(p, b) { return p <= b.t ? "good" : p <= b.w ? "watch" : "leak"; }
   function word(s) { return s === "good" ? "On track" : s === "watch" ? "Watch" : "Leak"; }
   function card(label, pct, bench, state) {
-    return '<article class="card"><h3>' + label + '</h3><p><strong>' + pct.toFixed(1) + '%</strong> · ' + word(state) + '</p><p>' + bench + "</p></article>";
+    return '<article class="card is-' + state + '"><h3>' + label +
+      '</h3><p class="pmc-val"><strong>' + pct.toFixed(1) + '%</strong>' +
+      '<span class="pmc-state">' + word(state) + '</span></p><p class="pmc-bench">' +
+      bench + "</p></article>";
   }
   form.addEventListener("submit", function (e) {
     e.preventDefault();

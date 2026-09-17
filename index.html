@@ -22,7 +22,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=h7">
+  <link rel="stylesheet" href="/styles.css?v=h8">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"AccountingService","@id":"https://pinktax.com.au/#business","name":"Pink Accounting & Tax Solutions","url":"https://pinktax.com.au/","telephone":"+61735446386","email":"admin@pinktax.com.au","image":"https://pinktax.com.au/assets/og.png","logo":"https://pinktax.com.au/assets/logo.png","priceRange":"$$","knowsAbout":["hospitality bookkeeping","restaurant payroll","cafe margins","BAS","GST"],"address":{"@type":"PostalAddress","streetAddress":"Shop 15A, 18-22 Kremzow Rd","addressLocality":"Brendale","addressRegion":"QLD","postalCode":"4500","addressCountry":"AU"},"areaServed":{"@type":"Country","name":"Australia"},"openingHoursSpecification":{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"09:00","closes":"16:30"},"founder":{"@type":"Person","name":"Huong Bui"},"taxID":"51682301891","identifier":"26284368","sameAs":["https://www.google.com/maps?cid=17544456102082616748"]}
   </script>
@@ -130,6 +130,42 @@
           <article class="card"><h3>Costs drift constantly</h3><p>Wages creep, suppliers nudge prices, waste becomes a habit. An annual check can't catch a weekly problem.</p></article>
           <article class="card"><h3>Nobody flags it</h3><p>Your old accountant files and forgets. We watch the margin every month and tell you the moment a line moves.</p></article>
         </div>
+      </div>
+    </section>
+    <section class="band band-bone calcband">
+      <div class="wrap">
+        <span class="eyebrow">60-second margin check</span>
+        <h2>See it on your own numbers.</h2>
+        <p class="lead">Five figures off your last month. No email, nothing sent anywhere — it runs in your browser and tells you where the money is most likely going.</p>
+        <form class="enquiry hours-check" id="pmc-calc">
+          <div class="fields">
+            <label>Average weekly sales
+              <input type="number" id="pmc-sales" min="0" step="100" required inputmode="decimal" placeholder="Takings, excluding GST">
+            </label>
+            <label>Weekly wages
+              <input type="number" id="pmc-wages" min="0" step="50" inputmode="decimal" placeholder="Including super and on-costs">
+            </label>
+            <label>Weekly food &amp; beverage cost
+              <input type="number" id="pmc-cogs" min="0" step="50" inputmode="decimal">
+            </label>
+            <label>Monthly rent
+              <input type="number" id="pmc-rent" min="0" step="100" inputmode="decimal" placeholder="Leave blank if you own it">
+            </label>
+            <label>Other weekly running costs
+              <input type="number" id="pmc-other" min="0" step="50" inputmode="decimal">
+            </label>
+          </div>
+          <button class="btn btn-primary" type="submit" data-event="home-margin-check">Show me my leaks</button>
+          <p class="form-note" id="pmc-err" hidden>Please enter your weekly sales. That is the number everything else is measured against.</p>
+        </form>
+        <section id="pmc-results" hidden>
+          <p id="pmc-hl-label" class="eyebrow">Your biggest leak</p>
+          <h2 id="pmc-hl-text"></h2>
+          <p id="pmc-hl-note"></p>
+          <div id="pmc-metrics" class="grid3"></div>
+          <p class="calc-note">A sketch from the figures you typed. Not your file, and not tax advice. On the call we look at the real books.</p>
+          <a class="btn btn-primary" href="/book/" data-event="calc-book">Book a 15-minute call</a>
+        </section>
       </div>
     </section>
     <section class="page" id="pink-pricing">
@@ -240,7 +276,8 @@
       <p class="legal">© 2026 Pink Accounting &amp; Tax Solutions Pty Ltd. ABN 51 682 301 891. Business clients only. Registered Tax Agent No. 26284368 · ASIC Registered Agent No. 52580 · <a href="https://www.tpb.gov.au/public-register" rel="noopener">TPB Register</a><br>Liability limited by a scheme approved under Professional Standards Legislation.</p>
     </div>
   </footer>
-  <script src="/track.js?v=h7"></script>
-  <script src="/nav.js?v=h7"></script>
+  <script src="/track.js?v=h8"></script>
+  <script src="/margin-check.js?v=h8"></script>
+  <script src="/nav.js?v=h8"></script>
 </body>
 </html>
