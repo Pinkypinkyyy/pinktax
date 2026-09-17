@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -76,6 +77,43 @@ def test_enquiry_form_fires_generate_lead():
     nav = (ROOT / "nav.js").read_text(encoding="utf-8")
     assert 'gtag("event", "generate_lead", { method: "enquiry-form" })' in nav
     assert "spLead" not in nav
+
+
+def test_counter_fallback_matches_target():
+    # The proof-bar numbers are printed in the HTML so they are right with JS
+    # off and on reduced motion. If a printed value drifts from its data-to,
+    # visitors without the animation see a different number to everyone else.
+    import re
+
+    html = (ROOT / "index.html").read_text(encoding="utf-8")
+    ticks = re.findall(r'<span class="tick"([^>]*)>([^<]*)</span>', html)
+    assert ticks, "proof bar counters missing"
+    for attrs, shown in ticks:
+        to = float(re.search(r'data-to="([\d.]+)"', attrs).group(1))
+        dp = int((re.search(r'data-dp="(\d+)"', attrs) or [0, "0"])[1])
+        prefix = (re.search(r'data-prefix="([^"]*)"', attrs) or [0, ""])[1]
+        body = f"{to:.{dp}f}"
+        if 'data-sep="1"' in attrs:
+            whole, _, frac = body.partition(".")
+            body = f"{int(whole):,}" + (f".{frac}" if frac else "")
+        assert shown == prefix + body, f"{shown!r} != {prefix + body!r}"
+
+
+def test_stars_are_svg_not_glyphs():
+    # Neither Montserrat nor Manrope contains U+2605, so the character would
+    # render in a system fallback face.
+    html = (ROOT / "index.html").read_text(encoding="utf-8")
+    assert "★" not in html
+    assert html.count('<svg class="stars"') == 3
+
+
+def test_no_synthesised_font_weights():
+    # Only weights actually fetched from Google may be used, or the browser
+    # fakes the face and the text reads as a different font.
+    css = (ROOT / "styles.css").read_text(encoding="utf-8")
+    loaded = {"400", "500", "600", "700", "800"}
+    used = set(re.findall(r"font-weight:(\d+)", css))
+    assert used <= loaded, f"weights with no loaded face: {sorted(used - loaded)}"
 
 
 def test_assets():

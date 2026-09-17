@@ -22,6 +22,54 @@
     });
   }
 
+  /* Count-up on the proof bar. The correct values are already printed in the
+     HTML, so this only animates them once when the band first scrolls into
+     view. No JS, old browser or reduced motion: the numbers are simply there. */
+  var ticks = document.querySelectorAll(".tick");
+  if (
+    ticks.length &&
+    "IntersectionObserver" in window &&
+    !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  ) {
+    var fmtTick = function (el, v) {
+      var dp = parseInt(el.getAttribute("data-dp") || "0", 10);
+      var s = v.toFixed(dp);
+      if (el.getAttribute("data-sep") === "1") {
+        var parts = s.split(".");
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        s = parts.join(".");
+      }
+      return (el.getAttribute("data-prefix") || "") + s;
+    };
+    var runTick = function (el) {
+      var to = parseFloat(el.getAttribute("data-to"));
+      if (!isFinite(to)) return;
+      var dur = 1100;
+      var t0 = null;
+      var step = function (t) {
+        if (t0 === null) t0 = t;
+        var p = Math.min(1, (t - t0) / dur);
+        el.textContent = fmtTick(el, to * (1 - Math.pow(1 - p, 3)));
+        if (p < 1) requestAnimationFrame(step);
+        else el.textContent = fmtTick(el, to);
+      };
+      requestAnimationFrame(step);
+    };
+    var tickIO = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (e) {
+          if (!e.isIntersecting) return;
+          tickIO.unobserve(e.target);
+          runTick(e.target);
+        });
+      },
+      { threshold: 0.4 }
+    );
+    ticks.forEach(function (el) {
+      tickIO.observe(el);
+    });
+  }
+
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (!reduce) {
     var nodes = document.querySelectorAll(".pcol, .feat, .tier, .stepc, .funnel .card, .meet");

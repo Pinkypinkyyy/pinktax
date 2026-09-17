@@ -83,7 +83,7 @@ h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.12;letter-spac
 .brand{display:flex;align-items:center;gap:12px;min-width:0;color:#fff}
 .brand img{height:34px;width:auto}
 .brand .mark{display:flex;flex-direction:column;line-height:1.15}
-.brand .offer{font-size:.92rem;font-weight:650;letter-spacing:-.01em;color:#fff}
+.brand .offer{font-size:.92rem;font-weight:600;letter-spacing:-.01em;color:#fff}
 .brand .firm{font-size:.68rem;color:rgba(255,255,255,.62);letter-spacing:.04em}
 .links{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
 .links a{color:rgba(255,255,255,.82);font-size:.92rem}
@@ -157,7 +157,7 @@ h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.12;letter-spac
 .tile{position:relative;display:block;overflow:hidden;color:#fff;border-radius:var(--radius);box-shadow:0 18px 36px -24px rgba(18,22,28,.4)}
 .tile img{width:100%;height:100%;object-fit:cover;aspect-ratio:4/5;transition:transform .35s ease}
 .tile:hover img{transform:scale(1.03)}
-.tile span{position:absolute;left:14px;bottom:14px;z-index:1;font-weight:650;letter-spacing:.04em;text-transform:uppercase;font-size:.82rem;background:rgba(18,22,28,.82);padding:8px 12px;border-radius:10px}
+.tile span{position:absolute;left:14px;bottom:14px;z-index:1;font-weight:600;letter-spacing:.04em;text-transform:uppercase;font-size:.82rem;background:rgba(18,22,28,.82);padding:8px 12px;border-radius:10px}
 .tile-text{position:relative;min-height:0;padding:28px 24px;background:#fff;border:1px solid var(--line);color:var(--ink);display:flex;flex-direction:column;justify-content:flex-end;box-shadow:0 12px 28px -22px rgba(18,22,28,.3)}
 .tile-text span{position:static;background:none;color:var(--ink);padding:0;font-size:1.05rem;letter-spacing:-.02em;text-transform:none}
 .tile-text p{margin-top:8px;color:var(--soft);font-size:.95rem}
@@ -174,7 +174,7 @@ h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.12;letter-spac
 .split-copy p{color:var(--soft)}
 .split .docket{position:static;width:auto;margin-top:18px;background:var(--ink)}
 .scope-fold{margin-top:28px;background:#fff;border:1px solid var(--line);padding:16px 18px;border-radius:var(--radius)}
-.scope-fold summary{cursor:pointer;font-weight:650}
+.scope-fold summary{cursor:pointer;font-weight:600}
 .final-photo{position:relative;background:var(--ink)}
 .meet .shot img{width:100%;height:auto;aspect-ratio:4/5;display:block;object-fit:cover;object-position:50% 18%;border-radius:0}
 
@@ -227,7 +227,7 @@ h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.12;letter-spac
   transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
 .tier:hover{transform:translateY(-4px);border-color:var(--ink);box-shadow:0 16px 28px -18px rgba(14,14,18,.28)}
-.tier .tname{font-weight:650}
+.tier .tname{font-weight:600}
 .tier .tprice{font-size:1.5rem;margin:10px 0 2px;font-variant-numeric:tabular-nums}
 .tier .tprice small{font-size:.72rem;color:var(--muted)}
 .tier p{font-size:.9rem;color:var(--soft);margin-top:8px}
@@ -277,12 +277,12 @@ h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.12;letter-spac
 .scope th,.scope td{text-align:left;padding:14px;border-bottom:1px solid var(--line);vertical-align:top}
 .scope th{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500}
 .scope td strong{display:block;color:var(--ink)}
-.scope .price{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:650}
+.scope .price{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600}
 .scope .pop td{background:var(--paper-2)}
 .scope-cards{display:none;margin-top:28px}
 .scope-card{background:#fff;border:1px solid var(--line);padding:20px;margin-bottom:12px;border-radius:var(--radius)}
 .scope-card h3{font-size:1.15rem}
-.scope-card .price{font-weight:650;margin:8px 0}
+.scope-card .price{font-weight:600;margin:8px 0}
 .scope-card p{color:var(--soft);font-size:.92rem;margin-top:8px}
 .scope-card b{color:var(--ink)}
 
@@ -319,7 +319,7 @@ h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.12;letter-spac
 
 .faq{margin-top:36px}
 .faq details{background:#fff;border:1px solid var(--line);padding:16px 18px;margin-bottom:8px;border-radius:var(--radius)}
-.faq summary{cursor:pointer;font-weight:650}
+.faq summary{cursor:pointer;font-weight:600}
 .faq details p{color:var(--soft);margin-top:10px}
 
 .example{margin-top:28px;background:#fff;border-left:4px solid var(--accent);padding:20px 24px}
@@ -351,7 +351,7 @@ h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.12;letter-spac
   box-shadow:var(--shadow-deep);
 }
 .sticky-book.show{display:flex}
-.sticky-book span{font-size:.88rem;font-weight:650}
+.sticky-book span{font-size:.88rem;font-weight:600}
 .sticky-book .btn{padding:12px 18px;min-height:42px}
 .funnel a.card{transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease}
 .funnel a.card:hover{transform:translateY(-4px);box-shadow:0 16px 28px -18px rgba(18,22,28,.28);border-color:var(--accent)}
@@ -409,7 +409,7 @@ h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.12;letter-spac
   .foot .grid{gap:24px}
 }
 .stars{
-  display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink);font-weight:650
+  display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink);font-weight:600
 }
 .stars .star-value{font-variant-numeric:tabular-nums}
 .stars .star-icons{color:var(--gold);letter-spacing:.06em}
@@ -421,12 +421,12 @@ h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.12;letter-spac
 .quotes p{color:var(--soft);font-size:.98rem}
 .quotes footer{margin-top:14px;font-size:.82rem;color:var(--muted)}
 .pricing-more{margin-top:22px}
-.pricing-more a{text-decoration:underline;text-underline-offset:3px;font-weight:650}
+.pricing-more a{text-decoration:underline;text-underline-offset:3px;font-weight:600}
 .trade-next{margin-top:36px;color:var(--soft)}
 .trade-next a{text-decoration:underline;text-underline-offset:3px}
 .enquiry{margin-top:22px;max-width:none;background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:28px 32px}
 .enquiry .fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.enquiry label{display:block;font-weight:650;font-size:.92rem;margin:12px 0 0;color:var(--ink)}
+.enquiry label{display:block;font-weight:600;font-size:.92rem;margin:12px 0 0;color:var(--ink)}
 .enquiry .fields label{margin-top:0}
 .enquiry input,.enquiry select,.enquiry textarea{
   display:block;width:100%;margin-top:6px;padding:12px 14px;border:1px solid var(--line);
@@ -438,7 +438,7 @@ h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.12;letter-spac
 .enquiry .form-note{margin-top:12px;font-size:.82rem;color:var(--muted);font-weight:400}
 .enquiry .form-note a{text-decoration:underline;text-underline-offset:3px}
 .enquiry .hp{position:absolute;left:-9999px;height:0;width:0;opacity:0}
-.enquiry-ok{margin-top:18px;padding:16px 18px;background:var(--paper-2);border-radius:var(--radius);font-weight:650}
+.enquiry-ok{margin-top:18px;padding:16px 18px;background:var(--paper-2);border-radius:var(--radius);font-weight:600}
 
 @media(max-width:940px){
   .quotes,.enquiry .fields{grid-template-columns:1fr}
@@ -517,7 +517,7 @@ h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.12;letter-spac
 .cash-bar{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1.15fr;min-height:64px;margin-top:8px;border:0;overflow:hidden;border-radius:var(--radius-btn)}
 .cash-bar .seg{
   display:flex;align-items:center;justify-content:center;padding:10px 6px;
-  font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;font-weight:650;
+  font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;font-weight:600;
   background:#0E0E12;color:#fff;border-right:1px solid rgba(255,255,255,.12);text-align:center;
   transition:background-color .18s ease, transform .18s ease;
 }
@@ -589,7 +589,7 @@ h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.12;letter-spac
 .sell-grid p{margin:0;color:var(--soft);font-size:.95rem}
 .hours-check{margin:12px 0 28px;max-width:none;background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:28px 32px}
 .hours-check .fields{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
-.hours-check label{display:block;font-weight:650;font-size:.92rem;color:var(--ink)}
+.hours-check label{display:block;font-weight:600;font-size:.92rem;color:var(--ink)}
 .hours-check input{
   display:block;width:100%;margin-top:6px;padding:12px 12px;border:1px solid var(--line);
   border-radius:12px;font:inherit;background:#fff
@@ -681,7 +681,7 @@ a:focus-visible,button:focus-visible,video:focus-visible,summary:focus-visible{
   padding:13px 16px;border-radius:18px;
   background:rgba(14,14,18,.84);border:1px solid rgba(255,255,255,.14);
   -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
-  color:#fff;font-weight:650;font-size:.95rem;line-height:1.3;
+  color:#fff;font-weight:600;font-size:.95rem;line-height:1.3;
 }
 .hero-shot figcaption span{
   display:block;margin-top:4px;font-weight:400;font-size:.75rem;
@@ -716,6 +716,43 @@ a:focus-visible,button:focus-visible,video:focus-visible,summary:focus-visible{
 .close h2{max-width:20ch;margin-inline:auto}
 .close .lead{margin-inline:auto}
 .close .cta{justify-content:center}
+
+/* Proof bar directly under the hero. The numbers count up once, when the
+   band first scrolls into view, and are printed in the HTML so they are
+   correct with JS off and for anyone on reduced motion. */
+.countbar{
+  background:var(--paper-2);
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  padding:clamp(26px,3vw,38px) 0;
+}
+.counts{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:clamp(18px,2.4vw,34px);margin:0;
+}
+.counts > div{
+  padding-left:18px;border-left:3px solid var(--accent);
+}
+.counts dt{
+  font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--muted);font-weight:600;line-height:1.35;
+}
+.counts dd{
+  margin:8px 0 0;font-family:var(--display);font-weight:800;
+  font-size:clamp(1.6rem,2.3vw,2.1rem);letter-spacing:-.025em;
+  line-height:1.05;color:var(--ink);font-variant-numeric:tabular-nums;
+}
+.counts dd small{
+  display:block;margin-top:7px;font-family:var(--body);font-weight:400;
+  font-size:.86rem;letter-spacing:0;color:var(--soft);line-height:1.45;
+}
+.counts dd small .tick{font-weight:600}
+
+@media(max-width:940px){
+  .counts{grid-template-columns:repeat(2,1fr);gap:22px}
+}
+@media(max-width:560px){
+  .counts{grid-template-columns:1fr;gap:18px}
+}
 
 /* Scope of work. Reuses .hire, another 2-up card grid that shipped in this
    stylesheet unused. The site said "BAS" 23 times and never once mentioned
@@ -754,12 +791,13 @@ a:focus-visible,button:focus-visible,video:focus-visible,summary:focus-visible{
 .proof .quotes{margin-top:32px;align-items:start}
 .proof .quotes blockquote{background:#fff;border-color:transparent}
 .proof .quotes p{color:var(--soft)}
-.proof .quotes footer{color:var(--muted);font-weight:650}
-/* p.stars, not .stars: `.proof .quotes p` out-specifies a bare class and
-   was painting the stars body-grey. */
-.proof .quotes p.stars{
-  color:var(--accent);font-size:.95rem;letter-spacing:.14em;
-  margin:0 0 12px;line-height:1
+.proof .quotes footer{color:var(--muted);font-weight:600}
+/* Stars are inline SVG, not the ★ character. Neither Montserrat nor Manrope
+   contains U+2605, so the glyph was falling back to a system font — a
+   visibly different typeface sitting in the most prominent section. */
+.proof svg.stars{
+  display:block;width:106px;height:auto;margin:0 0 14px;
+  fill:var(--accent)
 }
 .proof .cta{margin-top:30px}
 
