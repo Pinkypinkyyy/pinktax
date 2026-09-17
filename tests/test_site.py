@@ -142,3 +142,102 @@ def test_assets():
     assert (ROOT / "assets" / "logo.png").exists()
     assert (ROOT / "assets" / "logo-white.png").exists()
     assert (ROOT / "assets" / "pink-portrait.jpg").exists()
+
+
+LANDING = (
+    "restaurant-accountant",
+    "cafe-accountant",
+    "hospitality-bookkeeping",
+    "restaurant-bookkeeping",
+    "hospitality-payroll",
+    "restaurant-food-cost-percentage",
+    "hospitality-wage-percentage",
+    "restaurant-profit-margin",
+    "hospitality-accountant-brisbane",
+)
+
+
+def test_no_competitor_attack_copy():
+    # The sell is the structural one: hospitality moves weekly, traditional
+    # accounting reports yearly. Attacking the previous accountant is not
+    # needed to make it and reads badly to an owner who liked theirs.
+    banned = ("autopsy", "old accountant", "files and forgets")
+    for p in PAGES:
+        text = p.read_text(encoding="utf-8").lower()
+        for word in banned:
+            assert word not in text, f"{p}: {word}"
+
+
+def test_one_trust_statement_only():
+    # "No pitch", "no upsell" and "we'll tell you honestly" were repeated
+    # across the site. Piling up reassurance introduces the doubt it is
+    # trying to remove, so the cheaper-tier promise is made once, on the
+    # booking page, where the decision actually happens.
+    hits = [p for p in PAGES if "cheaper tier" in p.read_text(encoding="utf-8")]
+    assert len(hits) == 1, [str(p) for p in hits]
+    assert hits[0] == ROOT / "book" / "index.html"
+    for p in PAGES:
+        text = p.read_text(encoding="utf-8").lower()
+        assert "no pitch" not in text, p
+        assert "no upsell" not in text, p
+
+
+def test_offer_leads_with_the_four_questions():
+    # $990 Margin Protection is the product. It has to read as a management
+    # system rather than a list of accounting tasks, and it has to dominate
+    # the other three tiers instead of being compared with them.
+    home = (ROOT / "index.html").read_text(encoding="utf-8")
+    feat = home.index('<div class="feat">')
+    tiers = home.index('<div class="tiers">')
+    assert feat < tiers, "the $990 block must come before the other tiers"
+    assert "$990" in home[feat:tiers]
+    for q in (
+        "Are you actually making money?",
+        "What changed?",
+        "Where is margin leaking?",
+        "What should you do next?",
+    ):
+        assert q in home[feat:tiers], q
+    # bookkeeping, payroll and BAS are the infrastructure, not the headline
+    lead_in = home[feat:home.index("</div>", home.index('class="fdesc"'))]
+    assert "Bookkeeping" not in lead_in.split('class="fnote"')[0]
+
+
+def test_landing_pages_build_and_match_sitemap():
+    sitemap = (ROOT / "sitemap.xml").read_text(encoding="utf-8")
+    locs = re.findall(r"<loc>https://pinktax\.com\.au(/[^<]*)</loc>", sitemap)
+    assert len(locs) == len(set(locs)), "duplicate sitemap entries"
+    for slug in LANDING:
+        page = ROOT / slug / "index.html"
+        assert page.exists(), slug
+        text = page.read_text(encoding="utf-8")
+        assert f'<link rel="canonical" href="https://pinktax.com.au/{slug}/">' in text
+        assert f"/{slug}/" in locs, f"{slug} missing from sitemap"
+    for loc in locs:
+        target = ROOT / loc.strip("/") / "index.html" if loc != "/" else ROOT / "index.html"
+        assert target.exists(), f"sitemap points at a page that does not exist: {loc}"
+
+
+def test_landing_pages_are_distinct_and_convert():
+    titles, descs = set(), set()
+    for slug in LANDING:
+        text = (ROOT / slug / "index.html").read_text(encoding="utf-8")
+        title = re.search(r"<title>(.*?)</title>", text).group(1)
+        desc = re.search(r'<meta name="description" content="(.*?)">', text).group(1)
+        assert title not in titles, f"duplicate title: {title}"
+        assert desc not in descs, f"duplicate description on {slug}"
+        titles.add(title)
+        descs.add(desc)
+        assert len(title) <= 65, f"{slug} title too long for the SERP: {len(title)}"
+        assert 'href="/book/"' in text, slug
+        assert 'href="/margin-check/"' in text, slug
+        assert len(text.split()) > 600, f"{slug} is too thin to rank"
+
+
+def test_footer_links_the_landing_pages():
+    # Orphan pages do not rank. Every landing page is reachable from the
+    # footer of every page, which is where the builder lifts it from.
+    home = (ROOT / "index.html").read_text(encoding="utf-8")
+    foot = home[home.index('<footer class="foot">'):]
+    for slug in LANDING:
+        assert f'href="/{slug}/"' in foot, slug
