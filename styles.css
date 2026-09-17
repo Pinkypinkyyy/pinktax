@@ -773,6 +773,31 @@ a:focus-visible,button:focus-visible,video:focus-visible,summary:focus-visible{
 }
 .handles-note{margin-top:22px;font-size:.84rem;color:var(--muted)}
 
+/* Venue imagery. Reuses .mosaic and .tile, both of which shipped in this
+   stylesheet and were never used. The site sold to hospitality without a
+   single cafe, kitchen or dining room anywhere on it.
+   These are licensed stock, not client venues, so the captions name the
+   segments we serve rather than implying these rooms are anyone's file. */
+.venues .mosaic{margin-top:30px}
+.venues .tile{margin:0}
+.venues .tile span{
+  font-family:var(--body);letter-spacing:.06em;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(255,255,255,.16)
+}
+
+@media(max-width:940px){
+  /* .mosaic is display:none below 940px further up this file, which was fine
+     while nothing used it. */
+  .venues .mosaic{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .venues .tile:last-child{grid-column:1 / -1}
+  .venues .tile:last-child img{aspect-ratio:16/9}
+}
+@media(max-width:560px){
+  .venues .mosaic{grid-template-columns:1fr}
+  .venues .tile:last-child img{aspect-ratio:4/5}
+}
+
 /* Home margin check. Reuses the calculator that already lives on
    /margin-check/ — same ids, same script, so there is one implementation.
    It was the only genuinely interactive thing on the site and it was sitting
