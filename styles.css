@@ -615,3 +615,96 @@ h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.12;letter-spac
   .cash-bar{grid-template-columns:1fr 1fr;min-height:0}
   .cash-bar .seg{min-height:44px;border-bottom:1px solid rgba(255,255,255,.12)}
 }
+
+/* =====================================================================
+   Home composition repair — 17 Sep 2026
+   The hero markup was a flat list of five elements inside a two-column
+   grid, so they auto-placed into a zigzag with a void down the middle.
+   These rules give the hero, the video block and the pricing cards a
+   deliberate shape instead of an accidental one.
+   ===================================================================== */
+
+html{scroll-padding-top:calc(var(--nav-h) + 16px)}
+
+a:focus-visible,button:focus-visible,video:focus-visible,summary:focus-visible{
+  outline:3px solid var(--accent);outline-offset:3px;border-radius:8px
+}
+
+.hero .wrap{
+  grid-template-columns:minmax(0,1.04fr) minmax(0,.82fr);
+  gap:clamp(28px,4.4vw,60px);
+  align-items:center;
+  padding-top:8px;
+}
+/* Named .hero-lede, not .hero-copy: .hero-copy already belongs to the dark
+   full-bleed hero further up this file and forces white text. */
+.hero-lede{min-width:0}
+.hero-lede h1{font-size:clamp(2.1rem,4.2vw,3.4rem);max-width:15ch;margin-top:14px;color:var(--ink)}
+.hero-lede .lead{max-width:33em;color:var(--soft)}
+.hero-lede .creds{margin-top:24px;font-size:.84rem;color:var(--muted);max-width:32em;line-height:1.7}
+
+.hero-shot{
+  position:relative;margin:0;overflow:hidden;
+  border-radius:var(--radius-photo);background:var(--ink);
+  box-shadow:var(--shadow-deep);
+}
+.hero-shot img{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;object-position:50% 14%}
+.hero-shot figcaption{
+  position:absolute;left:14px;right:14px;bottom:14px;
+  padding:13px 16px;border-radius:18px;
+  background:rgba(14,14,18,.84);border:1px solid rgba(255,255,255,.14);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  color:#fff;font-weight:650;font-size:.95rem;line-height:1.3;
+}
+.hero-shot figcaption span{
+  display:block;margin-top:4px;font-weight:400;font-size:.75rem;
+  color:rgba(255,255,255,.74);letter-spacing:.01em
+}
+
+/* Pricing cards: even rhythm, and the tier most venues buy actually leads. */
+.grid3{gap:20px}
+.card{display:flex;flex-direction:column}
+.card h3{font-size:1.18rem;margin:6px 0 0}
+.card .price{
+  font-family:var(--display);font-size:1.5rem;letter-spacing:-.025em;
+  margin:8px 0 12px;color:var(--ink);font-variant-numeric:tabular-nums
+}
+.card .eyebrow{color:var(--accent)}
+.card-lead{border-top:3px solid var(--accent);box-shadow:0 20px 42px -26px rgba(14,14,18,.5)}
+
+/* .page carries calc(nav-h + 48px) of top padding so an interior page clears
+   the fixed header. On the home page .page is used for mid-document sections,
+   where that clearance became a ~200px hole between blocks. Only strip it
+   when something already precedes the section. */
+.hero + .page,.page + .page,.band + .page,.page + .band,.band + .band{
+  padding-top:clamp(36px,3.6vw,52px)
+}
+.hero + .page,.page + .page,.band + .page{padding-bottom:clamp(36px,3.6vw,52px)}
+
+/* Closing block: centred so the page ends on purpose instead of trailing off. */
+.close .wrap{text-align:center}
+.close h2{max-width:20ch;margin-inline:auto}
+.close .lead{margin-inline:auto}
+.close .cta{justify-content:center}
+
+/* Reusing the .watch component that shipped in this stylesheet unused. */
+.watch figcaption .eyebrow{display:block;margin-bottom:10px}
+.watch figcaption .creds{margin-top:14px;font-size:.84rem;color:var(--muted)}
+.watch figcaption .cta{margin-top:22px}
+.watch-frame{border:1px solid rgba(255,255,255,.08)}
+
+@media(max-width:940px){
+  .hero .wrap{grid-template-columns:1fr;gap:30px;align-items:start}
+  .hero-lede h1{max-width:18ch;font-size:clamp(1.75rem,7vw,2.3rem)}
+  .hero-shot{max-width:400px}
+  .grid3{grid-template-columns:1fr}
+}
+
+@media(max-width:640px){
+  /* The template hid every secondary button below 640px, which removed the
+     free Margin Check and the Google reviews link on phones — where most of
+     this traffic lands. Keep them, stacked under the primary. */
+  .cta{flex-direction:column;align-items:stretch}
+  .cta .btn-outline{display:inline-flex;width:100%;justify-content:center}
+  .hero-lede .creds{margin-top:18px}
+}
