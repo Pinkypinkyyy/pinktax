@@ -1,3 +1,24 @@
+"""One-time scaffold that generated this site on 12 September 2026.
+
+DO NOT RUN. The HTML is hand-maintained now and this script was never kept in
+step with it. Running it would revert, among other things:
+
+  * the hero rebuild (.hero-lede / .hero-shot)
+  * the "Is profit lying to you?" video block
+  * the Google reviews section
+  * the scope-of-work section
+  * the removal of Service Profit wording from /contact/
+
+That last one is a firm rule, not a preference: Pink is hospitality-only on
+every public surface. Re-running this would silently put the breach back on
+the live site.
+
+Either retire this file or bring it back in step with the HTML deliberately.
+The guard below stops an accident; it is not a substitute for that decision.
+"""
+
+import os
+import sys
 from pathlib import Path
 from shared import (
     MSBOOK,
@@ -426,6 +447,15 @@ def robots():
 
 
 if __name__ == "__main__":
+    if os.environ.get("PINK_ALLOW_STALE_REGEN") != "1":
+        sys.exit(
+            "build_pages.py is a one-time scaffold and is out of step with the "
+            "live HTML. Running it would revert hand-made changes, including "
+            "the removal of Service Profit wording from /contact/, which is a "
+            "hospitality-only compliance rule.\n"
+            "Read the module docstring. If you have genuinely re-synced this "
+            "script with the HTML, set PINK_ALLOW_STALE_REGEN=1."
+        )
     write("index.html", home())
     write("system/index.html", system())
     write("why-pink/index.html", why())

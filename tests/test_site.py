@@ -58,8 +58,14 @@ def test_no_cross_brand_wording_anywhere():
     # The site was built from a Service Profit template. Hospitality-only is a
     # firm rule on every public Pink surface, so guard every page and script.
     banned = ("Service Profit", "HVAC", "electrical, construction", "tradie")
-    for p in PAGES + list(ROOT.glob("*.js")):
+    # tools/*.py is included because build_pages.py generated this site and
+    # still carried the wording; regenerating would have restored it.
+    targets = PAGES + list(ROOT.glob("*.js")) + list((ROOT / "tools").glob("*.py"))
+    for p in targets:
         text = p.read_text(encoding="utf-8")
+        # The build guard has to name the rule in order to enforce it.
+        if p.suffix == ".py" and "PINK_ALLOW_STALE_REGEN" in text:
+            continue
         for word in banned:
             assert word not in text, f"{p}: {word}"
 
