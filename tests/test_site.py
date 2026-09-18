@@ -138,6 +138,33 @@ def test_home_carries_the_margin_check():
     assert "is-' + state" in js, "benchmark state class missing"
 
 
+def test_legacy_urls_are_recovered():
+    # These paths were live on the WordPress site until 12 Sep 2026 and
+    # returned hard 404s after the move. GitHub Pages cannot serve a 301, so
+    # each one is a stub that canonicalises to its replacement, carries
+    # noindex, and moves the visitor there.
+    legacy = {
+        "service": "/system/",
+        "services": "/system/",
+        "about": "/why-pink/",
+        "blog": "/",
+        "tax-returns": "/",
+        "bookkeeping": "/hospitality-bookkeeping/",
+        "the-60-second-margin-self-check": "/margin-check/",
+    }
+    for slug, dest in legacy.items():
+        f = ROOT / slug / "index.html"
+        assert f.exists(), slug
+        t = f.read_text(encoding="utf-8")
+        assert f'href="https://pinktax.com.au{dest}"' in t, slug
+        assert "noindex" in t, f"{slug} must not compete in the index"
+        assert f'url={dest}' in t, slug
+    # Stubs are for humans arriving on dead links, not for the sitemap.
+    sitemap = (ROOT / "sitemap.xml").read_text(encoding="utf-8")
+    for slug in legacy:
+        assert f"/{slug}/" not in sitemap, slug
+
+
 def test_assets():
     assert (ROOT / "assets" / "logo.png").exists()
     assert (ROOT / "assets" / "logo-white.png").exists()

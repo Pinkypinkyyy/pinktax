@@ -240,7 +240,7 @@ h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.12;letter-spac
 
 .page{padding:calc(var(--nav-h) + 48px) 0 80px}
 .page h1{font-size:clamp(2.1rem,4.2vw,3.2rem);margin:14px 0 16px}
-.page .prose{max-width:44em;color:var(--soft)}
+.page .prose{max-width:36em;color:var(--soft)}
 .page .prose p,.page .prose li{margin:0 0 16px}
 .page .prose h2{font-size:1.4rem;margin:32px 0 10px;color:var(--ink)}
 .page .prose ul,.page .prose ol{padding-left:1.15em}
@@ -919,7 +919,8 @@ a:focus-visible,button:focus-visible,video:focus-visible,summary:focus-visible{
 /* Long-form landing pages (tools/build_landing_pages.py). The earlier prose
    rules are scoped to .page; these pages set their prose on a .band, so the
    measure, paragraph rhythm and link colour are restated here. */
-.band .prose{max-width:44em;color:var(--soft)}
+/* 36em is ~72 characters. Was 44em, which measured 88 and read as a wall. */
+.band .prose{max-width:36em;color:var(--soft)}
 .band .prose p,.band .prose li{margin:0 0 16px}
 .band .prose ul,.band .prose ol{padding-left:1.15em}
 .band .prose li{margin-bottom:10px}
