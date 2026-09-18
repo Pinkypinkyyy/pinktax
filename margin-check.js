@@ -61,6 +61,35 @@
       $("pmc-hl-text").textContent = "Your operating margin is " + marginP.toFixed(1) + "%";
     }
     $("pmc-hl-note").textContent = "Sketch from the numbers you typed. Not your file. Not a promise.";
+    // Opt-in only, and it opens the visitor's own mail client rather than
+    // posting their takings and wages through a third-party form relay.
+    var send = $("pmc-send");
+    if (send) {
+      var lines = [
+        "My 60-second Margin Check",
+        "",
+        $("pmc-hl-label").textContent + ": " + $("pmc-hl-text").textContent,
+        ""
+      ];
+      document.querySelectorAll("#pmc-metrics .card").forEach(function (c) {
+        var h = c.querySelector("h3");
+        var v = c.querySelector(".pmc-val");
+        var b = c.querySelector(".pmc-bench");
+        var pct = v.querySelector("strong").textContent.trim();
+        var state = v.querySelector(".pmc-state").textContent.trim();
+        lines.push("- " + h.textContent + ": " + pct + " " + state +
+          " (" + b.textContent + ")");
+      });
+      lines.push("",
+        "Weekly sales " + sales + ", wages " + wages + ", food and beverage " + cogs +
+        ", monthly rent " + rentM + ", other weekly " + other + ".",
+        "",
+        "Please call me about this.");
+      send.setAttribute("href",
+        "mailto:admin@pinktax.com.au?subject=" + encodeURIComponent("Margin Check result") +
+        "&body=" + encodeURIComponent(lines.join("\n")));
+      send.hidden = false;
+    }
     var out = $("pmc-results");
     out.hidden = false;
     out.scrollIntoView({ behavior: "smooth", block: "start" });

@@ -165,6 +165,36 @@ def test_legacy_urls_are_recovered():
         assert f"/{slug}/" not in sitemap, slug
 
 
+def test_margin_check_privacy_claim_is_exact():
+    # The calculator now has an opt-in "email these results" button, so an
+    # absolute "nothing is sent anywhere" would no longer be true. A firm
+    # that audits other people's claims cannot be loose with its own.
+    for p in PAGES:
+        t = p.read_text(encoding="utf-8")
+        assert "nothing sent anywhere." not in t.lower(), p
+        assert "nothing is sent anywhere;" not in t.lower(), p
+    home = (ROOT / "index.html").read_text(encoding="utf-8")
+    assert 'id="pmc-send"' in home
+    assert "unless you choose" in home
+    js = (ROOT / "margin-check.js").read_text(encoding="utf-8")
+    # Opt-in send must stay a mailto: venue takings and wages should not be
+    # posted through a third-party form relay.
+    assert "mailto:admin@pinktax.com.au" in js
+    assert "formsubmit" not in js
+
+
+def test_switching_page_exists_and_is_linked():
+    # Changing accountants is the biggest objection in this market and no
+    # page addressed it.
+    f = ROOT / "switching" / "index.html"
+    assert f.exists()
+    t = f.read_text(encoding="utf-8")
+    assert 'canonical" href="https://pinktax.com.au/switching/"' in t
+    assert "30 June" in t, "mid-year switching must be addressed"
+    assert "/switching/" in (ROOT / "sitemap.xml").read_text(encoding="utf-8")
+    assert "/switching/" in (ROOT / "index.html").read_text(encoding="utf-8")
+
+
 def test_assets():
     assert (ROOT / "assets" / "logo.png").exists()
     assert (ROOT / "assets" / "logo-white.png").exists()
