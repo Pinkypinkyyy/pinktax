@@ -422,3 +422,26 @@ def test_margin_check_cache_bust_is_uniform():
     for p in list(ROOT.rglob("*.html")) + list(ROOT.rglob("*.py")):
         refs.update(re.findall(r"margin-check\.js\?v=([a-z0-9]+)", p.read_text(encoding="utf-8")))
     assert len(refs) == 1, f"margin-check.js served under mixed versions: {sorted(refs)}"
+
+
+def test_paid_landing_page_feeds_both_platforms():
+    # /margin/ is the paid landing page. It ships its own tracking rather than
+    # loading track.js, so a placeholder pixel id here is invisible until a
+    # month of Meta budget has bought an audience that was never recorded.
+    # The kit this page came from had META_PIXEL_ID as XXXXXXXXXXXXXXX.
+    lp = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
+    assert "26989404134047568" in lp, "paid landing page lost the real Meta pixel"
+    assert "META_PIXEL_ID: 'X" not in lp, "placeholder pixel id is back"
+
+    # Paid traffic only. Letting this rank would split organic authority with
+    # /margin-check/, which is the page the site already points at.
+    assert 'content="noindex' in lp, "paid landing page must not be indexed"
+
+    # The honeypot is the only defence against bot form spam here, since the
+    # page deliberately has no third-party form relay.
+    assert 'name="company_website"' in lp, "spam honeypot removed"
+
+    # Venue takings are collected on this page. The mailto fallback keeps them
+    # in the visitor's own mail client. If a FORM_ENDPOINT is ever wired, that
+    # decision needs a human looking at where a venue's sales figure lands.
+    assert "mailto:admin@pinktax.com.au" in lp, "lead fallback relay changed"
