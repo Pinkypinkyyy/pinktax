@@ -215,10 +215,34 @@ LANDING = (
 
 
 def test_no_competitor_attack_copy():
-    # The sell is the structural one: hospitality moves weekly, traditional
-    # accounting reports yearly. Attacking the previous accountant is not
-    # needed to make it and reads badly to an owner who liked theirs.
-    banned = ("autopsy", "old accountant", "files and forgets")
+    # HB, 18 Sep 2026, firm-wide and absolute: never attack another firm or
+    # another accountant. It is unprofessional, and an owner who liked their
+    # last accountant hears it as an insult to their judgement.
+    #
+    # The sell is structural and stands on its own: hospitality moves weekly,
+    # an annual reporting cycle lands after the year has closed. That point
+    # needs no comparison to anyone.
+    #
+    # "current accountant" and "outgoing accountant" stay allowed: /switching/
+    # has to name the other party to explain a handover, and it does so
+    # neutrally, including stating that their working papers are their
+    # property.
+    banned = (
+        "autopsy",
+        "old accountant",
+        "files and forgets",
+        "most accountants",
+        "other accountants",
+        "typical accountant",
+        "traditional accounting",
+        "traditional accountant",
+        "unlike other",
+        "unlike most",
+        "your accountant never",
+        "cheap accountant",
+        "bad accountant",
+        "wrong accountant",
+    )
     for p in PAGES:
         text = p.read_text(encoding="utf-8").lower()
         for word in banned:
