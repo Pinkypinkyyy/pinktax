@@ -95,6 +95,14 @@
     out.scrollIntoView({ behavior: "smooth", block: "start" });
     try {
       if (typeof gtag === "function") gtag("event", "pink_margin_check_complete", { method: "calculator" });
+      // Meta counterpart. CompleteRegistration, not Lead: the calculator
+      // finishes without contact details, so counting it as a Lead would
+      // inflate the number nav.js owns for real form submits. The warm
+      // retargeting audience is built from this event. No takings, wages or
+      // result figures are sent - only that the tool was completed.
+      if (typeof window.pinkMeta === "function") {
+        window.pinkMeta("CompleteRegistration", { content_name: "margin_check" });
+      }
     } catch (err2) {}
   });
 })();

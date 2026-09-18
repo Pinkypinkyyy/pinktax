@@ -388,3 +388,37 @@ def test_venue_figures_never_leave_the_browser():
         calc = text[start:text.index("</form>", start)]
         assert "name=" not in calc, f"{rel} calculator fields would submit"
         assert "action=" not in calc, f"{rel} calculator has a submit target"
+
+
+def test_margin_check_completion_reaches_both_ad_platforms():
+    # Completing the calculator is the strongest signal a visitor gives
+    # without handing over contact details, and it is what the Meta warm
+    # audience is built from. It fired to Google only, so Meta could neither
+    # retarget those people nor learn from them, and paid budget bought the
+    # same cold traffic twice.
+    js = (ROOT / "margin-check.js").read_text(encoding="utf-8")
+    assert "pink_margin_check_complete" in js, "Google event missing"
+    assert "pinkMeta(" in js, "Meta event missing - Google-only again"
+
+    # CompleteRegistration, not Lead. nav.js owns Lead for real form submits
+    # where an email or phone was given; reusing it here would inflate the
+    # lead count both platforms bid against.
+    assert "CompleteRegistration" in js, "wrong Meta event for the calculator"
+    assert 'pinkMeta("Lead"' not in js, "calculator must not count as a Lead"
+
+    # The event names the tool and nothing else. A venue's figures do not
+    # leave the browser through an analytics call either.
+    call = js[js.index("pinkMeta("):]
+    call = call[:call.index(")")]
+    for leak in ("sales", "wages", "cogs", "rent", "value", "revenue"):
+        assert leak not in call, f"margin check would send {leak} to Meta"
+
+
+def test_margin_check_cache_bust_is_uniform():
+    # The page builder emitted an older version string than the pages it
+    # regenerates, which serves visitors the previous script and silently
+    # reverts any fix to it. One version everywhere, or the fix never ships.
+    refs = set()
+    for p in list(ROOT.rglob("*.html")) + list(ROOT.rglob("*.py")):
+        refs.update(re.findall(r"margin-check\.js\?v=([a-z0-9]+)", p.read_text(encoding="utf-8")))
+    assert len(refs) == 1, f"margin-check.js served under mixed versions: {sorted(refs)}"

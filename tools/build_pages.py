@@ -275,7 +275,7 @@ def margin_check():
     </div>
   </main>
 {footer()}
-<script src="/margin-check.js?v=h1"></script>
+<script src="/margin-check.js?v=i6"></script>
 """
     return h + body
 
