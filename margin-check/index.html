@@ -79,6 +79,35 @@
         <p>This is a sketch from the numbers you typed. Not your file. Not tax advice. On the call we look at the real books.</p>
         <a class="btn btn-primary" href="/book/">Book a 15-minute call</a>
           <a class="btn btn-outline" id="pmc-send" href="#" hidden data-event="calc-email">Email these results to Pink</a>
+        <form class="enquiry" id="pmcLead" data-relay="margin-check" data-ok="pmcLeadOk" data-subject="Margin Check enquiry">
+          <h2>Want this checked against your real books?</h2>
+          <p>Leave your details and Pink will ring you about what the check found. The figures you typed stay in this browser — only the four boxes below are sent.</p>
+          <div class="fields">
+            <label>Your name
+              <input type="text" name="name" autocomplete="name" required>
+            </label>
+            <label>Email
+              <input type="email" name="email" autocomplete="email" required>
+            </label>
+            <label>Mobile
+              <input type="tel" name="mobile" autocomplete="tel" required>
+            </label>
+            <label>Venue
+              <select name="venue">
+                <option value="">Choose one</option>
+                <option>Cafe</option>
+                <option>Restaurant</option>
+                <option>Bar or pub</option>
+                <option>More than one venue</option>
+                <option>Something else</option>
+              </select>
+            </label>
+          </div>
+          <input class="hp" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <button class="btn btn-primary" type="submit">Have Pink ring me</button>
+          <p class="form-note">We use these details to call you about this check, and for nothing else. Read the <a href="/privacy/">Privacy Policy</a>.</p>
+        </form>
+        <div class="enquiry-ok" id="pmcLeadOk" hidden>Thanks — Pink will ring you within one business day.</div>
       </section>
     </div>
   </main>

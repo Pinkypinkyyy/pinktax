@@ -10,7 +10,20 @@ concurrency:
   group: pages
   cancel-in-progress: true
 jobs:
+  # The suite guards the conversion path, the competitor-attack copy and the
+  # rule that a venue's takings stay in the browser. It was never run before
+  # a deploy, so it guarded nothing.
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install pytest
+      - run: python -m pytest tests/ -q
   deploy:
+    needs: test
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

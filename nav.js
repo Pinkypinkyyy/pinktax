@@ -122,10 +122,26 @@
           // event we own, so it carries the Ads conversion.
           if (row.e === "book-calendar") {
             gtag("event", "generate_lead", { method: "booking-calendar" });
+            if (typeof window.pinkMeta === "function") {
+              window.pinkMeta("Lead", { content_name: "booking-calendar" });
+            }
           }
         }
       } catch (err) {}
     });
+  });
+
+  // Every phone number on the site. A venue owner who rings instead of
+  // booking is the same lead, and until now that click was invisible.
+  document.addEventListener("click", function (e) {
+    var a = e.target && e.target.closest ? e.target.closest('a[href^="tel:"]') : null;
+    if (!a) return;
+    try {
+      if (typeof gtag === "function") {
+        gtag("event", "phone_click", { lead_source: "site_phone_link" });
+      }
+      if (typeof window.pinkMeta === "function") window.pinkMeta("Contact");
+    } catch (err) {}
   });
 
   var hoursForm = document.getElementById("hoursCheck");
@@ -157,23 +173,38 @@
     });
   }
 
-  var form = document.getElementById("enquiryForm");
-  var ok = document.getElementById("enquiryOk");
-  if (form) {
-    var params = new URLSearchParams(window.location.search);
-    if (params.get("sent") === "1" && ok) {
+  // Enquiry relays. Any form carrying data-relay posts to the firm mailbox
+  // and counts as a lead, so the contact page and the margin check share one
+  // tested path instead of two. The value of data-relay is the GA4 method.
+  //
+  // What a relay form may carry: a name, an email, a phone number, a venue
+  // and a message. Nothing else. A venue's takings and wages never go through
+  // a third-party relay — the margin check keeps those in the browser.
+  document.querySelectorAll("form[data-relay]").forEach(function (form) {
+    var ok = document.getElementById(form.getAttribute("data-ok") || "");
+    var method = form.getAttribute("data-relay") || "enquiry-form";
+    var subject = form.getAttribute("data-subject") || "Pink Accounting enquiry";
+
+    function succeeded() {
       form.hidden = true;
-      ok.hidden = false;
-      var pick0 = document.getElementById("pick-time");
-      if (pick0) {
-        pick0.classList.add("is-next");
-        pick0.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (ok) ok.hidden = false;
+      var pick = document.getElementById("pick-time");
+      if (pick) {
+        pick.classList.add("is-next");
+        pick.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     }
+
+    if (ok && new URLSearchParams(window.location.search).get("sent") === "1") {
+      succeeded();
+    }
+
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-      if (form.querySelector("[name=_gotcha]").value) return;
+      var trap = form.querySelector("[name=_gotcha]");
+      if (trap && trap.value) return;
       var btn = form.querySelector("button[type=submit]");
+      var label = btn ? btn.textContent : "";
       if (btn) {
         btn.disabled = true;
         btn.textContent = "Sending…";
@@ -184,6 +215,7 @@
       });
       data._template = "table";
       data._captcha = "false";
+      data._subject = subject;
       fetch("https://formsubmit.co/ajax/admin@pinktax.com.au", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
@@ -193,41 +225,43 @@
           if (!res.ok) throw new Error("send-failed");
           return res.json();
         })
-        .then(function () {
-          form.hidden = true;
-          if (ok) ok.hidden = false;
-          var pick = document.getElementById("pick-time");
-          if (pick) {
-            pick.classList.add("is-next");
-            pick.scrollIntoView({ behavior: "smooth", block: "start" });
-          }
+        .then(function (json) {
+          // The relay answers 200 with success:"false" when the endpoint is
+          // not activated or the post is rejected. Reading only res.ok would
+          // thank the visitor, hide the form and count a conversion for an
+          // enquiry that was never delivered.
+          if (!json || String(json.success) === "false") throw new Error("not-sent");
+          succeeded();
           try {
-            if (typeof gtag === "function") gtag("event", "generate_lead", { method: "enquiry-form" });
+            if (typeof gtag === "function") gtag("event", "generate_lead", { method: method });
+            if (typeof window.pinkMeta === "function") {
+              window.pinkMeta("Lead", { content_name: method });
+            }
           } catch (err) {}
         })
         .catch(function () {
-          var body =
-            "Name: " + (data.name || "") +
-            "\nVenue: " + (data.venue || "") +
-            "\nEmail: " + (data.email || "") +
-            "\nMobile: " + (data.mobile || "") +
-            "\nRevenue: " + (data.revenue || "") +
-            "\nStaff: " + (data.staff || "") +
-            "\nHurting: " + (data.hurt || "") +
-            "\nCurrent position: " + (data.position || "") +
-            "\n12-month vision: " + (data.vision || "");
+          // The relay is someone else's server. If it is down the enquiry
+          // still has to reach us, so hand it to the visitor's mail client.
+          var body = Object.keys(data)
+            .filter(function (k) {
+              return k.charAt(0) !== "_" && data[k];
+            })
+            .map(function (k) {
+              return k.charAt(0).toUpperCase() + k.slice(1) + ": " + data[k];
+            })
+            .join("\n");
           window.location.href =
             "mailto:admin@pinktax.com.au?subject=" +
-            encodeURIComponent("Pink Accounting hospitality intake") +
+            encodeURIComponent(subject) +
             "&body=" +
             encodeURIComponent(body);
         })
         .finally(function () {
           if (btn) {
             btn.disabled = false;
-            btn.textContent = "Send this";
+            btn.textContent = label;
           }
         });
     });
-  }
+  });
 })();

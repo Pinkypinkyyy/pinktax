@@ -62,6 +62,40 @@
         <section class="card"><span class="eyebrow">Email</span><h2><a href="mailto:admin@pinktax.com.au">admin@pinktax.com.au</a></h2><p>The firm mailbox. A person reads it.</p></section>
         <section class="card"><span class="eyebrow">Visit</span><h2>Brendale QLD 4500</h2><p>Shop 15A, 18–22 Kremzow Rd. Cafes, restaurants, bars and venues — Brendale office, clients across Australia.</p></section>
       </div>
+
+      <h2 id="enquire">Or write it down here</h2>
+      <p>Tell us what is going on. You will get a reply from Pink, not an auto-responder.</p>
+      <form class="enquiry" id="enquiryForm" data-relay="contact-form" data-ok="enquiryOk" data-subject="Pink Accounting contact form">
+        <div class="fields">
+          <label>Your name
+            <input type="text" name="name" autocomplete="name" required>
+          </label>
+          <label>Email
+            <input type="email" name="email" autocomplete="email" required>
+          </label>
+          <label>Mobile
+            <input type="tel" name="mobile" autocomplete="tel" required>
+          </label>
+          <label>Venue
+            <select name="venue">
+              <option value="">Choose one</option>
+              <option>Cafe</option>
+              <option>Restaurant</option>
+              <option>Bar or pub</option>
+              <option>More than one venue</option>
+              <option>Something else</option>
+            </select>
+          </label>
+        </div>
+        <label>What is going on
+          <textarea name="message" class="short" rows="4" required></textarea>
+        </label>
+        <input class="hp" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <button class="btn btn-primary" type="submit">Send this</button>
+        <p class="form-note">We use these details to answer your enquiry and to contact you about it, and for nothing else. Read the <a href="/privacy/">Privacy Policy</a>.</p>
+        <p class="form-note">Please keep tax file numbers, bank details and client records off this form. Bring those to the call.</p>
+      </form>
+      <div class="enquiry-ok" id="enquiryOk" hidden>That is with us. You will hear back within one business day, and sooner if it is a BAS week.</div>
     </div>
   </main>
   <footer class="foot">

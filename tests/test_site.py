@@ -322,3 +322,55 @@ def test_footer_links_the_landing_pages():
     foot = home[home.index('<footer class="foot">'):]
     for slug in LANDING:
         assert f'href="/{slug}/"' in foot, slug
+
+
+RELAY = {
+    "contact/index.html": "contact-form",
+    "index.html": "margin-check",
+    "margin-check/index.html": "margin-check",
+}
+
+
+def test_lead_capture_and_tracking():
+    # Google Ads spent $255 against zero conversions because the site could
+    # neither capture a lead nor report one. This holds the whole chain: the
+    # forms exist, the events fire, and every form says what it does with
+    # what it collects.
+    nav = (ROOT / "nav.js").read_text(encoding="utf-8")
+    track = (ROOT / "track.js").read_text(encoding="utf-8")
+    assert 'gtag("event", "phone_click"' in nav, "phone clicks are not counted"
+    assert "form[data-relay]" in nav, "the shared enquiry relay is gone"
+    assert "connect.facebook.net" in track, "Meta pixel is not installed"
+    assert 'fbq("track", "PageView")' in track
+
+    for rel, method in RELAY.items():
+        text = (ROOT / rel).read_text(encoding="utf-8")
+        assert f'data-relay="{method}"' in text, rel
+        for field in ('name="name"', 'name="email"', 'name="mobile"'):
+            assert field in text, f"{rel} is missing {field}"
+        assert 'name="_gotcha"' in text, f"{rel} has no spam trap"
+        assert 'href="/privacy/">Privacy Policy</a>' in text, f"{rel} has no consent line"
+        # The relay posts to a third party, so the page has to be allowed to
+        # reach it. A form that silently fails CSP looks identical to a form
+        # nobody used.
+        assert "https://formsubmit.co" in text, f"{rel} CSP would block the relay"
+
+
+def test_venue_figures_never_leave_the_browser():
+    # A venue's takings, wages and rent are the visitor's financial data. The
+    # calculator may hold them; the relay to a third-party form service may
+    # not. This is the line the opt-in mailto was built to protect and it has
+    # to survive every later edit to these pages.
+    for rel in ("index.html", "margin-check/index.html"):
+        text = (ROOT / rel).read_text(encoding="utf-8")
+        start = text.index('id="pmcLead"')
+        lead = text[start:text.index("</form>", start)]
+        for leak in ("sales", "wages", "cogs", "rent", "other", "revenue"):
+            assert f'name="{leak}"' not in lead, f"{rel} would post {leak} to the relay"
+
+        # No name attribute and no action means a failed script cannot fall
+        # back to a native GET that puts those figures in the URL.
+        start = text.index('id="pmc-calc"')
+        calc = text[start:text.index("</form>", start)]
+        assert "name=" not in calc, f"{rel} calculator fields would submit"
+        assert "action=" not in calc, f"{rel} calculator has a submit target"
