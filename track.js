@@ -5,10 +5,15 @@
   // number. The Google tag GT-WVXQ29L2 still loads, so conversion linker
   // and GA4 import keep working. Do not invent an AW- id.
   var AW = "";
-  // Meta dataset 'Pink Document Capture' (Events Manager). Brief of 18 Sep
-  // 2026 named this id. Create a new dataset if Pink says this one is for
-  // something else.
-  var META = "26989404134047568";
+  // "Pink Accounting's Pixel", the only dataset in business 317537009282419
+  // and the one attached to ad account 543906261707152, so it is the one Meta
+  // can actually build audiences and optimise from.
+  //
+  // This was 26989404134047568 until 18 Sep 2026. That id is not a dataset in
+  // this business at all: Events Manager routes it as an app and returns
+  // "content isn't available", so every Meta event the site fired went
+  // nowhere. Verified live before changing. Do not restore it.
+  var META = "1237708438188688";
 
   window.dataLayer = window.dataLayer || [];
   function gtag() {

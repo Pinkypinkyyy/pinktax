@@ -430,8 +430,22 @@ def test_paid_landing_page_feeds_both_platforms():
     # month of Meta budget has bought an audience that was never recorded.
     # The kit this page came from had META_PIXEL_ID as XXXXXXXXXXXXXXX.
     lp = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
-    assert "26989404134047568" in lp, "paid landing page lost the real Meta pixel"
+    track = (ROOT / "track.js").read_text(encoding="utf-8")
+
+    # "Pink Accounting's Pixel" - the only dataset in the business, and the one
+    # the ad account can build audiences from. The site fired at
+    # 26989404134047568 until 18 Sep 2026; Events Manager routes that id as an
+    # app and returns "content isn't available", so every event went nowhere.
+    PIXEL = "1237708438188688"
+    assert PIXEL in lp, "paid landing page lost the real Meta pixel"
+    assert PIXEL in track, "track.js lost the real Meta pixel"
     assert "META_PIXEL_ID: 'X" not in lp, "placeholder pixel id is back"
+
+    # The dead id must never come back as a value. It is allowed to appear in a
+    # comment, because both files explain why it was removed.
+    for name, body in (("margin/index.html", lp), ("track.js", track)):
+        for form in ('"26989404134047568"', "'26989404134047568'"):
+            assert form not in body, f"{name} restored the dead pixel"
 
     # Paid traffic only. Letting this rank would split organic authority with
     # /margin-check/, which is the page the site already points at.
