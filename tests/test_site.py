@@ -75,15 +75,18 @@ def test_no_cross_brand_wording_anywhere():
             assert word not in text, f"{p}: {word}"
 
 
-def test_booking_click_fires_generate_lead():
-    # Google Ads' primary conversion is the GA4 generate_lead event. Intake
-    # now happens on bookings.cloud.microsoft, an origin we cannot observe,
-    # so the click onto the calendar is the last event we own. If it stops
-    # firing, paid spend has no conversion signal at all.
+def test_booking_click_fires_book_click():
+    # Intake finishes on Microsoft Bookings, which we cannot observe. The
+    # click onto the calendar is the last event we own, so it is the primary
+    # conversion until bookings return to this domain. generate_lead is
+    # reserved for a real enquiry (name, email, phone), not a calendar click.
     nav = (ROOT / "nav.js").read_text(encoding="utf-8")
     book = (ROOT / "book" / "index.html").read_text(encoding="utf-8")
     assert 'row.e === "book-calendar"' in nav
-    assert 'gtag("event", "generate_lead", { method: "booking-calendar" })' in nav
+    assert 'gtag("event", "book_click"' in nav
+    assert 'lead_source: "outlook_booking"' in nav
+    assert 'gtag("event", "generate_lead", { method: "booking-calendar" })' not in nav
+    assert 'method: "hours-check"' not in nav
     assert 'data-event="book-calendar"' in book
     assert "spLead" not in nav
 
@@ -340,12 +343,22 @@ def test_lead_capture_and_tracking():
     track = (ROOT / "track.js").read_text(encoding="utf-8")
     assert 'gtag("event", "phone_click"' in nav, "phone clicks are not counted"
     assert "form[data-relay]" in nav, "the shared enquiry relay is gone"
+    assert 'gtag("event", "generate_lead", lead)' in nav
+    assert "lead_source: source" in nav
     assert "connect.facebook.net" in track, "Meta pixel is not installed"
     assert 'fbq("track", "PageView")' in track
+    assert "26989404134047568" in track
+    assert "window.pinkHash" in track
+    assert "SHA-256" in track
+    mc = (ROOT / "margin-check" / "index.html").read_text(encoding="utf-8")
+    assert "</html>" in mc
+    assert mc.index("/margin-check.js") < mc.index("</body>")
+    assert mc.strip().endswith("</html>")
 
     for rel, method in RELAY.items():
         text = (ROOT / rel).read_text(encoding="utf-8")
         assert f'data-relay="{method}"' in text, rel
+        assert 'method="post"' in text, f"{rel} would fall back to GET"
         for field in ('name="name"', 'name="email"', 'name="mobile"'):
             assert field in text, f"{rel} is missing {field}"
         assert 'name="_gotcha"' in text, f"{rel} has no spam trap"
@@ -354,6 +367,7 @@ def test_lead_capture_and_tracking():
         # reach it. A form that silently fails CSP looks identical to a form
         # nobody used.
         assert "https://formsubmit.co" in text, f"{rel} CSP would block the relay"
+        assert 'String(json.success) === "false"' in nav
 
 
 def test_venue_figures_never_leave_the_browser():

@@ -104,6 +104,20 @@
     }, { passive: true });
   }
 
+  function fireBookClick(href) {
+    try {
+      if (typeof gtag === "function") {
+        gtag("event", "book_click", {
+          lead_source: "outlook_booking",
+          link_url: href || ""
+        });
+      }
+      if (typeof window.pinkMeta === "function") {
+        window.pinkMeta("Lead", { content_name: "outlook_booking" });
+      }
+    } catch (err) {}
+  }
+
   document.querySelectorAll("[data-event]").forEach(function (el) {
     el.addEventListener("click", function () {
       try {
@@ -117,18 +131,22 @@
         sessionStorage.setItem("spEvents", JSON.stringify(prev.slice(-50)));
         if (typeof gtag === "function") {
           gtag("event", "select_content", { content_id: row.e });
-          // Intake moved wholly into Microsoft Bookings, which is another
-          // origin we cannot observe. The click onto the calendar is the last
-          // event we own, so it carries the Ads conversion.
-          if (row.e === "book-calendar") {
-            gtag("event", "generate_lead", { method: "booking-calendar" });
-            if (typeof window.pinkMeta === "function") {
-              window.pinkMeta("Lead", { content_name: "booking-calendar" });
-            }
-          }
         }
+        // Intake finishes on Microsoft Bookings, which we cannot observe.
+        // The click onto the calendar is the last event we own, so it is
+        // the primary conversion until bookings return to this domain.
+        if (row.e === "book-calendar") fireBookClick(row.href);
       } catch (err) {}
     });
+  });
+
+  document.addEventListener("click", function (e) {
+    var a = e.target && e.target.closest ? e.target.closest("a[href]") : null;
+    if (!a) return;
+    var href = a.getAttribute("href") || "";
+    if (href.indexOf("outlook.office.com/book/") === -1) return;
+    if (a.getAttribute("data-event") === "book-calendar") return;
+    fireBookClick(href);
   });
 
   // Every phone number on the site. A venue owner who rings instead of
@@ -143,35 +161,6 @@
       if (typeof window.pinkMeta === "function") window.pinkMeta("Contact");
     } catch (err) {}
   });
-
-  var hoursForm = document.getElementById("hoursCheck");
-  var hoursOut = document.getElementById("hoursResult");
-  var hoursLine = document.getElementById("hoursResultLine");
-  if (hoursForm && hoursOut && hoursLine) {
-    hoursForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-      var quoted = parseFloat(hoursForm.quoted.value);
-      var tools = parseFloat(hoursForm.tools.value);
-      var rate = parseFloat(hoursForm.rate.value);
-      if (!(quoted > 0) || !(tools > 0) || !(rate > 0)) return;
-      var extra = Math.max(0, Math.round((tools - quoted) * 10) / 10);
-      var dollars = Math.round(extra * rate);
-      if (extra <= 0) {
-        hoursLine.textContent =
-          "That job landed on quote. The leak is often the next job, or the bank. Book 15 minutes if the quotes and the tax still do not match.";
-      } else {
-        hoursLine.textContent =
-          "That job ran " + extra + " hours over. At $" + rate +
-          " an hour, about $" + dollars +
-          " never made the next quote.";
-      }
-      hoursOut.hidden = false;
-      hoursOut.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      try {
-        if (typeof gtag === "function") gtag("event", "generate_lead", { method: "hours-check" });
-      } catch (err) {}
-    });
-  }
 
   // Enquiry relays. Any form carrying data-relay posts to the firm mailbox
   // and counts as a lead, so the contact page and the margin check share one
@@ -232,12 +221,33 @@
           // enquiry that was never delivered.
           if (!json || String(json.success) === "false") throw new Error("not-sent");
           succeeded();
-          try {
-            if (typeof gtag === "function") gtag("event", "generate_lead", { method: method });
-            if (typeof window.pinkMeta === "function") {
-              window.pinkMeta("Lead", { content_name: method });
-            }
-          } catch (err) {}
+          var source = method === "contact-form" ? "contact_form" : method === "margin-check" ? "margin_check" : method;
+          var venue = String(data.venue || "");
+          var lead = {
+            lead_source: source,
+            venue_type: venue,
+            currency: "AUD",
+            value: 990
+          };
+          var hashP = typeof window.pinkHash === "function"
+            ? window.pinkHash(data.email, data.mobile)
+            : Promise.resolve({});
+          return hashP.then(function (hashed) {
+            try {
+              if (typeof gtag === "function") {
+                if (data.email || data.mobile) {
+                  gtag("set", "user_data", {
+                    email: data.email || undefined,
+                    phone_number: data.mobile || undefined
+                  });
+                }
+                gtag("event", "generate_lead", lead);
+              }
+              if (typeof window.pinkMeta === "function") {
+                window.pinkMeta("Lead", { content_name: source, currency: "AUD", value: 990 }, hashed);
+              }
+            } catch (err) {}
+          });
         })
         .catch(function () {
           // The relay is someone else's server. If it is down the enquiry
