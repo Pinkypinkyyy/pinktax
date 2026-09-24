@@ -2,14 +2,14 @@
 
 Pink Accounting hospitality website. GitHub Pages for **pinktax.com.au**.
 
-Same operating model as Service Profit (`Pinkypinkyyy/jobprofit`):
+1. Edit the HTML (most pages are hand-maintained) or `tools/build_landing_pages.py` (the nine guide pages)
+2. `python tools/build_landing_pages.py` is the rebuild. It applies `identity.json` to every page first, then builds the guide pages and the sitemap. `git status` should be clean afterwards.
+3. `python -m pytest tests/ -q`
+4. Push a branch. Merging to `main` publishes the site.
 
-1. Edit `tools/shared.py` and `tools/build_pages.py`
-2. `python tools/build_pages.py`
-3. `python -m pytest tests/test_site.py -q`
-4. Commit and push `main`
+Business name, legal entity, office, hours, Google profile and the cross-link to the trades line all come from `identity.json`. It is generated from the firm's canonical file in `Pink-Accounting-Automation`; never edit it here.
 
-Hospitality only. Service Profit (HVAC / electrical / construction) lives on https://www.serviceprofit.com.au/
+Hospitality only. The trades line, Service Profit (a Pink Accounting service), lives on https://www.serviceprofit.com.au/ and is named on this site only in the footer cross-link and the two-doors block on /contact/.
 
 Booking calendar: PinkAccountingTaxSolutionsClientBookings@pinktax.com.au  
 Enquiry form: formsubmit to admin@pinktax.com.au

@@ -1,4 +1,7 @@
+import html
+import json
 import re
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -60,19 +63,141 @@ def test_urls_exist():
 
 
 def test_no_cross_brand_wording_anywhere():
-    # The site was built from a Service Profit template. Hospitality-only is a
-    # firm rule on every public Pink surface, so guard every page and script.
+    # The site was built from a Service Profit template. One site, one niche
+    # is still a firm rule: this site speaks to hospitality, and trades
+    # wording belongs on serviceprofit.com.au.
+    #
+    # HB, 24 Sep 2026: one company, two service lines, one office. The trades
+    # line may be named in exactly two identity-owned places, the quiet
+    # cross-link line in the footer and the two-doors block on /contact/, plus
+    # the schema department that tells Google both lines are one business.
+    # Those are stripped before the check; everything else is guarded as before.
     banned = ("Service Profit", "HVAC", "electrical, construction", "tradie")
-    # tools/*.py is included because build_pages.py generated this site and
-    # still carried the wording; regenerating would have restored it.
+    allowed = (
+        re.compile(r'<p class="sister-line" data-identity="cross-link">.*?</p>', re.S),
+        re.compile(r'<section[^>]*data-identity="two-doors".*?</section>', re.S),
+        re.compile(r'"department":\[.*?\]'),
+    )
+    # tools/*.py is included because a stale builder once put the wording
+    # back on regeneration. The builders read the trades name from
+    # identity.json, so they never need to spell it out.
     targets = PAGES + list(ROOT.glob("*.js")) + list((ROOT / "tools").glob("*.py"))
     for p in targets:
         text = p.read_text(encoding="utf-8")
-        # The build guard has to name the rule in order to enforce it.
-        if p.suffix == ".py" and "PINK_ALLOW_STALE_REGEN" in text:
-            continue
+        for block in allowed:
+            text = block.sub("", text)
         for word in banned:
             assert word not in text, f"{p}: {word}"
+
+
+IDENTITY = json.loads((ROOT / "identity.json").read_text(encoding="utf-8"))
+STUBS = [p for p in PAGES if 'http-equiv="refresh"' in p.read_text(encoding="utf-8")]
+
+
+def org_nodes(text):
+    nodes = []
+    for raw in re.findall(r'<script type="application/ld\+json">\s*(.*?)\s*</script>', text, re.S):
+        node = json.loads(raw)
+        if node.get("@type") == "AccountingService":
+            nodes.append(node)
+    return nodes
+
+
+def test_identity_json_is_published():
+    # The Google profile, the trades site and this site all read the same
+    # file. It sits at the site root and ships with the Pages artifact (the
+    # workflow uploads the whole repo, and .nojekyll keeps nothing hidden).
+    ident = json.loads((ROOT / "identity.json").read_text(encoding="utf-8"))
+    assert ident["public_name"] == "Pink Accounting"
+    assert (ROOT / ".nojekyll").exists()
+
+
+def test_schema_org_node_matches_identity():
+    office = IDENTITY["office"]
+    for rel in ("index.html", "contact/index.html"):
+        nodes = org_nodes((ROOT / rel).read_text(encoding="utf-8"))
+        assert len(nodes) == 1, rel
+        n = nodes[0]
+        assert n["name"] == IDENTITY["public_name"] == "Pink Accounting", rel
+        assert n["@id"] == IDENTITY["schema"]["organization_id"], rel
+        assert n["legalName"] == IDENTITY["legal"]["entity"], rel
+        assert n["telephone"] == office["phone_e164"], rel
+        assert n["email"] == office["email"], rel
+        assert n["address"] == {
+            "@type": "PostalAddress",
+            "streetAddress": office["street"],
+            "addressLocality": office["locality"],
+            "addressRegion": office["region"],
+            "postalCode": office["postcode"],
+            "addressCountry": office["country"],
+        }, rel
+        hours = n["openingHoursSpecification"]
+        assert hours["dayOfWeek"] == office["hours"]["days"], rel
+        assert (hours["opens"], hours["closes"]) == (office["hours"]["opens"], office["hours"]["closes"]), rel
+        assert IDENTITY["google_profile"]["maps_url"] in n["sameAs"], rel
+        trades = IDENTITY["service_lines"]["trades"]
+        assert {"@type": "AccountingService", "name": trades["service_name"], "url": trades["site"]} in n["department"], rel
+
+
+def test_public_name_is_pink_accounting():
+    # The legal entity belongs in legal and disclosure lines only, and always
+    # with "Pty Ltd". Anywhere else the business is "Pink Accounting".
+    legal = "Pink Accounting & Tax Solutions"
+    for p in PAGES + list(ROOT.glob("*.js")):
+        text = html.unescape(p.read_text(encoding="utf-8"))
+        for name in IDENTITY["banned_public_names"]:
+            assert name.lower() not in text.lower(), f"{p}: {name}"
+        assert not re.search(re.escape(legal) + r"(?! Pty Ltd)", text), f"{p}: {legal} without Pty Ltd"
+        title = re.search(r"<title>(.*?)</title>", text, re.S)
+        if title and "Pink" in title.group(1):
+            assert "Tax Solutions" not in title.group(1), p
+
+
+def test_cross_link_line_once_per_page():
+    x = IDENTITY["cross_links"]["on_hospitality_site"]
+    line = (
+        f'<p class="sister-line" data-identity="cross-link">{html.escape(x["text"])} '
+        f'<a href="{x["href"]}">{html.escape(x["link_text"])}</a></p>'
+    )
+    for p in PAGES:
+        if p in STUBS:
+            continue  # redirect stubs have no footer
+        text = p.read_text(encoding="utf-8")
+        assert text.count('data-identity="cross-link"') == 1, p
+        assert text.count(line) == 1, f"{p}: cross-link line differs from identity.json"
+        foot = text[text.rindex("<footer"):text.rindex("</footer>")]
+        assert line in foot, f"{p}: cross-link must sit in the footer"
+
+
+def test_contact_is_the_office_page():
+    # The Google profile's website link points here, so this page is the
+    # firm's office page: details from identity.json, hospitality first, and
+    # one small block that shows the trades door.
+    text = (ROOT / "contact" / "index.html").read_text(encoding="utf-8")
+    office = IDENTITY["office"]
+    for value in (office["one_line"], office["phone_display"], office["email"], office["hours"]["display"]):
+        assert html.escape(value) in text, value
+    assert "Saturday" not in text, "office hours are Monday to Friday only"
+    start = text.index('data-identity="two-doors"')
+    doors = text[start:text.index("</section>", start)]
+    trades = IDENTITY["service_lines"]["trades"]
+    assert trades["display"] in doors
+    assert f'href="{trades["site"]}"' in doors
+    assert "Hospitality" in doors
+    assert text.index("<h1>") < start, "hospitality must lead the page"
+    assert 'data-relay="contact-form"' in text, "contact form removed"
+
+
+def test_pages_equal_their_identity_rebuild():
+    # identity.json is regenerated from the firm's canonical file. If it
+    # changes and nobody reruns tools/build_landing_pages.py, this fails.
+    sys.path.insert(0, str(ROOT / "tools"))
+    import site_identity
+
+    for p in PAGES:
+        rel = p.relative_to(ROOT).as_posix()
+        text = p.read_text(encoding="utf-8")
+        assert site_identity.apply(text, rel) == text, f"{rel} is out of step with identity.json"
 
 
 def test_booking_click_fires_book_click():

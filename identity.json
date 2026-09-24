@@ -1,0 +1,88 @@
+{
+  "_rule": "Single source of truth for how Pink Accounting appears in public. Edit ONLY the canonical copy in Pinkypinkyyy/Pink-Accounting-Automation scripts/brand/pink-identity.json, then run scripts/brand/Invoke-PinkIdentityGuard.py --sync. Site copies are generated; site tests and the daily drift watch fail on any difference. HB 2026-09-24.",
+  "version": "2026-09-24.1",
+  "public_name": "Pink Accounting",
+  "legal": {
+    "entity": "Pink Accounting & Tax Solutions Pty Ltd",
+    "abn": "51 682 301 891",
+    "tax_agent_number": "26284368",
+    "asic_agent_number": "52580",
+    "use": "Legal and disclosure lines only, always with 'Pty Ltd'. Never the business name in headings, titles, schema name, Google or directories."
+  },
+  "office": {
+    "street": "Shop 15A, 18-22 Kremzow Rd",
+    "locality": "Brendale",
+    "region": "QLD",
+    "postcode": "4500",
+    "country": "AU",
+    "one_line": "Shop 15A, 18-22 Kremzow Rd, Brendale QLD 4500",
+    "phone_display": "(07) 3544 6386",
+    "phone_e164": "+61735446386",
+    "email": "admin@pinktax.com.au",
+    "hours": {
+      "days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "opens": "09:00",
+      "closes": "16:30",
+      "display": "Monday to Friday, 9:00am to 4:30pm"
+    }
+  },
+  "google_profile": {
+    "count_allowed": 1,
+    "name": "Pink Accounting",
+    "cid": "17544456102082616748",
+    "maps_url": "https://www.google.com/maps?cid=17544456102082616748",
+    "website_field": "https://pinktax.com.au/contact/?utm_source=google&utm_medium=organic&utm_campaign=gbp",
+    "services_must_include": [
+      "Hospitality accounting",
+      "Accounting for trades (Service Profit)"
+    ]
+  },
+  "schema": {
+    "organization_id": "https://pinktax.com.au/#organization",
+    "type": "AccountingService"
+  },
+  "service_lines": {
+    "hospitality": {
+      "service_name": "Pink Accounting",
+      "site": "https://pinktax.com.au/",
+      "audience": "cafes, restaurants, bars and venues",
+      "channels": [
+        "pinktax.com.au",
+        "facebook",
+        "instagram"
+      ]
+    },
+    "trades": {
+      "service_name": "Service Profit",
+      "display": "Service Profit, a Pink Accounting service",
+      "site": "https://www.serviceprofit.com.au/",
+      "audience": "air con, electrical and construction services businesses",
+      "channels": [
+        "serviceprofit.com.au",
+        "linkedin"
+      ]
+    }
+  },
+  "cross_links": {
+    "on_hospitality_site": {
+      "text": "Pink Accounting also looks after air con, electrical and construction businesses:",
+      "link_text": "Service Profit",
+      "href": "https://www.serviceprofit.com.au/"
+    },
+    "on_trades_site": {
+      "text": "Hospitality business? Pink Accounting looks after cafes, restaurants and venues at",
+      "link_text": "pinktax.com.au",
+      "href": "https://pinktax.com.au/"
+    }
+  },
+  "banned_public_names": [
+    "Pink Accounting and Tax Solutions",
+    "Pink Tax Solutions"
+  ]
+}

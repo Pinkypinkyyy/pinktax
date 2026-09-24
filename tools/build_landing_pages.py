@@ -5,14 +5,22 @@ the pages listed in PAGES below. Header, footer and the asset cache-buster are
 lifted out of index.html at build time, so a nav or footer change on the home
 page flows through here instead of drifting.
 
+It runs site_identity.sync() first, so identity.json reaches every page
+(including the footer this lifts) before anything is built. This script is
+the site rebuild: after running it, git status should be clean.
+
 Run from the repo root:  python3 tools/build_landing_pages.py
 """
 
 import re
 from pathlib import Path
 
+import site_identity
+
 ROOT = Path(__file__).resolve().parents[1]
-ORIGIN = "https://pinktax.com.au"
+ORIGIN = site_identity.ORIGIN
+AGENT = site_identity.LEGAL["tax_agent_number"]
+ASIC = site_identity.LEGAL["asic_agent_number"]
 OG = f"{ORIGIN}/assets/og.png"
 
 CSP = (
@@ -22,8 +30,9 @@ CSP = (
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
     "font-src https://fonts.gstatic.com; "
     "script-src 'self' https://www.googletagmanager.com https://connect.facebook.net; "
-    "connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com "
-    "https://region1.google-analytics.com https://www.facebook.com https://formsubmit.co; "
+    "connect-src 'self' https://www.google-analytics.com https://analytics.google.com "
+    "https://www.googletagmanager.com https://region1.google-analytics.com https://www.google.com "
+    "https://www.google.com.au https://www.facebook.com https://formsubmit.co; "
     "form-action 'self' mailto: https://formsubmit.co; media-src 'self'; base-uri 'self'"
 )
 
@@ -38,8 +47,15 @@ BANDS = [
 def home_parts():
     home = (ROOT / "index.html").read_text(encoding="utf-8")
     header = home[home.index("  <header class=\"nav\""):home.index("</header>") + len("</header>")]
-    footer = home[home.index("  <footer class=\"foot\""):home.index("</footer>") + len("</footer>")]
-    ver = re.search(r'styles\.css\?v=([a-z0-9]+)', home).group(1)
+    # Search for </footer> from the site footer onwards: the reviews on the
+    # home page use <footer> for the reviewer's name, and matching the first
+    # one left every landing page with no footer at all.
+    start = home.index("  <footer class=\"foot\"")
+    footer = home[start:home.index("</footer>", start) + len("</footer>")]
+    ver = {
+        n: re.search(rf"/{n}\.(?:css|js)\?v=([a-z0-9]+)", home).group(1)
+        for n in ("styles", "track", "nav")
+    }
     return header, footer, ver
 
 
@@ -80,7 +96,7 @@ def head(slug, title, desc, ver, faqs):
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v={ver}">{faq_ld}
+  <link rel="stylesheet" href="/styles.css?v={ver['styles']}">{faq_ld}
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -179,8 +195,8 @@ def page(slug, title, desc, h1, lead, sections, faqs, related):
     </section>
   </main>
 {footer}
-  <script src="/track.js?v={ver}"></script>
-  <script src="/nav.js?v={ver}"></script>
+  <script src="/track.js?v={ver['track']}"></script>
+  <script src="/nav.js?v={ver['nav']}"></script>
 </body>
 </html>
 """
@@ -190,7 +206,7 @@ def page(slug, title, desc, h1, lead, sections, faqs, related):
     return slug
 
 
-CHECK = '<p><a href="/margin-check/">Run the 60-second Margin Check</a> on your own figures. Nothing is sent anywhere; it runs in your browser.</p>'
+CHECK = '<p><a href="/margin-check/">Run the 60-second Margin Check</a> on your own figures. It runs in your browser, and nothing is sent unless you choose to send it.</p>'
 PLAN = '<p>Most venues sit on <a href="/#pink-pricing">Hospitality Margin Protection at $990 + GST a month</a>, which carries the bookkeeping, payroll for up to five staff and BAS oversight underneath the monthly margin review.</p>'
 
 R_ACCT = ("restaurant-accountant", "Restaurant accountant", "What a specialist actually does for a restaurant.")
@@ -209,7 +225,7 @@ PAGES = [
         title="Restaurant Accountant | Margin, Payroll, BAS | Pink Accounting",
         desc="A restaurant accountant who reads wages, food cost and prime cost every month, not once a year. Registered tax agent, hospitality only.",
         h1="A restaurant accountant who reads the month, not just the year.",
-        lead="Most accountants meet a restaurant once a year, after every decision that shaped the result has already been made. We work the other way around: the books stay current, the margin gets read every month, and the tax work happens on top of numbers you have already seen.",
+        lead="A restaurant's costs move week to week, so we work to that rhythm. The books stay current, the margin gets read every month, and the tax work happens on top of numbers you have already seen.",
         sections=[
             ("What a restaurant accountant should be doing", [
                 "<p>A restaurant is not a retail shop with a kitchen. The cost base moves weekly, the labour is rostered against trade that changes with the weather, and a supplier price rise lands without an email. So the job is not just lodgement. It is keeping the four numbers that decide the business visible while you can still act on them.</p>",
@@ -229,7 +245,7 @@ PAGES = [
                 CHECK,
             ]),
             ("Working with Pink", [
-                "<p>We are a small specialist firm. You deal with the person responsible for your numbers rather than a queue, and you get them on WhatsApp between meetings. Registered Tax Agent 26284368, ASIC Registered Agent 52580, based in Brendale and working with venues across Australia.</p>",
+                f"<p>We are a small specialist firm. You deal with the person responsible for your numbers rather than a queue, and you get them on WhatsApp between meetings. Registered Tax Agent {AGENT}, ASIC Registered Agent {ASIC}, based in Brendale and working with venues across Australia.</p>",
             ]),
         ],
         faqs=[
@@ -497,7 +513,7 @@ PAGES = [
         faqs=[
             ("Do we have to be in Brisbane?", "No. The office is at Brendale and we work with venues across Australia. Brisbane and South East Queensland clients simply get the option of meeting in person."),
             ("Can you visit the venue?", "Yes, and for a new engagement we prefer to, at least once. Seeing the floor at trade explains numbers that a file never will."),
-            ("Are you a registered tax agent?", "Yes. Registered Tax Agent 26284368 and ASIC Registered Agent 52580, listed on the TPB public register."),
+            ("Are you a registered tax agent?", f"Yes. Registered Tax Agent {AGENT} and ASIC Registered Agent {ASIC}, listed on the TPB public register."),
         ],
         related=[R_ACCT, R_CAFE, R_HBK],
     ),
@@ -505,10 +521,11 @@ PAGES = [
 
 
 def main():
+    site_identity.sync()
     built = [page(**spec) for spec in PAGES]
     locs = [
         "/", "/system/", "/why-pink/", "/book/", "/contact/", "/margin-check/",
-        "/working-with-us/", "/privacy/", "/terms/", "/feedback/",
+        "/switching/", "/working-with-us/", "/privacy/", "/terms/", "/feedback/",
         "/restaurant-cafe-bookkeeping-brendale/", "/accountant-brendale/",
     ] + [f"/{slug}/" for slug in built]
     seen, ordered = set(), []
