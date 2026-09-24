@@ -370,6 +370,12 @@ def test_no_competitor_attack_copy():
         "cheap accountant",
         "bad accountant",
         "wrong accountant",
+        # 24 Sep 2026 review: these got through and were live.
+        "plenty of",
+        "fewer can",
+        "most bookkeeping",
+        "should be doing",
+        "stay somewhere",
     )
     for p in PAGES:
         text = p.read_text(encoding="utf-8").lower()
@@ -594,7 +600,9 @@ def test_identity_first_on_every_first_screen():
         text = (ROOT / rel).read_text(encoding="utf-8")
         h1 = re.search(r"<h1[^>]*>(.*?)</h1>", text, re.S).group(1)
         assert h1 == "Accountants, bookkeepers and tax agents for hospitality", rel
-        assert trust in text, rel
+        # The H1 says who we are, so the line under the buttons carries the offer.
+        assert 'class="trust-line">Bookkeeping, payroll, BAS and tax' in text, rel
+        assert "$990 + GST a month" in text, rel
     margin = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
     assert 'class="hook" id="hl"' in margin, "ad message match must target the hook, not the H1"
     for p in PAGES:
@@ -610,3 +618,18 @@ def test_guide_pages_carry_the_trust_line():
     for slug in ("cafe-accountant", "restaurant-accountant", "hospitality-bookkeeping", "hospitality-payroll"):
         text = (ROOT / slug / "index.html").read_text(encoding="utf-8")
         assert 'class="trust-line"' in text, slug
+
+
+def test_hospitality_only_and_food_cost_said_right():
+    why = (ROOT / "why-pink" / "index.html").read_text(encoding="utf-8")
+    assert "beyond hospitality" not in why
+    food = (ROOT / "restaurant-food-cost-percentage" / "index.html").read_text(encoding="utf-8")
+    assert "It is purchases divided by sales" not in food
+
+
+def test_booking_button_on_the_first_screen_of_money_pages():
+    book = (ROOT / "book" / "index.html").read_text(encoding="utf-8")
+    assert book.index('data-event="book-calendar"') < book.index("What happens on the call")
+    margin = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
+    assert margin.index('data-ev="cta_top"') < margin.index('<ul class="ticks">')
+

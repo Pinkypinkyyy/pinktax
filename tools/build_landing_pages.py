@@ -160,14 +160,14 @@ def page(slug, title, desc, h1, lead, sections, faqs, related):
   <main id="main">
     <section class="page">
       <div class="wrap">
-        <span class="eyebrow">Hospitality accounting · Australia-wide</span>
+        <span class="eyebrow">Accountants · Bookkeepers · Tax agents · Hospitality</span>
         <h1>{h1}</h1>
         <p class="lead">{lead}</p>
         <div class="cta">
           <a class="btn btn-primary" href="/book/" data-event="{slug}-book">Book a 15-minute call</a>
           <a class="btn btn-outline" href="/margin-check/">Check your margin in 60 seconds</a>
         </div>
-        <p class="trust-line">Accountants, bookkeepers and tax agents for hospitality. From $550 + GST a month; most venues $990. Registered tax agent 26284368.</p>
+        <p class="trust-line">Accountants, bookkeepers and tax agents for hospitality. Most venues $990 + GST a month; from $550. Registered tax agent 26284368.</p>
       </div>
     </section>
     <section class="band band-bone">
@@ -228,7 +228,7 @@ PAGES = [
         h1="A restaurant accountant who reads the month, not just the year.",
         lead="A restaurant's costs move week to week, so we work to that rhythm. The books stay current, the margin gets read every month, and the tax work happens on top of numbers you have already seen.",
         sections=[
-            ("What a restaurant accountant should be doing", [
+            ("What a restaurant accountant does each month", [
                 "<p>A restaurant is not a retail shop with a kitchen. The cost base moves weekly, the labour is rostered against trade that changes with the weather, and a supplier price rise lands without an email. So the job is not just lodgement. It is keeping the four numbers that decide the business visible while you can still act on them.</p>",
                 bands_table(),
             ]),
@@ -292,7 +292,7 @@ PAGES = [
         title="Hospitality Bookkeeping Australia | Pink Accounting",
         desc="Hospitality bookkeeping that produces numbers you can run a venue from: POS takings, supplier bills, stock, payroll and reconciled bank.",
         h1="Bookkeeping you can actually run a venue from.",
-        lead="Most bookkeeping is built to satisfy the BAS. Hospitality bookkeeping has to do more than that: it has to tell you, this month, whether the roster and the menu are still working.",
+        lead="Getting the BAS right is the minimum. Hospitality books also have to tell you, this month, whether the roster and the menu are still working.",
         sections=[
             ("The difference between compliant and useful", [
                 "<p>A file can be perfectly compliant and still useless for running a venue. If every supplier invoice is coded to one catch-all cost of sales account, the BAS will be right and the margin work will be impossible. If takings land as a single deposit with no split between food, beverage and tips, nobody can tell you why last month moved.</p>",
@@ -389,7 +389,7 @@ PAGES = [
         title="Restaurant Food Cost Percentage | How to Calculate It | Pink",
         desc="How to calculate food cost percentage properly using opening and closing stock, where it should sit, and what to do when it drifts.",
         h1="Food cost percentage, calculated properly.",
-        lead="Food cost percentage is the number most owners quote and the one most often worked out wrong. Purchases divided by sales is not food cost. It is purchases divided by sales, and in a month with heavy buying it will lie to you.",
+        lead="Food cost percentage is the number most owners quote and the one most often worked out wrong. Most owners work it out as purchases divided by sales. Food cost is what you used, not what you bought, and in a heavy buying month the quick version will mislead you.",
         sections=[
             ("The calculation", [
                 "<p>Cost of goods used, not bought:</p>",
@@ -495,10 +495,10 @@ PAGES = [
         title="Hospitality Accountant Brisbane | Cafes & Restaurants | Pink",
         desc="Hospitality accountant in Brisbane. Monthly margin review, bookkeeping, payroll and BAS for cafes, restaurants and bars. Brendale office.",
         h1="Hospitality accountant in Brisbane.",
-        lead="Pink Accounting works with cafes, restaurants, bars and multi-venue groups across Brisbane and greater South East Queensland, from an office at Brendale. Hospitality is all we do.",
+        lead="Pink Accounting works with cafes, restaurants, bars and multi-venue groups across Brisbane and greater South East Queensland, from an office at Brendale.",
         sections=[
             ("Local, and specialist", [
-                "<p>Plenty of Brisbane firms will do your tax. Fewer can tell you why your wage cost moved two points in August, and fewer again will tell you before the year is over. We read the venue every month against the same bands, so the conversation is about what to change rather than what happened.</p>",
+                "<p>We read your venue every month against the same bands, so you know why wage cost moved two points in August while August can still be fixed. The conversation is about what to change, not what happened.</p>",
                 bands_table(),
             ]),
             ("Who we work with", [
