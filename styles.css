@@ -311,7 +311,7 @@ h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.12;letter-spac
 .foot .grid{display:grid;grid-template-columns:1.6fr 1fr 1.1fr 1.1fr;gap:36px}
 .foot img{height:30px;margin-bottom:14px;filter:none}
 .foot .blurb{max-width:28em;line-height:1.7;color:rgba(255,255,255,.78)}
-.foot h4{font-family:var(--mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:#fff;margin-bottom:12px}
+.foot h2{font-family:var(--mono);font-size:.78rem;font-weight:600;line-height:1.4;letter-spacing:.12em;text-transform:uppercase;color:#fff;margin:0 0 12px}
 .foot a{display:block;padding:4px 0;color:rgba(255,255,255,.78)}
 .foot a:hover{color:#fff}
 .foot .legal{margin-top:40px;padding-top:18px;border-top:1px solid rgba(255,255,255,.18);font-size:.85rem;color:rgba(255,255,255,.62);line-height:1.7}

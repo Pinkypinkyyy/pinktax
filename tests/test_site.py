@@ -650,3 +650,13 @@ def test_no_implied_contrast_lines():
         for phrase in ("ticket queue", "a queue", "easier than staying put", "not a service", "honest tiering"):
             assert phrase not in text, (rel, phrase)
 
+
+
+def test_headings_do_not_skip_a_level():
+    # Lighthouse 24 Sep 2026: footer h4 after a page h2 skipped a level.
+    for p in PAGES:
+        if p in STUBS:
+            continue
+        levels = [int(m) for m in re.findall(r"<h([1-6])[ >]", p.read_text(encoding="utf-8"))]
+        for before, after in zip(levels, levels[1:]):
+            assert after <= before + 1, f"{p}: h{before} jumps to h{after}"
