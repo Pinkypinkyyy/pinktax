@@ -241,11 +241,10 @@ footer a{color:var(--muted);text-decoration:underline}
 
       <div id="step2">
         <div class="ok">✓</div>
-        <h2>Got it. Now pick your time.</h2>
-        <p class="sub">Your details are with us. Choose a slot below and you are locked in — or call now and we will do it on the spot.</p>
-        <a class="btn btn--wide" id="bookBtn" href="#" target="_blank" rel="noopener" data-ev="booking_click">Pick a time</a>
-        <a class="btn btn--wide btn--ghost" href="tel:+61735446386" style="margin-top:10px" data-ev="call_click">Call (07) 3544 6386</a>
-        <p class="hint">If nothing suits, reply to the confirmation email and we will work around your service.</p>
+        <h2>Got it. Pink will be in touch to lock in a time.</h2>
+        <p class="sub">Your details are with us, so there is nothing else to fill in. Within one business day you will get a call or an email with two times to choose from.</p>
+        <a class="btn btn--wide" href="tel:+61735446386" data-ev="call_click">Rather do it now? Call (07) 3544 6386</a>
+        <p class="hint">In the middle of service? Reply to our email with a time that suits and we will work around it.</p>
       </div>
     </div>
   </div>
@@ -333,8 +332,7 @@ footer a{color:var(--muted);text-decoration:underline}
 <script>
 (function(){
   var CFG=window.PINK_CFG, f=document.getElementById('leadForm'), err=document.getElementById('err'),
-      btn=document.getElementById('submitBtn'), book=document.getElementById('bookBtn');
-  book.href=CFG.BOOKING_URL;
+      btn=document.getElementById('submitBtn');
 
   /* --- message match: ad group decides the headline, so the page answers the search --- */
   var q=new URLSearchParams(location.search), s=q.get('s');
