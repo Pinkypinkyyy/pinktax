@@ -645,8 +645,8 @@ def test_ad_page_counts_a_lead_only_when_it_was_sent():
 
 
 def test_no_implied_contrast_lines():
-    for rel in ("index.html", "contact/index.html", "switching/index.html", "why-pink/index.html"):
+    for rel in ("index.html", "contact/index.html", "switching/index.html", "why-pink/index.html", "margin/index.html", "restaurant-accountant/index.html"):
         text = (ROOT / rel).read_text(encoding="utf-8").lower()
-        for phrase in ("ticket queue", "easier than staying put", "not a service", "honest tiering"):
+        for phrase in ("ticket queue", "a queue", "easier than staying put", "not a service", "honest tiering"):
             assert phrase not in text, (rel, phrase)
 

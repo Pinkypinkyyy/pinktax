@@ -246,7 +246,7 @@ PAGES = [
                 CHECK,
             ]),
             ("Working with Pink", [
-                f"<p>We are a small specialist firm. You deal with the person responsible for your numbers rather than a queue, and you get them on WhatsApp between meetings. Registered Tax Agent {AGENT}, ASIC Registered Agent {ASIC}, based in Brendale and working with venues across Australia.</p>",
+                f"<p>We are a small specialist firm. You deal with the person responsible for your numbers, and you get them on WhatsApp between meetings. Registered Tax Agent {AGENT}, ASIC Registered Agent {ASIC}, based in Brendale and working with venues across Australia.</p>",
             ]),
         ],
         faqs=[
