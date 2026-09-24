@@ -1,6 +1,6 @@
 {
   "_rule": "Single source of truth for how Pink Accounting appears in public. Edit ONLY the canonical copy in Pinkypinkyyy/Pink-Accounting-Automation scripts/brand/pink-identity.json, then run scripts/brand/Invoke-PinkIdentityGuard.py --sync. Site copies are generated; site tests and the daily drift watch fail on any difference. HB 2026-09-24.",
-  "version": "2026-09-24.1",
+  "version": "2026-09-24.2",
   "public_name": "Pink Accounting",
   "legal": {
     "entity": "Pink Accounting & Tax Solutions Pty Ltd",
@@ -28,8 +28,8 @@
         "Friday"
       ],
       "opens": "09:00",
-      "closes": "16:30",
-      "display": "Monday to Friday, 9:00am to 4:30pm"
+      "closes": "17:00",
+      "display": "Monday to Friday, 9:00am to 5:00pm"
     }
   },
   "google_profile": {
