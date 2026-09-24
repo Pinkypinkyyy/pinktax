@@ -167,6 +167,7 @@ def page(slug, title, desc, h1, lead, sections, faqs, related):
           <a class="btn btn-primary" href="/book/" data-event="{slug}-book">Book a 15-minute call</a>
           <a class="btn btn-outline" href="/margin-check/">Check your margin in 60 seconds</a>
         </div>
+        <p class="trust-line">Accountants, bookkeepers and tax agents for hospitality. From $550 + GST a month; most venues $990. Registered tax agent 26284368.</p>
       </div>
     </section>
     <section class="band band-bone">

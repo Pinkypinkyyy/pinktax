@@ -937,3 +937,11 @@ a:focus-visible,button:focus-visible,video:focus-visible,summary:focus-visible{
 .band .prose .table-hint{margin-top:8px}
 .psub{margin:32px 0 0}
 .two-doors{margin-bottom:56px}
+
+/* Identity first, 3-second fixes (HB 24 Sep 2026) */
+.hook{font-weight:700;font-size:clamp(1.25rem,2.3vw,1.7rem);line-height:1.25;letter-spacing:-.015em;color:#D8124B;margin:10px 0 4px;text-wrap:balance}
+.trust-line{margin:14px 0 0;font-size:.86rem;line-height:1.5;color:#5b5b63;max-width:40em}
+.page .trust-line{margin-bottom:8px}
+.call-icon{display:none;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:#ED1651;color:#fff}
+.call-icon svg{width:20px;height:20px}
+@media(max-width:940px){.call-icon{display:inline-flex}}

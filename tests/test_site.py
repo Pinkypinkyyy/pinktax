@@ -584,3 +584,29 @@ def test_paid_landing_page_feeds_both_platforms():
     # in the visitor's own mail client. If a FORM_ENDPOINT is ever wired, that
     # decision needs a human looking at where a venue's sales figure lands.
     assert "mailto:admin@pinktax.com.au" in lp, "lead fallback relay changed"
+
+
+def test_identity_first_on_every_first_screen():
+    # HB 24 Sep 2026: people must know us as accountants, bookkeepers and tax
+    # agents first, then hospitality. The ad-matched line sits under the H1.
+    trust = "Accountants, bookkeepers and tax agents for hospitality."
+    for rel in ("index.html", "margin/index.html"):
+        text = (ROOT / rel).read_text(encoding="utf-8")
+        h1 = re.search(r"<h1[^>]*>(.*?)</h1>", text, re.S).group(1)
+        assert h1 == "Accountants, bookkeepers and tax agents for hospitality", rel
+        assert trust in text, rel
+    margin = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
+    assert 'class="hook" id="hl"' in margin, "ad message match must target the hook, not the H1"
+    for p in PAGES:
+        if p in STUBS:
+            continue
+        text = p.read_text(encoding="utf-8")
+        assert "BAS &amp; tax agent" not in text and "BAS & tax agent" not in text, p
+        if 'class="phone"' in text:
+            assert 'class="call-icon"' in text, f"{p}: no tap-to-call"
+
+
+def test_guide_pages_carry_the_trust_line():
+    for slug in ("cafe-accountant", "restaurant-accountant", "hospitality-bookkeeping", "hospitality-payroll"):
+        text = (ROOT / slug / "index.html").read_text(encoding="utf-8")
+        assert 'class="trust-line"' in text, slug
