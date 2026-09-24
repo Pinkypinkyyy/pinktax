@@ -17,7 +17,7 @@ window.PINK_CFG = {
   ADS_ID:        'AW-XXXXXXXXXX',             // optional. Conversions already reach Ads via the GA4 import; this block no-ops while unset
   ADS_LABEL:     'XXXXXXXXXXXXXXXXXX',        // only needed if the AW- direct tag above is ever used instead of the GA4 import
   META_PIXEL_ID: '1237708438188688',          // "Pink Accounting's Pixel" - the dataset ad account 543906261707152 can actually use
-  FORM_ENDPOINT: '',                          // TODO Power Automate / Forms HTTP endpoint. Empty = page still works, lead is emailed via mailto fallback
+  FORM_ENDPOINT: 'https://formsubmit.co/ajax/admin@pinktax.com.au', // same tested relay as every other pinktax form
   BOOKING_URL:   'https://outlook.office.com/book/PinkAccountingTaxSolutionsClientBookings@pinktax.com.au/'
 };
 </script>
@@ -232,6 +232,7 @@ footer a{color:var(--muted);text-decoration:underline}
 
           <p class="err" id="err">Please complete the highlighted fields.</p>
           <button class="btn btn--wide" type="submit" style="margin-top:22px" id="submitBtn">Request my 15 minutes</button>
+          <p id="sendFail" hidden style="margin:12px 0 0;font-weight:600">That did not send. Call <a href="tel:+61735446386">(07) 3544 6386</a>, or send the email that just opened.</p>
           <p class="hint">We do not ask for a TFN, bank details or logins at this stage, and we never will by email. <a href="/privacy/">Privacy</a>.</p>
         </form>
       </div>
@@ -258,7 +259,7 @@ footer a{color:var(--muted);text-decoration:underline}
       <div><div class="num">03</div><h3>Where is it leaking?</h3><p>Wages, food and beverage, rent and overhead, each against what it should be for a venue like yours.</p></div>
       <div><div class="num">04</div><h3>What do we do about it?</h3><p>A short list of changes worth making, ranked, with the dollars attached to each one.</p></div>
       <div><div class="num">05</div><h3>Compliance, handled</h3><p>Bookkeeping, payroll, STP, BAS and IAS, annual financials and returns. Company, trust and individual.</p></div>
-      <div><div class="num">06</div><h3>One person, not a queue</h3><p>You deal with the principal, a registered tax agent, not a rotating offshore team.</p></div>
+      <div><div class="num">06</div><h3>One person, not a queue</h3><p>You deal with the principal, a registered tax agent.</p></div>
     </div>
   </div>
 </section>
@@ -341,7 +342,7 @@ footer a{color:var(--muted);text-decoration:underline}
     bris:{e:'Brendale, North Brisbane',h:'A Brisbane accountant who reads the month, not just the year.',
       s:'Bookkeeping, payroll, BAS and tax under one fixed monthly fee, from a registered tax agent five minutes off the Bruce Highway.'},
     book:{e:'Registered tax agent',h:'Books you can actually make a decision from.',
-      s:'Xero bookkeeping, payroll and STP coded from source documents — never guessed off the bank feed. BAS lodged on time, every time.'},
+      s:'Xero bookkeeping, payroll and STP coded from source documents — never guessed off the bank feed. BAS lodged on time.'},
     tax:{e:'Registered Tax Agent 26284368',h:'Tax handled through the year, not sprung on you in July.',
       s:'Company, trust and individual returns, BAS and IAS, and tax planning while there is still time to act on it. Fixed fee, quoted upfront.'},
     switch:{e:'Changing accountants',h:'Changing accountants is a form and a phone call.',
@@ -385,16 +386,22 @@ footer a{color:var(--muted);text-decoration:underline}
       document.getElementById('formCard').scrollIntoView({behavior:'smooth',block:'center'});
     }
 
-    if(CFG.FORM_ENDPOINT){
-      fetch(CFG.FORM_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)})
-        .then(done).catch(function(){ done(); });   /* never trap the lead behind a failed POST */
-    } else {
-      /* fallback until the endpoint is wired: hand the lead straight to the inbox */
-      var body=Object.keys(d).map(function(k){return k+': '+d[k];}).join('\n');
+    /* 24 Sep 2026: count a Lead only when the relay accepted it. If it did not,
+       never say "your details are with us": show the phone number and hand
+       the details to the visitor's mail app instead. */
+    function fallback(){
+      var fail=document.getElementById('sendFail'); if(fail) fail.hidden=false;
+      var btn=document.getElementById('submitBtn'); if(btn){ btn.disabled=false; btn.textContent='Request my 15 minutes'; }
+      var body=Object.keys(d).filter(function(k){return k.charAt(0)!=='_'&&d[k];}).map(function(k){return k+': '+d[k];}).join('\n');
       window.location.href='mailto:admin@pinktax.com.au?subject='+
         encodeURIComponent('Website call request - '+(d.venue||d.name))+'&body='+encodeURIComponent(body);
-      setTimeout(done,400);
     }
+    d._template='table'; d._captcha='false'; d._subject='Website call request - '+(d.venue||d.name||'');
+    var sb=document.getElementById('submitBtn'); if(sb){ sb.disabled=true; sb.textContent='Sending\u2026'; }
+    fetch(CFG.FORM_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(d)})
+      .then(function(r){ if(!r.ok) throw new Error('send-failed'); return r.json(); })
+      .then(function(j){ if(!j||String(j.success)==='false') throw new Error('not-sent'); done(); })
+      .catch(fallback);
   });
 })();
 </script>

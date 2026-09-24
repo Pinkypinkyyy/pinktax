@@ -633,3 +633,20 @@ def test_booking_button_on_the_first_screen_of_money_pages():
     margin = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
     assert margin.index('data-ev="cta_top"') < margin.index('<ul class="ticks">')
 
+
+def test_ad_page_counts_a_lead_only_when_it_was_sent():
+    # 24 Sep 2026: the /margin/ form had no endpoint, opened a mail app and
+    # still told the visitor "your details are with us" and fired a Lead.
+    m = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
+    assert "FORM_ENDPOINT: 'https://formsubmit.co/ajax/admin@pinktax.com.au'" in m
+    assert "setTimeout(done" not in m and "catch(function(){ done(); })" not in m
+    assert "String(j.success)==='false'" in m and 'id="sendFail"' in m
+    assert "offshore" not in m
+
+
+def test_no_implied_contrast_lines():
+    for rel in ("index.html", "contact/index.html", "switching/index.html", "why-pink/index.html"):
+        text = (ROOT / rel).read_text(encoding="utf-8").lower()
+        for phrase in ("ticket queue", "easier than staying put", "not a service", "honest tiering"):
+            assert phrase not in text, (rel, phrase)
+

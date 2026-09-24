@@ -948,3 +948,4 @@ a:focus-visible,button:focus-visible,video:focus-visible,summary:focus-visible{
 .page .prose h1{color:var(--ink)}
 .trust-line{color:#3f3f46;font-size:.92rem}
 .prose .btn,.prose .btn:hover{text-decoration:none}
+.page .prose a.btn,.page .prose a.btn:hover{text-decoration:none}
