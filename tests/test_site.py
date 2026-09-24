@@ -329,6 +329,24 @@ def test_assets():
     assert (ROOT / "assets" / "pink-portrait.jpg").exists()
 
 
+def test_tab_icon_is_square():
+    # Pages used to point the tab icon at the wide wordmark, which the browser
+    # squashed into a 16px smear. The icon is now a square tile in favicon.ico.
+    import struct
+
+    ico = (ROOT / "favicon.ico").read_bytes()
+    count = struct.unpack("<H", ico[4:6])[0]
+    sizes = {(ico[6 + 16 * i], ico[7 + 16 * i]) for i in range(count)}
+    assert {(16, 16), (32, 32), (48, 48)} <= sizes, sizes
+    touch = (ROOT / "apple-touch-icon.png").read_bytes()
+    assert struct.unpack(">II", touch[16:24]) == (180, 180)
+    for p in PAGES:
+        text = p.read_text(encoding="utf-8")
+        assert 'href="/assets/logo.png"' not in text, p
+        if 'http-equiv="refresh"' not in text:  # redirect stubs fall back to /favicon.ico
+            assert 'rel="icon" href="/favicon.ico"' in text, p
+
+
 LANDING = (
     "restaurant-accountant",
     "cafe-accountant",
