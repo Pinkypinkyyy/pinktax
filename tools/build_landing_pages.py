@@ -307,14 +307,14 @@ PAGES = [
                 "<li>Owner drawings, loans and related-party transactions kept clean for year end</li></ul>",
                 "<p>Delivery platforms deserve their own mention. The deposit in your bank is net of commission, and if it is booked as revenue, your sales are understated and your margin looks better than it is.</p>",
             ]),
-            ("Two people check the books before anything is lodged", [
-                "<p>Before a BAS, a monthly report or a tax return goes out, the period is checked twice. One of us works through it. A second person, who did not do that work, reviews it in live Xero and signs it off the same day. Anything they disagree on goes back and is fixed in Xero, not explained away.</p>",
-                "<ul><li>The bank in Xero agrees to your bank statement, to the cent</li>"
-                "<li>Food, beverage and other supplier accounts agree to the suppliers' own statements, or each difference is named</li>"
-                "<li>Every pay run is traced through STP, the bank and the super fund</li>"
-                "<li>The BAS figures agree to the file and to what was lodged before</li>"
-                "<li>Opening balances are checked against last year's finished figures, so an old period cannot quietly change</li></ul>",
-                "<p>Once a BAS is lodged, that period is locked in Xero. Changing a locked period is the principal's decision, made in writing. The principal signs off every BAS and return before it is lodged.</p>",
+            ("How the books are checked before a BAS is lodged", [
+                "<p>Our method is a two-person check. One person works through the period. A second person, who did not do that work, reviews it in live Xero before it is signed off. Anything they disagree on goes back and is fixed in Xero, not explained away.</p>",
+                "<ul><li>The bank in Xero is agreed to your bank statement</li>"
+                "<li>Food, beverage and other supplier accounts are agreed to the suppliers' own statements, or the difference is named</li>"
+                "<li>Pay runs are traced through STP, the bank and the super fund</li>"
+                "<li>The BAS figures are agreed to the file and to what was lodged before</li>"
+                "<li>Opening balances are checked against last year's finished figures</li></ul>",
+                "<p>The principal reviews the BAS or tax return before it is lodged.</p>",
             ]),
             ("Then the numbers get read", [
                 "<p>Clean books are the input, not the output. Every month we read them against the bands below and tell you what changed.</p>",
