@@ -327,6 +327,9 @@ def test_assets():
     assert (ROOT / "assets" / "logo.png").exists()
     assert (ROOT / "assets" / "logo-white.png").exists()
     assert (ROOT / "assets" / "pink-portrait.jpg").exists()
+    # Email signatures, the firm email code and every email already sent
+    # load the logo from the old WordPress path. Moving it blanks them all.
+    assert (ROOT / "wp-content" / "uploads" / "2026" / "06" / "pink_logo_email_360.png").exists()
 
 
 def test_tab_icon_is_square():
