@@ -169,6 +169,16 @@ def test_cross_link_line_once_per_page():
         assert line in foot, f"{p}: cross-link must sit in the footer"
 
 
+def test_address_written_one_way_only():
+    # Google compares the site against the profile and directories character
+    # by character, slash included. Footer and schema come from identity.json.
+    street = IDENTITY["office"]["street"]
+    form = re.compile(r"Shop 15A\s*[,/]?\s*18\s*[-–]\s*22 Kremzow R(?:oa)?d")
+    for p in PAGES:
+        for m in form.finditer(p.read_text(encoding="utf-8")):
+            assert m.group(0) == street, f"{p.relative_to(ROOT)}: {m.group(0)!r}"
+
+
 def test_contact_is_the_office_page():
     # The Google profile's website link points here, so this page is the
     # firm's office page: details from identity.json, hospitality first, and

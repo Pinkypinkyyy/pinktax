@@ -11,6 +11,7 @@ byte alone:
 
   * the AccountingService JSON-LD node (home and /contact/)
   * the one cross-link line at the foot of every page
+  * the footer office address
   * the office and two-doors blocks on /contact/, between identity markers
 
 apply() is pure, so tests can check that every committed page already equals
@@ -35,6 +36,7 @@ XLINK = ID["cross_links"]["on_hospitality_site"]
 
 LD = re.compile(r'(<script type="application/ld\+json">\s*)(\{"@context":"https://schema\.org","@type":"AccountingService".*?\})(\s*</script>)', re.S)
 SISTER = re.compile(r'[ \t]*<p class="sister-line"[^>]*>.*?</p>\n')
+ADDR = re.compile(r'(<p class="addr"[^>]*>).*?(</p>)', re.S)
 
 
 def e(text):
@@ -115,6 +117,10 @@ def fill(text, name, body):
 
 def apply(text, rel):
     text = LD.sub(lambda m: m.group(1) + json.dumps(org_node(), ensure_ascii=True, separators=(",", ":")) + m.group(3), text)
+
+    # Footer address, written exactly as the Google profile and directories carry it.
+    town = f'{OFFICE["locality"]} {OFFICE["region"]} {OFFICE["postcode"]}'
+    text = ADDR.sub(lambda m: f'{m.group(1)}{e(OFFICE["street"])}<br>{e(town)}{m.group(2)}', text)
 
     # One cross-link line, last thing inside the footer's wrap.
     text = SISTER.sub("", text)
