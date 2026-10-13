@@ -83,25 +83,32 @@
           <a class="btn btn-outline" id="pmc-send" href="#" hidden data-event="calc-email">Email these results to Pink</a>
         <form class="enquiry" id="pmcLead" method="post" data-relay="margin-check" data-ok="pmcLeadOk" data-subject="Margin Check enquiry">
           <h2>Want this checked against your real books?</h2>
-          <p>Leave your details and Pink will ring you about what the check found. The figures you typed stay in this browser — only the four boxes below are sent.</p>
+          <p>Leave your details and Pink will ring you about what the check found. The figures you typed stay in this browser — only the five boxes below are sent.</p>
           <div class="fields">
             <label>Your name
               <input type="text" name="name" autocomplete="name" required>
+            </label>
+            <label>Business name
+              <input type="text" name="business" autocomplete="organization" required>
             </label>
             <label>Email
               <input type="email" name="email" autocomplete="email" required>
             </label>
             <label>Mobile
-              <input type="tel" name="mobile" autocomplete="tel" required>
+              <input type="tel" name="mobile" autocomplete="tel" inputmode="tel" required data-phone>
             </label>
-            <label>Venue
-              <select name="venue">
+            <label>Type of business
+              <select name="venue" required>
                 <option value="">Choose one</option>
                 <option>Cafe</option>
                 <option>Restaurant</option>
                 <option>Bar or pub</option>
+                <option>Takeaway or food truck</option>
+                <option>Bakery or catering</option>
+                <option>Hotel, club or function venue</option>
                 <option>More than one venue</option>
-                <option>Something else</option>
+                <option>Other food or drink business</option>
+                <option>Not hospitality</option>
               </select>
             </label>
           </div>
@@ -146,7 +153,7 @@
     </div>
   </footer>
   <script src="/track.js?v=i6"></script>
-  <script src="/nav.js?v=i5"></script>
+  <script src="/nav.js?v=i7"></script>
   <script src="/margin-check.js?v=i6"></script>
 </body>
 </html>

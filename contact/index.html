@@ -83,20 +83,59 @@
           <label>Your name
             <input type="text" name="name" autocomplete="name" required>
           </label>
+          <label>Business name
+            <input type="text" name="business" autocomplete="organization" required>
+          </label>
           <label>Email
             <input type="email" name="email" autocomplete="email" required>
           </label>
           <label>Mobile
-            <input type="tel" name="mobile" autocomplete="tel" required>
+            <input type="tel" name="mobile" autocomplete="tel" inputmode="tel" required data-phone>
           </label>
-          <label>Venue
-            <select name="venue">
+          <label>Type of business
+            <select name="venue" required>
               <option value="">Choose one</option>
               <option>Cafe</option>
               <option>Restaurant</option>
               <option>Bar or pub</option>
+              <option>Takeaway or food truck</option>
+              <option>Bakery or catering</option>
+              <option>Hotel, club or function venue</option>
               <option>More than one venue</option>
+              <option>Other food or drink business</option>
+              <option>Not hospitality</option>
+            </select>
+          </label>
+          <label>Yearly turnover, roughly
+            <select name="turnover" required>
+              <option value="">Choose one</option>
+              <option>Not trading yet</option>
+              <option>Under $500k</option>
+              <option>$500k to $1M</option>
+              <option>$1M to $3M</option>
+              <option>Over $3M</option>
+              <option>Rather not say</option>
+            </select>
+          </label>
+          <label>Staff, including you
+            <select name="staff" required>
+              <option value="">Choose one</option>
+              <option>Just me</option>
+              <option>2 to 5</option>
+              <option>6 to 15</option>
+              <option>16 to 40</option>
+              <option>More than 40</option>
+            </select>
+          </label>
+          <label>Bookkeeping software
+            <select name="software">
+              <option value="">Choose one</option>
+              <option>Xero</option>
+              <option>MYOB</option>
+              <option>QuickBooks</option>
+              <option>Spreadsheet or paper</option>
               <option>Something else</option>
+              <option>Not sure</option>
             </select>
           </label>
         </div>
@@ -108,7 +147,7 @@
         <p class="form-note">We will use these details to answer your enquiry and to contact you about it. See our <a href="/privacy/">Privacy Policy</a>.</p>
         <p class="form-note">Please keep tax file numbers, bank details and client records off this form. Bring those to the call.</p>
       </form>
-      <div class="enquiry-ok" id="enquiryOk" hidden>That is with us. You will hear back within one business day, and sooner if it is a BAS week.</div>
+      <div class="enquiry-ok" id="enquiryOk" hidden>That is with us. You will hear back within one business day, and sooner if it is a BAS week. Rather pick a time now? <a href="/book/" data-event="sent-book">Book a 15-minute call</a>.</div>
     </div>
   </main>
   <footer class="foot">
@@ -144,6 +183,6 @@
     </div>
   </footer>
   <script src="/track.js?v=i6"></script>
-  <script src="/nav.js?v=i5"></script>
+  <script src="/nav.js?v=i7"></script>
 </body>
 </html>
