@@ -534,6 +534,31 @@ def test_lead_capture_and_tracking():
         assert 'String(json.success) === "false"' in nav
 
 
+def test_forms_carry_ok_to_call_consent():
+    # HB 2026-10-19: outbound calls only with recorded approval, and the
+    # firm discloses its AI/automated processing in general terms. The
+    # disclosure names the kind of processing (follow-ups, correspondence,
+    # admin, data collection, onboarding steps) once, for the firm. It
+    # does not itemise individual systems or assistants on a lead form.
+    mc = (ROOT / "margin-check/index.html").read_text(encoding="utf-8")
+    start = mc.index('id="pmcLead"')
+    lead = mc[start:mc.index("</form>", start)]
+    assert 'name="okToCall"' in lead and "required" in lead, "margin check lead form has no required call consent"
+    for phrase in ("AI and automated systems", "follow-ups and correspondence",
+                   "data collection", "onboarding", "ask to deal with a person"):
+        assert phrase in lead, f"margin check form disclosure is missing: {phrase}"
+    assert "text first" in lead, "margin check consent must promise the pre-call text"
+    ct = (ROOT / "contact/index.html").read_text(encoding="utf-8")
+    start = ct.index('id="enquiryForm"')
+    form = ct[start:ct.index("</form>", start)]
+    assert 'name="okToCall"' in form, "contact form has no call consent tick"
+    assert "AI and automated systems" in form, "contact form has no AI disclosure"
+    assert "text first" in form, "contact consent must promise the pre-call text"
+    pv = (ROOT / "privacy/index.html").read_text(encoding="utf-8")
+    assert "AI and automated systems" in pv, "privacy policy has no AI disclosure section"
+    assert "professional judgement" in pv, "privacy AI section must keep human oversight"
+
+
 def test_venue_figures_never_leave_the_browser():
     # A venue's takings, wages and rent are the visitor's financial data. The
     # calculator may hold them; the relay to a third-party form service may

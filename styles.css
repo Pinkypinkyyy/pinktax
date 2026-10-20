@@ -440,6 +440,8 @@ h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.12;letter-spac
 .enquiry .fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .enquiry label{display:block;font-weight:600;font-size:.92rem;margin:12px 0 0;color:var(--ink)}
 .enquiry .fields label{margin-top:0}
+.enquiry label.consent{display:flex;gap:10px;align-items:flex-start;font-weight:400;line-height:1.45}
+.enquiry label.consent input{display:inline-block;width:auto;margin-top:3px;flex:0 0 auto;padding:0}
 .enquiry input,.enquiry select,.enquiry textarea{
   display:block;width:100%;margin-top:6px;padding:12px 14px;border:1px solid var(--line);
   border-radius:12px;font:inherit;background:#fff;color:var(--ink)
