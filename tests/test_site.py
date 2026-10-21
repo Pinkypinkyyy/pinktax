@@ -6,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PAGES = list(ROOT.rglob("*.html"))
-HOSP = "PinkAccountingTaxSolutionsClientBookings"
+HOSP = "widget/bookings/call-with-pinky"
 SP = "ServiceProfit@pinktax.com.au"
 
 
@@ -19,7 +19,7 @@ def test_hospitality_calendar_only():
 
 
 def test_book_page_has_one_intake_only():
-    # Microsoft Bookings asks revenue, staff, what is hurting, where the
+    # The booking page (GoHighLevel Call with Pinky, HB 2026-10-21) asks contact details;
     # business is now and where it is going, several of them mandatory. The
     # site used to ask all of it again first, so a visitor wrote the same
     # three paragraphs twice before they could pick a time.

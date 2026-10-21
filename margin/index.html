@@ -20,7 +20,7 @@ window.PINK_CFG = {
   ADS_LABEL:     'XXXXXXXXXXXXXXXXXX',        // only needed if the AW- direct tag above is ever used instead of the GA4 import
   META_PIXEL_ID: '1237708438188688',          // "Pink Accounting's Pixel" - the dataset ad account 543906261707152 can actually use
   FORM_ENDPOINT: 'https://formsubmit.co/ajax/admin@pinktax.com.au', // same tested relay as every other pinktax form
-  BOOKING_URL:   'https://outlook.office.com/book/PinkAccountingTaxSolutionsClientBookings@pinktax.com.au/'
+  BOOKING_URL:   'https://api.leadconnectorhq.com/widget/bookings/call-with-pinky'
 };
 </script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-8T6SXPNSCW"></script>
@@ -30,8 +30,8 @@ window.PINK_CFG = {
   gtag('config',PINK_CFG.GA4_ID);
   if(PINK_CFG.ADS_ID.indexOf('X')===-1){
     gtag('config',PINK_CFG.ADS_ID);
-    /* cross-domain: keeps gclid attached when the visitor is handed to Outlook Bookings */
-    gtag('set','linker',{domains:['pinktax.com.au','outlook.office.com']});
+    /* cross-domain: keeps gclid attached when the visitor is handed to the booking page */
+    gtag('set','linker',{domains:['pinktax.com.au','api.leadconnectorhq.com']});
   }
 </script>
 <script>

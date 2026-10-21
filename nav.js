@@ -144,7 +144,7 @@
     var a = e.target && e.target.closest ? e.target.closest("a[href]") : null;
     if (!a) return;
     var href = a.getAttribute("href") || "";
-    if (href.indexOf("outlook.office.com/book/") === -1) return;
+    if (href.indexOf("leadconnectorhq.com/widget/bookings/") === -1) return;
     if (a.getAttribute("data-event") === "book-calendar") return;
     fireBookClick(href);
   });
