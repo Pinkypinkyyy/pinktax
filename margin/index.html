@@ -126,6 +126,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent)}
 /* price */
 .price{padding:56px 0}
 .tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:28px}
+.price .tiers{grid-template-columns:repeat(2,1fr)}
 .tier{border:1.5px solid var(--line);border-radius:var(--radius);padding:24px}
 .tier--pick{border-color:var(--accent);position:relative}
 .tier--pick::after{content:"Most chosen";position:absolute;top:-11px;left:24px;background:var(--accent);color:#fff;
@@ -159,7 +160,7 @@ footer a{color:var(--muted);text-decoration:underline}
 
 @media (max-width:900px){
   .hero-grid{grid-template-columns:1fr;gap:34px}
-  .cols,.tiers{grid-template-columns:1fr}
+  .cols,.tiers,.price .tiers{grid-template-columns:1fr}
   .hero{padding:32px 0 0}
   .band,.price,.final{padding:40px 0;margin-top:40px}
   .lede{max-width:none}
