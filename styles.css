@@ -231,6 +231,7 @@ h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.12;letter-spac
 .tier .tname{font-weight:600}
 .tier .tprice{font-size:1.5rem;margin:10px 0 2px;font-variant-numeric:tabular-nums}
 .tier .tprice small{font-size:.72rem;color:var(--muted)}
+.tier .tgst{font-size:.72rem;color:var(--muted);margin:0 0 8px;font-variant-numeric:tabular-nums}
 .tier p{font-size:.9rem;color:var(--soft);margin-top:8px}
 
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:40px}
