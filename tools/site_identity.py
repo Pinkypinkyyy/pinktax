@@ -59,7 +59,6 @@ def org_node():
         "knowsAbout": ["hospitality bookkeeping", "restaurant payroll", "cafe margins", "BAS", "GST"],
         "address": {
             "@type": "PostalAddress",
-            "streetAddress": OFFICE["street"],
             "addressLocality": OFFICE["locality"],
             "addressRegion": OFFICE["region"],
             "postalCode": OFFICE["postcode"],
@@ -118,9 +117,9 @@ def fill(text, name, body):
 def apply(text, rel):
     text = LD.sub(lambda m: m.group(1) + json.dumps(org_node(), ensure_ascii=True, separators=(",", ":")) + m.group(3), text)
 
-    # Footer address, written exactly as the Google profile and directories carry it.
+    # Footer shows the locality only. The street is not published.
     town = f'{OFFICE["locality"]} {OFFICE["region"]} {OFFICE["postcode"]}'
-    text = ADDR.sub(lambda m: f'{m.group(1)}{e(OFFICE["street"])}<br>{e(town)}{m.group(2)}', text)
+    text = ADDR.sub(lambda m: f'{m.group(1)}{e(town)}{m.group(2)}', text)
 
     # One cross-link line, last thing inside the footer's wrap.
     text = SISTER.sub("", text)
