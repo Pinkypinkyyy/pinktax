@@ -282,7 +282,7 @@ PAGES = [
             ]),
         ],
         faqs=[
-            ("We are a small cafe. Is $990 a month worth it?", "A single point of wage cost or food cost on a $700,000 venue is $7,000 a year. That is the arithmetic the plan has to beat, and it is the first thing we look at on the call."),
+            ("Is a monthly plan worth it for a small cafe?", "A single point of wage cost or food cost on a $700,000 venue is $7,000 a year. That is the arithmetic the plan has to beat, and it is the first thing we look at on the call."),
             ("Do you set up the POS mapping?", "Yes, we check how takings, GST codes and tips flow into the file before the first review, because everything after that depends on it."),
         ],
         related=[R_HBK, R_FOOD, R_WAGE],
@@ -387,7 +387,7 @@ PAGES = [
             ("What it costs", [PLAN]),
         ],
         faqs=[
-            ("How many staff does the $990 plan cover?", "Payroll for up to five staff sits inside it. Beyond that we price the payroll separately so you are not paying for a tier you do not need."),
+            ("How many staff does a plan cover?", "Payroll for up to five staff sits inside it. Beyond that we price the payroll separately so you are not paying for a tier you do not need."),
             ("Can you fix historic underpayments?", "We can calculate the exposure and help you correct it. Whether and how you disclose it is a decision we walk through with you."),
             ("Do you do rosters?", "No, the roster is yours. We tell you what it cost and where the structure is expensive."),
         ],
