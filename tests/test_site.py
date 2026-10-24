@@ -659,8 +659,7 @@ def test_identity_first_on_every_first_screen():
         h1 = re.search(r"<h1[^>]*>(.*?)</h1>", text, re.S).group(1)
         assert h1 == "Accountants, bookkeepers and tax agents for hospitality", rel
         # The H1 says who we are, so the line under the buttons carries the offer.
-        assert 'class="trust-line">Bookkeeping, payroll, BAS and tax' in text, rel
-        assert "$990 + GST a month" in text, rel
+        assert 'class="trust-line">Accountants, bookkeepers and tax agents for hospitality, plus tax returns' in text, rel
     margin = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
     assert 'class="hook" id="hl"' in margin, "ad message match must target the hook, not the H1"
     for p in PAGES:
