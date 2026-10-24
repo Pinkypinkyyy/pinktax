@@ -208,7 +208,7 @@ def page(slug, title, desc, h1, lead, sections, faqs, related):
 
 
 CHECK = '<p><a href="/margin-check/">Run the 60-second Margin Check</a> on your own figures. It runs in your browser, and nothing is sent unless you choose to send it.</p>'
-PLAN = '<p>Most venues sit on <a href="/#pink-pricing">Hospitality Margin Protection at $990 + GST a month</a>, which carries the bookkeeping, payroll for up to five staff and BAS oversight underneath the monthly margin review.</p>'
+PLAN = '<p><a href="/#pink-pricing">Hospitality Margin Protection</a> is our core monthly plan. It carries the bookkeeping, payroll for up to five staff and BAS oversight underneath the monthly margin review.</p>'
 
 R_ACCT = ("restaurant-accountant", "Restaurant accountant", "What a specialist actually does for a restaurant.")
 R_CAFE = ("cafe-accountant", "Cafe accountant", "Small tickets, high volume, thin margin.")
@@ -368,10 +368,10 @@ PAGES = [
         title="Hospitality Payroll | Awards, Penalties, STP, Super | Pink",
         desc="Hospitality payroll run against the award: penalties, casual loading, STP Phase 2 and super at 12%. Wages read as a share of sales every month.",
         h1="Hospitality payroll, run against the award and against your sales.",
-        lead="Payroll is the biggest number in most venues and the easiest one to get quietly wrong. Two things have to be true at once: it has to be compliant, and it has to be affordable against the trade it is covering.",
+        lead="Payroll is a major cost for a hospitality venue, and one of the easiest to get quietly wrong. Two things have to be true at once: it has to be compliant, and it has to be affordable against the trade it is covering.",
         sections=[
             ("Compliant", [
-                "<p>Most venues sit under the Hospitality Industry (General) Award 2020 or the Restaurant Industry Award 2020. Between them they carry casual loading, evening and weekend penalties, public holidays, split shifts, overtime and minimum engagement periods. Getting a classification wrong is not a rounding error, because it repeats every pay run until someone catches it.</p>",
+                "<p>Depending on the business, the Hospitality Industry (General) Award 2020 or the Restaurant Industry Award 2020 may apply. Between them they carry casual loading, evening and weekend penalties, public holidays, split shifts, overtime and minimum engagement periods. Getting a classification wrong is not a rounding error, because it repeats every pay run until someone catches it.</p>",
                 "<ul><li>Award interpretation and classification checked at setup, not assumed</li>"
                 "<li>Single Touch Payroll Phase 2 reporting on every run</li>"
                 "<li>Super guarantee at 12%, paid on time, because late super is not deductible</li>"
@@ -434,7 +434,7 @@ PAGES = [
         title="Hospitality Wage Percentage | What It Should Be | Pink",
         desc="How to calculate wage percentage in a hospitality venue, where it should sit, and what to do when it runs hot. Australian award context.",
         h1="Wage percentage: the number that decides your month.",
-        lead="Wages are the largest controllable cost in most venues and the one that moves fastest. A roster that worked in June can be expensive by September without anything visibly changing.",
+        lead="Wages are a major controllable cost for a venue, and they can move quickly. A roster that worked in June can be expensive by September without anything visibly changing.",
         sections=[
             ("The calculation", [
                 "<p><b>Total wage cost &divide; sales for the same period &times; 100 = wage percentage.</b></p>",
