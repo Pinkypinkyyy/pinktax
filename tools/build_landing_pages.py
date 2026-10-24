@@ -167,7 +167,7 @@ def page(slug, title, desc, h1, lead, sections, faqs, related):
           <a class="btn btn-primary" href="/book/" data-event="{slug}-book">Book a 15-minute call</a>
           <a class="btn btn-outline" href="/margin-check/">Check your margin in 60 seconds</a>
         </div>
-        <p class="trust-line">Accountants, bookkeepers and tax agents for hospitality. Plans from $990 + GST a month ($1,089 incl. GST). Registered tax agent 26284368.</p>
+        <p class="trust-line">Accountants, bookkeepers and tax agents for hospitality, plus tax returns for individuals and sole traders. Pink Accounting &amp; Tax Solutions Pty Ltd, registered tax agent 26284368.</p>
       </div>
     </section>
     <section class="band band-bone">
