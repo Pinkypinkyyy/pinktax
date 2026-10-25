@@ -149,6 +149,7 @@ h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.12;letter-spac
 .hour-board .cell span{display:block;margin-top:8px;color:var(--soft);font-size:.9rem;line-height:1.45}
 .hour-board .cell.is-miss b{color:var(--gold)}
 .hire{display:grid;grid-template-columns:1fr 1fr;gap:var(--gutter);margin-top:var(--gutter)}
+.hire.single{grid-template-columns:1fr}
 .hire article{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:28px 24px;box-shadow:0 12px 28px -22px rgba(18,22,28,.3)}
 .hire h3{font-size:1.3rem;margin:8px 0 10px}
 .hire p{color:var(--soft)}
