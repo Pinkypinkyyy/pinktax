@@ -511,7 +511,7 @@ def test_lead_capture_and_tracking():
     assert "lead_source: source" in nav
     assert "connect.facebook.net" in track, "Meta pixel is not installed"
     assert 'fbq("track", "PageView")' in track
-    assert "26989404134047568" in track
+    assert 'var META = "1237708438188688";' in track, "live Meta pixel id changed or is wrong"
     assert "window.pinkHash" in track
     assert "SHA-256" in track
     mc = (ROOT / "margin-check" / "index.html").read_text(encoding="utf-8")
