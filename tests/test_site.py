@@ -717,3 +717,25 @@ def test_headings_do_not_skip_a_level():
         levels = [int(m) for m in re.findall(r"<h([1-6])[ >]", p.read_text(encoding="utf-8"))]
         for before, after in zip(levels, levels[1:]):
             assert after <= before + 1, f"{p}: h{before} jumps to h{after}"
+
+
+def test_margin_footer_has_one_merged_disclaimer():
+    # One merged disclaimer replaces the two overlapping footer lines on /margin/
+    # (same wording as /individuals/). The old lines must not come back.
+    t = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
+    foot = t[t.index("</main>"):] if "</main>" in t else t
+    merged = (
+        "General information only. It is not tax advice or personal financial product advice, "
+        "and it does not take your circumstances into account. Pink Accounting &amp; Tax Solutions Pty Ltd "
+        "does not hold an Australian Financial Services Licence. The ATO decides due dates, processing times, "
+        "interest, penalties and outcomes, and these depend on your situation. "
+        "Pink can't control the ATO or other third parties. Prices are current at the date of publication, "
+        "and we confirm your fee in writing before we start. "
+        "Nothing on this page limits your rights under the Australian Consumer Law."
+    )
+    assert foot.count(merged) == 1
+    assert 'class="legal">Registered Tax Agent 26284368. ASIC Registered Agent 52580.<br>' + merged + "</div>" in foot
+    assert foot.count('<div class="legal">') == 1
+    assert "General information only, not advice." not in t
+    assert "Pink can't control the ATO, timing" not in t
+    assert "Fee examples are current" not in t
