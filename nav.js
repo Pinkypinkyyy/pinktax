@@ -225,9 +225,7 @@
           var venue = String(data.venue || "");
           var lead = {
             lead_source: source,
-            venue_type: venue,
-            currency: "AUD",
-            value: 990
+            venue_type: venue
           };
           var hashP = typeof window.pinkHash === "function"
             ? window.pinkHash(data.email, data.mobile)
@@ -244,7 +242,7 @@
                 gtag("event", "generate_lead", lead);
               }
               if (typeof window.pinkMeta === "function") {
-                window.pinkMeta("Lead", { content_name: source, currency: "AUD", value: 990 }, hashed);
+                window.pinkMeta("Lead", { content_name: source }, hashed);
               }
             } catch (err) {}
           });
