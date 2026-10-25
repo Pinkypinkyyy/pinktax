@@ -719,6 +719,7 @@ def test_headings_do_not_skip_a_level():
             assert after <= before + 1, f"{p}: h{before} jumps to h{after}"
 
 
+TPB_COMPANY = "Pink Accounting &amp; Tax Solutions Pty Ltd, registered tax agent 26284368"
 DISCLAIMER_LEAD = (
     "General information only, not advice for your situation. "
     "Pink Accounting &amp; Tax Solutions Pty Ltd is a registered tax agent (TPB 26284368) and "
@@ -736,12 +737,11 @@ def test_margin_footer_has_one_merged_disclaimer():
         DISCLAIMER_LEAD
         + "The ATO decides due dates, processing times, "
         "interest, penalties and outcomes, and these depend on your situation. "
-        "Pink can't control the ATO or other third parties. Prices are current at the date of publication, "
-        "and we confirm your fee in writing before we start. "
+        "Pink can't control the ATO or other third parties. Prices are current at the date of publication. "
         "Nothing on this page limits your rights under the Australian Consumer Law."
     )
     assert foot.count(merged) == 1
-    assert 'class="legal">Registered Tax Agent 26284368.<br>' + merged + "</div>" in foot
+    assert 'class="legal">' + TPB_COMPANY + '.<br>' + merged + "</div>" in foot
     assert foot.count('<div class="legal">') == 1
     assert "General information only, not advice." not in t
     assert "Pink can't control the ATO, timing" not in t
@@ -761,9 +761,24 @@ def test_margin_page_text_size_and_tap_targets():
     assert ".legal{margin-top:12px;font-size:14.4px" in css
 
 
+def _tpb_number_is_company_only(t):
+    # 26284368 is the company's TPB number (Pink Accounting & Tax Solutions Pty Ltd).
+    # Huong Bui's own number is different, so no person's name may caption it.
+    for m in re.finditer("26284368", t):
+        near = t[max(0, m.start() - 150):m.end() + 150]
+        for person in ("Huong", "Pinky", "Bui", "founder", "person responsible"):
+            assert person not in near, (person, near)
+
+
 def test_margin_page_has_no_asic_registered_agent_line():
     # "ASIC Registered Agent" (number 52580) is unverified and can read as a licence number.
     t = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
     assert "ASIC Registered Agent" not in t and "52580" not in t
     assert "is not tax advice" not in t
-    assert "Registered Tax Agent 26284368" in t
+    assert TPB_COMPANY in t
+    assert t.count(TPB_COMPANY) >= 3  # footer, FAQ and trust strip all name the company
+    t_ui = t.split("<script>")[0]
+    assert "Registered Tax Agent 26284368" not in t_ui
+    _tpb_number_is_company_only(t)
+    disc = re.search(r'<div class="legal">(.*?)</div>', t, re.S).group(1)
+    assert "in writing" not in disc
