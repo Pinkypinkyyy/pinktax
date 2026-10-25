@@ -333,6 +333,7 @@ def test_switching_page_exists_and_is_linked():
     assert "/switching/" in (ROOT / "index.html").read_text(encoding="utf-8")
 
 
+TPB_COMPANY = "Pink Accounting &amp; Tax Solutions Pty Ltd, registered tax agent 26284368"
 DISCLAIMER_LEAD = (
     "General information only, not advice for your situation. "
     "Pink Accounting &amp; Tax Solutions Pty Ltd is a registered tax agent (TPB 26284368) and "
@@ -343,8 +344,7 @@ MERGED_DISCLAIMER = (
     DISCLAIMER_LEAD
     + "The ATO decides due dates, processing times, "
     "interest, penalties and outcomes, and these depend on your situation. "
-    "Pink can't control the ATO or other third parties. Prices are current at the date of publication, "
-    "and we confirm your fee in writing before we start. "
+    "Pink can't control the ATO or other third parties. Prices are current at the date of publication. "
     "Nothing on this page limits your rights under the Australian Consumer Law."
 )
 
@@ -437,12 +437,27 @@ def test_individuals_page_scope_sentences_word_for_word():
         assert re.search(r"\b" + bad + r"\b", cards) is None, bad
 
 
+def _tpb_number_is_company_only(t):
+    # 26284368 is the company's TPB number (Pink Accounting & Tax Solutions Pty Ltd).
+    # Huong Bui's own number is different, so no person's name may caption it.
+    for m in re.finditer("26284368", t):
+        near = t[max(0, m.start() - 150):m.end() + 150]
+        for person in ("Huong", "Pinky", "Bui", "founder", "person responsible"):
+            assert person not in near, (person, near)
+
+
 def test_individuals_page_has_no_asic_registered_agent_line():
     # "ASIC Registered Agent" (number 52580) is unverified and can read as a licence number.
     t = (ROOT / "individuals" / "index.html").read_text(encoding="utf-8")
     assert "ASIC Registered Agent" not in t and "52580" not in t
     assert "is not tax advice" not in t
-    assert "Registered Tax Agent No. 26284368" in t
+    assert TPB_COMPANY in t
+    assert "Registered Tax Agent No. 26284368" not in t
+    assert 'Business and individual clients. · <a href="https://www.tpb.gov.au/public-register"' in t
+    _tpb_number_is_company_only(t)
+    # the disclaimer does not repeat the fee-in-writing promise; the scope sentence carries it
+    disc = re.search(r'<p class="disclaimer">(.*?)</p>', t, re.S).group(1)
+    assert "in writing" not in disc
 
 
 def test_individuals_page_one_phone_format_and_no_hours():
