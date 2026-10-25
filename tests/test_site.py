@@ -752,33 +752,38 @@ def test_margin_ad_variant_eyebrow_names_the_company_with_the_tax_agent_number()
         assert "Pink Accounting &amp; Tax Solutions Pty Ltd, registered tax agent 26284368" in t[max(0, m.start() - 90):m.end()]
 
 
-def test_margin_plan_cards_price_cta_and_layout():
+def test_margin_plan_cards_no_prices_cta_and_layout():
+    # PD decision 25 Oct 2026: PR #13 wins, so no plan-card prices on /margin/.
+    # The price styling lives on branch later/margin-price-styling-2026-10-25.
     t = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
     section = t[t.index('<section class="price">'):t.index("</section>", t.index('<section class="price">'))]
     cards = re.findall(r'<div class="tier[^"]*">(.*?)\n      </div>', section, re.S)
     assert len(cards) == 2
     names = ["Hospitality Margin Protection", "Weekly Visibility"]
-    amounts = ["$990", "$1,950"]
+    scopes = [
+        ["We do the bookkeeping and payroll", "Monthly margin read, all four questions", "BAS, IAS, STP and year end", "Tax planning through the year"],
+        ["Weekly numbers, not monthly", "Wage % tracked against roster", "Everything in Margin Protection", "For venues mid-change"],
+    ]
     hero_cta = re.search(r'<a class="btn" href="([^"]+)"', t).group(1)
-    for card, name, amt in zip(cards, names, amounts):
-        # order: plan name, price line (amount + GST + per month), scope list, CTA last
-        order = [card.index("<h3>"), card.index('class="price-line"'), card.index("<ul>"), card.index('class="tier-cta"')]
+    for card, name, scope in zip(cards, names, scopes):
+        # order: plan name, fee line, 4-bullet scope list, CTA last
+        order = [card.index("<h3>"), card.index('class="per"'), card.index("<ul>"), card.index('class="tier-cta"')]
         assert order == sorted(order)
         assert "<h3>" + name + "</h3>" in card
-        assert re.search(r'<span class="amt">' + re.escape(amt) + r' <span class="gst">\+ GST</span></span> <span class="per">per month</span>', card)
+        assert '<div class="per">Fee confirmed in writing before we start</div>' in card
+        assert re.findall(r"<li>(.*?)</li>", card) == scope
         cta = re.search(r'<a class="tier-cta" href="([^"]+)"[^>]*>Book a 15-minute call</a>', card)
         assert cta and cta.group(1) == hero_cta
         assert card.rstrip().endswith("</a>"), "CTA is the last element in the card"
-    # every dollar figure in the price section carries "+ GST"
-    for m in re.finditer(r"\$[\d,]+", _margin_text(section)):
-        assert re.match(r"\s?\+ GST", _margin_text(section)[m.end():m.end() + 8]), m.group(0)
+        # no dollar figures, GST pairs or per-month prices in a plan card
+        assert "$" not in card and "GST" not in card and "per month" not in card
+        assert 'class="amt"' not in card and 'price-line' not in card
+    assert "$" not in section, "no price figures anywhere in the plan section"
     css = t[: t.index("</style>")]
-    assert re.search(r"\.tier \.amt\{[^}]*white-space:nowrap[^}]*font-weight:700[^}]*font-size:28px[^}]*line-height:1\.1[^}]*color:var\(--ink\)", css)
-    assert re.search(r"\.tier \.amt \.gst\{[^}]*font-size:16px;font-weight:600;color:var\(--ink\)", css)
+    assert not re.search(r"\.(amt|price-line|gst)\s*[{,.]|\.(amt|price-line|gst)\b(?!atic)", css)
     assert re.search(r"\.tier \.per\{[^}]*font-size:14\.4px", css)
     assert re.search(r"\.tier \.tier-cta\{[^}]*margin-top:auto[^}]*min-height:44px[^}]*font-size:16px;font-weight:700[^}]*text-decoration:underline", css)
     assert re.search(r"\.tier\{[^}]*display:flex;flex-direction:column", css)
-    assert "font-size:27px" not in css
     assert "a:focus-visible" in css
     # two columns from 941px, one column at 940px and below
     assert ".price .tiers{grid-template-columns:repeat(2,1fr)}" in css

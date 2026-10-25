@@ -132,10 +132,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent)}
 .tier--pick::after{content:"Most chosen";position:absolute;top:-11px;left:24px;background:var(--accent-deep);color:#fff;
   font-size:14.4px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 12px;border-radius:var(--pill)}
 .tier h3{margin:0}
-.tier .price-line{margin:10px 0 14px;line-height:1.1}
-.tier .amt{display:inline-block;white-space:nowrap;font-family:var(--display);font-weight:700;font-size:28px;line-height:1.1;color:var(--ink)}
-.tier .amt .gst{font-family:var(--body);font-size:16px;font-weight:600;color:var(--ink)}
-.tier .per{display:inline-block;font-size:14.4px;color:var(--muted);margin-left:6px}
+.tier .per{font-size:14.4px;color:var(--muted);margin:6px 0 14px}
 .tier ul{list-style:none;padding:0;margin:0 0 18px;font-size:15px;color:var(--soft)}
 .tier .tier-cta{margin-top:auto;align-self:flex-start;display:inline-flex;align-items:center;min-height:44px;font-size:16px;font-weight:700;color:var(--ink);text-decoration:underline;text-underline-offset:3px}
 a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
@@ -165,7 +162,6 @@ footer a,.hint a,details p a{display:inline-flex;align-items:center;justify-cont
 .sister-line{margin-top:10px;font-size:14.4px}
 
 @media (max-width:940px){.tiers,.price .tiers{grid-template-columns:1fr}}
-@media (max-width:480px){.tier .per{display:block;margin-left:0;margin-top:4px}}
 @media (max-width:900px){
   .hero-grid{grid-template-columns:1fr;gap:34px}
   .cols{grid-template-columns:1fr}
@@ -281,18 +277,18 @@ footer a,.hint a,details p a{display:inline-flex;align-items:center;justify-cont
     <div class="tiers">
       <div class="tier tier--pick">
         <h3>Hospitality Margin Protection</h3>
-        <p class="price-line"><span class="amt">$990 <span class="gst">+ GST</span></span> <span class="per">per month</span></p>
+        <div class="per">Fee confirmed in writing before we start</div>
         <ul><li>We do the bookkeeping and payroll</li><li>Monthly margin read, all four questions</li><li>BAS, IAS, STP and year end</li><li>Tax planning through the year</li></ul>
         <a class="tier-cta" href="#formCard" data-ev="cta_plan">Book a 15-minute call</a>
       </div>
       <div class="tier">
         <h3>Weekly Visibility</h3>
-        <p class="price-line"><span class="amt">$1,950 <span class="gst">+ GST</span></span> <span class="per">per month</span></p>
+        <div class="per">Fee confirmed in writing before we start</div>
         <ul><li>Weekly numbers, not monthly</li><li>Wage % tracked against roster</li><li>Everything in Margin Protection</li><li>For venues mid-change</li></ul>
         <a class="tier-cta" href="#formCard" data-ev="cta_plan">Book a 15-minute call</a>
       </div>
     </div>
-    <p class="hint" style="margin-top:22px">Multi-venue groups from $3,500 + GST per month, by application. Fees are not contingent on any tax outcome.</p>
+    <p class="hint" style="margin-top:22px">Multi-venue groups by application. Fees are not contingent on any tax outcome.</p>
   </div>
 </section>
 
