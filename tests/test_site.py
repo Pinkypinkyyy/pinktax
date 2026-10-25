@@ -333,10 +333,15 @@ def test_switching_page_exists_and_is_linked():
     assert "/switching/" in (ROOT / "index.html").read_text(encoding="utf-8")
 
 
+DISCLAIMER_LEAD = (
+    "General information only, not advice for your situation. "
+    "Pink Accounting &amp; Tax Solutions Pty Ltd is a registered tax agent (TPB 26284368) and "
+    "does not hold an Australian Financial Services Licence, so we do not give financial product advice "
+    "(for example, which investments, super funds or SMSF to buy). "
+)
 MERGED_DISCLAIMER = (
-    "General information only. It is not tax advice or personal financial product advice, "
-    "and it does not take your circumstances into account. Pink Accounting &amp; Tax Solutions Pty Ltd "
-    "does not hold an Australian Financial Services Licence. The ATO decides due dates, processing times, "
+    DISCLAIMER_LEAD
+    + "The ATO decides due dates, processing times, "
     "interest, penalties and outcomes, and these depend on your situation. "
     "Pink can't control the ATO or other third parties. Prices are current at the date of publication, "
     "and we confirm your fee in writing before we start. "
@@ -846,3 +851,11 @@ def test_headings_do_not_skip_a_level():
         levels = [int(m) for m in re.findall(r"<h([1-6])[ >]", p.read_text(encoding="utf-8"))]
         for before, after in zip(levels, levels[1:]):
             assert after <= before + 1, f"{p}: h{before} jumps to h{after}"
+
+
+def test_individuals_page_has_no_asic_registered_agent_line():
+    # "ASIC Registered Agent" (number 52580) is unverified and can read as a licence number.
+    t = (ROOT / "individuals" / "index.html").read_text(encoding="utf-8")
+    assert "ASIC Registered Agent" not in t and "52580" not in t
+    assert "is not tax advice" not in t
+    assert "Registered Tax Agent No. 26284368" in t
