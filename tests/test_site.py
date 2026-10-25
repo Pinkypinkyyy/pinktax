@@ -739,3 +739,12 @@ def test_feedback_card_two_has_one_tap_link_the_phone():
     assert re.search(r'<a class="btn btn-primary" href="mailto:admin@pinktax\.com\.au\?subject=Feedback%20for%20Pink">Contact Pink</a>', card2)
     assert "amelia@" not in text
 
+
+def test_feedback_tel_link_focus_ring_offset_is_page_scoped():
+    # Brand Studio round 3 optional polish (REVIEW3 section 6): pull the tel link's focus
+    # ring in by 2px. Page-scoped rule only; shared styles.css is untouched.
+    text = (ROOT / "feedback" / "index.html").read_text(encoding="utf-8")
+    style = re.search(r"<style>(.*?)</style>", text, re.S).group(1)
+    assert ".page.tap:focus-visible{outline-offset:-2px}" in re.sub(r"\s+", "", style)
+    assert ".tap:focus-visible" not in (ROOT / "styles.css").read_text(encoding="utf-8")
+
