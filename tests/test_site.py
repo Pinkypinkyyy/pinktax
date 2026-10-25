@@ -333,32 +333,98 @@ def test_switching_page_exists_and_is_linked():
     assert "/switching/" in (ROOT / "index.html").read_text(encoding="utf-8")
 
 
+MERGED_DISCLAIMER = (
+    "General information only. It is not tax advice or personal financial product advice, "
+    "and it does not take your circumstances into account. Pink Accounting &amp; Tax Solutions Pty Ltd "
+    "does not hold an Australian Financial Services Licence. The ATO decides due dates, processing times, "
+    "interest, penalties and outcomes, and these depend on your situation. "
+    "Pink can't control the ATO or other third parties. Prices are current at the date of publication, "
+    "and we confirm your fee in writing before we start. "
+    "Nothing on this page limits your rights under the Australian Consumer Law."
+)
+
+
+def _visible_text(fragment):
+    fragment = re.sub(r"<!--.*?-->", "", fragment, flags=re.S)
+    fragment = re.sub(r"<style.*?</style>", "", fragment, flags=re.S)
+    return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", fragment))).replace(" (", " (").strip()
+
+
 def test_individuals_page_prices_and_disclaimer():
-    # HELD FOR PINKY. Only two prices may appear on this page, both as
-    # "from", ex GST; the fee is confirmed in writing; the ATO disclaimer is
-    # printed in full; the booking button uses the existing /book/ page and
-    # no third-party booking or pricing link is embedded.
+    # HELD FOR PINKY. Prices are shown GST-inclusive first (ACL single price),
+    # with the ex-GST breakdown beside them; only the figures below may appear.
+    # The one merged disclaimer sits under the price cards at regular weight.
     f = ROOT / "individuals" / "index.html"
     assert f.exists()
     t = f.read_text(encoding="utf-8")
     assert 'canonical" href="https://pinktax.com.au/individuals/"' in t
     assert "/individuals/" in (ROOT / "sitemap.xml").read_text(encoding="utf-8")
     main = t[t.index('<main id="main">'):t.index("</main>")]
-    assert sorted(set(re.findall(r"\$[\d,]+", main))) == ["$2,500", "$2,750", "$41", "$410", "$451"], "only the two from-prices (with their GST figures) may appear"
-    assert "From $451 <small>incl. GST ($410 + $41 GST)</small>" in main
-    assert "From $2,500 + GST per year ($2,750 incl. GST)" in main
-    assert "From $451 incl. GST ($410 + $41 GST)" in t and "($2,750 incl. GST)" in t.split("<main")[0]
-    assert "We confirm your fee in writing before we start." in main
-    assert (
-        "General information only, not advice. The ATO decides due dates, processing times, "
-        "interest, penalties and outcomes, and these depend on your situation. "
-        "Pink can't control the ATO, timing or other third parties."
-    ) in main
+    main_live = re.sub(r"<!--.*?-->", "", main, flags=re.S)
+    text = _visible_text(main)
+    assert sorted(set(re.findall(r"\$[\d,]+", main))) == ["$2,500", "$2,750", "$250", "$41", "$410", "$451"], "only the allowed price figures may appear"
+    assert "From $451 incl. GST ($410 + $41 GST)" in text
+    assert "From $2,750 incl. GST per year ($2,500 + $250 GST)" in text
+    assert "$2,500 + GST" not in t, "ex-GST-led sole-trader wording is gone"
+    # total price is the most prominent part: breakdown is in the smaller element
+    assert '<span class="ptotal">From $451 incl. GST</span>' in main
+    assert '<span class="ptotal">From $2,750 incl. GST per year</span>' in main
+    # the fee-in-writing sentence appears once, inside the merged disclaimer
+    assert text.lower().count("confirm your fee in writing") == 1
+    assert 'class="disclaimer">' + MERGED_DISCLAIMER + "</p>" in main
+    assert "<b>General information" not in main and "ATO decides" in main
+    assert "can't control the ATO or other third parties" in main and "timing" not in text.lower().split("the ato decides")[1]
     assert 'href="/book/"' in main
-    for bad in ("seamlss", "leadconnector", "guarantee", "refund", "within 24", "turnaround"):
-        assert bad not in t.lower(), bad
+    for bad in ("seamlss", "leadconnector", "guarantee", "refund", "within 24", "turnaround",
+                "bas ", "bookkeeping ", "payroll", "opening hours", "mon-fri", "mon\u2013fri", "9:00", " ai "):
+        assert bad not in " " + _visible_text(main).lower() + " ", bad
     assert "<h1>Tax returns for individuals and sole traders</h1>" in main
+    assert (
+        '<p class="lead">Book a 15-minute call with Pink Accounting &amp; Tax Solutions Pty Ltd, a registered tax agent. '
+        "For individuals and sole traders who need a tax return.</p>"
+    ) in main
     assert 'class="trust-line">Accountants, bookkeepers and tax agents for hospitality, plus tax returns for individuals and sole traders. Pink Accounting &amp; Tax Solutions Pty Ltd, registered tax agent 26284368.' in main
+    assert "Pty Ltd" in main_live
+
+
+def test_individuals_page_scope_placeholder_is_not_live_text():
+    # The scope sentence for "$2,500 + GST per year" is pending from the Tax
+    # Manager / CFO. The marker lives in an HTML comment only; no visible
+    # placeholder text may reach the page.
+    t = (ROOT / "individuals" / "index.html").read_text(encoding="utf-8")
+    assert "<!-- SCOPE-PENDING:" in t
+    live = _visible_text(t)
+    for bad in ("SCOPE-PENDING", "[", "]", "Tax Manager", "TBC", "TODO", "placeholder"):
+        assert bad not in live, bad
+
+
+def test_individuals_page_one_phone_format_and_no_hours():
+    t = (ROOT / "individuals" / "index.html").read_text(encoding="utf-8")
+    live = _visible_text(t)
+    found = set(re.findall(r"\(?0?7\)?[\s-]*3544[\s-]*6386", live))
+    assert found == {"(07) 3544 6386"}, found
+    assert live.count("(07) 3544 6386") >= 3
+    for bad in ("Mon", "Fri", "9:00", "9am", "5pm", "opening hours", "hours:", "Brisbane time"):
+        assert bad not in live, bad
+
+
+def test_individuals_page_readability_and_footer():
+    t = (ROOT / "individuals" / "index.html").read_text(encoding="utf-8")
+    css = re.search(r"<style>(.*?)</style>", t, re.S).group(1)
+    for size in re.findall(r"font-size:\s*([\d.]+)rem", css):
+        assert float(size) >= 0.875, size
+    assert "min-height:44px" in css and "width:44px;height:44px" in css
+    assert "body.individuals .hero-ink{background:#0E0E12" in css
+    assert "repeat(2,minmax(0,1fr))" in css
+    footer = t[t.index('<footer class="foot">'):t.index("</footer>")]
+    blurb = re.search(r'<p class="blurb">(.*?)</p>', footer).group(1)
+    assert "across Australia" not in blurb and "individuals and sole traders" in blurb
+    assert "Business and individual clients." in footer
+    head = t.split("<body")[0]
+    descs = re.findall(r'<meta (?:name|property)="(?:description|og:description|twitter:description)" content="([^"]*)"', head)
+    assert len(descs) == 3 and len(set(descs)) == 1
+    assert 135 <= len(descs[0]) <= 150, len(descs[0])
+    assert "$451 incl. GST" in descs[0] and "$2,750 incl. GST" in descs[0]
 
 
 def test_assets():
