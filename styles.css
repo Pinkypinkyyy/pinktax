@@ -762,12 +762,7 @@ a:focus-visible,button:focus-visible,video:focus-visible,summary:focus-visible{
 }
 .counts dd small .tick{font-weight:600}
 
-@media(max-width:940px){
-  .counts{grid-template-columns:repeat(2,1fr);gap:22px}
-}
-@media(max-width:560px){
-  .counts{grid-template-columns:1fr;gap:18px}
-}
+@media(max-width:860px){.counts{grid-template-columns:1fr;gap:18px}}
 
 /* Scope of work. Reuses .hire, another 2-up card grid that shipped in this
    stylesheet unused. The site said "BAS" 23 times and never once mentioned
