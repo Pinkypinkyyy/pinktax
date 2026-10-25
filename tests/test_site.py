@@ -695,12 +695,14 @@ def test_margin_footer_has_one_merged_disclaimer():
 
 def test_margin_page_text_size_and_tap_targets():
     # /margin/ carries its own inline CSS (shared styles.css is not used by this page).
-    # Minimum text 14px, footer and inline links at least 44px to tap, white-on-pink
-    # buttons use the deeper pink so contrast passes WCAG AA.
+    # Minimum text 14.4px (Brand Studio floor, 25 Oct 2026), footer and inline links at
+    # least 44px to tap, white-on-pink buttons use the deeper pink so contrast passes AA.
     t = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
     css = re.search(r"<style>(.*?)</style>", t, re.S).group(1)
     for size in re.findall(r"font-size:\s*([\d.]+)px", css):
-        assert float(size) >= 14, size
+        assert float(size) >= 14.4, size
+    # form fields show a visible focus outline, not only a border colour change
+    assert re.search(r"input:focus-visible,select:focus-visible,textarea:focus-visible\{outline:3px solid", css)
     assert "footer a,.hint a,details p a{display:inline-flex" in css and "min-height:44px" in css
     assert ".btn{display:inline-block;background:var(--accent-deep)" in css
     assert ".legal{margin-top:12px;font-size:14.4px" in css
