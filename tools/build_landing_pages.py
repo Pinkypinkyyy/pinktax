@@ -20,7 +20,6 @@ import site_identity
 ROOT = Path(__file__).resolve().parents[1]
 ORIGIN = site_identity.ORIGIN
 AGENT = site_identity.LEGAL["tax_agent_number"]
-ASIC = site_identity.LEGAL["asic_agent_number"]
 OG = f"{ORIGIN}/assets/og.png"
 
 CSP = (
@@ -246,7 +245,7 @@ PAGES = [
                 CHECK,
             ]),
             ("Working with Pink", [
-                f"<p>We are a small specialist firm. You deal with the person responsible for your numbers, and you get them on WhatsApp between meetings. Registered Tax Agent {AGENT}, ASIC Registered Agent {ASIC}, based in Brendale and working with venues across Australia.</p>",
+                f"<p>We are a small specialist firm. You deal with the person responsible for your numbers, and you get them on WhatsApp between meetings. Pink Accounting &amp; Tax Solutions Pty Ltd, registered tax agent {AGENT}, is based in Brendale and works with venues across Australia.</p>",
             ]),
         ],
         faqs=[
@@ -523,7 +522,7 @@ PAGES = [
         faqs=[
             ("Do we have to be in Brisbane?", "No. The office is at Brendale and we work with venues across Australia. Brisbane and South East Queensland clients simply get the option of meeting in person."),
             ("Can you visit the venue?", "Yes, and for a new engagement we prefer to, at least once. Seeing the floor at trade explains numbers that a file never will."),
-            ("Are you a registered tax agent?", f"Yes. Registered Tax Agent {AGENT} and ASIC Registered Agent {ASIC}, listed on the TPB public register."),
+            ("Are you a registered tax agent?", f"Yes. Registered Tax Agent {AGENT}, listed on the TPB public register."),
         ],
         related=[R_ACCT, R_CAFE, R_HBK],
     ),
