@@ -720,11 +720,27 @@ def test_headings_do_not_skip_a_level():
 
 
 TPB_COMPANY = "Pink Accounting &amp; Tax Solutions Pty Ltd, registered tax agent 26284368"
-DISCLAIMER_LEAD = (
-    "General information only, not advice for your situation. "
-    "Pink Accounting &amp; Tax Solutions Pty Ltd is a registered tax agent (TPB 26284368) and "
-    "does not hold an Australian Financial Services Licence, so we do not give financial product advice "
-    "(for example, which investments, super funds or SMSF to buy). "
+# One place to swap the disclaimer text (identical constant in the other branch). Text is the
+# Tax Manager FINAL website disclaimer, /workspace/tax/web-disclaimer-FINAL-TM-2026-10-25.md,
+# character for character. Do not reword.
+FINAL_DISCLAIMER = (
+    "General information only, not advice for your situation. It is not personal financial product advice. "
+    "Pink Accounting & Tax Solutions Pty Ltd does not hold an Australian Financial Services Licence. "
+    "The ATO decides due dates, processing times, interest, penalties and outcomes, and these depend on your situation. "
+    "Pink can't control the ATO or other third parties. "
+    "Prices are current at the date of publication, and we confirm your fee in writing before we start. "
+    "Nothing on this page limits your rights under the Australian Consumer Law."
+)
+MERGED_DISCLAIMER = html.escape(FINAL_DISCLAIMER, quote=False)
+# earlier variants that must not come back
+DISCLAIMER_VARIANT_STRINGS = (
+    "is a registered tax agent (TPB",
+    "so we do not give financial product advice",
+    "which investments, super funds or SMSF to buy",
+    "does not take your circumstances into account",
+    "is not tax advice",
+    "not tax advice",
+    "It is not tax advice or personal financial product advice",
 )
 
 
@@ -733,14 +749,12 @@ def test_margin_footer_has_one_merged_disclaimer():
     # (same wording as /individuals/). The old lines must not come back.
     t = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
     foot = t[t.index("</main>"):] if "</main>" in t else t
-    merged = (
-        DISCLAIMER_LEAD
-        + "The ATO decides due dates, processing times, "
-        "interest, penalties and outcomes, and these depend on your situation. "
-        "Pink can't control the ATO or other third parties. Prices are current at the date of publication. "
-        "Nothing on this page limits your rights under the Australian Consumer Law."
-    )
+    merged = MERGED_DISCLAIMER
     assert foot.count(merged) == 1
+    visible = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", re.sub(r"<script.*?</script>|<style.*?</style>", "", t, flags=re.S))))
+    assert visible.count(FINAL_DISCLAIMER) == 1, "final disclaimer exactly once"
+    for variant in DISCLAIMER_VARIANT_STRINGS:
+        assert variant not in t, variant
     assert 'class="legal">' + TPB_COMPANY + '.<br>' + merged + "</div>" in foot
     assert foot.count('<div class="legal">') == 1
     assert "General information only, not advice." not in t
@@ -780,5 +794,14 @@ def test_margin_page_has_no_asic_registered_agent_line():
     t_ui = t.split("<script>")[0]
     assert "Registered Tax Agent 26284368" not in t_ui
     _tpb_number_is_company_only(t)
-    disc = re.search(r'<div class="legal">(.*?)</div>', t, re.S).group(1)
-    assert "in writing" not in disc
+    disc = re.search(r'<div class="legal">.*?<br>(.*?)</div>', t, re.S).group(1)
+    assert "26284368" not in disc, "the TPB number sits in the footer only, not in the disclaimer"
+
+
+def test_margin_page_has_no_unscoped_fixed_fee_wording():
+    # "fixed" promised a flat price the page does not scope. Say what the monthly fee covers.
+    t = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
+    assert "fixed" not in t.lower()
+    assert t.count("monthly fee for the agreed scope") >= 4
+    assert "One monthly fee for the agreed scope." in t
+    assert "Monthly fee for the agreed scope, quoted before we start. No hourly billing" in t
