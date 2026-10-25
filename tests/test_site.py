@@ -18,6 +18,45 @@ def test_hospitality_calendar_only():
             pass
 
 
+def test_feedback_card_two_has_one_tap_link_the_phone():
+    # Brand Studio, 25 Oct 2026: the email and phone .tap links sat on
+    # consecutive lines on a phone, their 44px tap boxes overlapped and
+    # tapping the email dialled the phone. The address is plain text; the
+    # "Contact Pink" button is the mailto. Exactly one inline .tap link in
+    # card 2, and it is the tel: one. (Rendered overlap check: see PR notes.)
+    text = (ROOT / "feedback" / "index.html").read_text(encoding="utf-8")
+    cards = re.findall(r"<article class=\"card\">(.*?)</article>", text, re.S)
+    assert len(cards) == 2
+    card2 = cards[1]
+    taps = re.findall(r"<a\b[^>]*class=\"[^\"]*\btap\b[^\"]*\"[^>]*>", card2)
+    assert len(taps) == 1, taps
+    assert 'href="tel:+61735446386"' in taps[0], taps
+    assert "mailto:" not in taps[0]
+    # the plain-text address is still shown, and the button is still the only mailto in the card
+    assert "email admin@pinktax.com.au or call" in re.sub(r"<[^>]+>", "", card2)
+    assert card2.count("mailto:") == 1
+    assert re.search(r'<a class="btn btn-primary" href="mailto:admin@pinktax\.com\.au\?subject=Feedback%20for%20Pink">Contact Pink</a>', card2)
+    assert "amelia@" not in text
+
+
+def test_feedback_tap_links_use_text_hugging_ring_and_padded_hit_area():
+    # Brand Studio round 4 (REVIEW4 section 4): the focus ring hugs the link text
+    # (0px onto the line above) while a ::after box supplies the >=44px hit area,
+    # mostly below the text. Page-scoped only; shared styles.css is untouched.
+    text = (ROOT / "feedback" / "index.html").read_text(encoding="utf-8")
+    style = re.sub(r"\s+", "", re.search(r"<style>(.*?)</style>", text, re.S).group(1))
+    assert (
+        '.page.tap{position:relative;display:inline;padding:0;margin:0;white-space:nowrap;'
+        'color:var(--ink);text-decoration:underline;text-underline-offset:3px}'
+    ) in style
+    assert '.page.tap::after{content:"";position:absolute;left:0;right:0;top:-6px;bottom:-20px}' in style
+    assert ".page.tap:focus-visible{outline-offset:0}" in style
+    # the old padded-box rules (ring struck through the line above) are gone
+    assert "padding:13px0" not in style and "margin:-13px0" not in style
+    assert "outline-offset:-2px" not in style
+    assert ".tap:focus-visible" not in (ROOT / "styles.css").read_text(encoding="utf-8")
+
+
 def test_book_page_has_one_intake_only():
     # The booking page (GoHighLevel Call with Pinky, HB 2026-10-21) asks contact details;
     # business is now and where it is going, several of them mandatory. The
@@ -717,42 +756,3 @@ def test_headings_do_not_skip_a_level():
         levels = [int(m) for m in re.findall(r"<h([1-6])[ >]", p.read_text(encoding="utf-8"))]
         for before, after in zip(levels, levels[1:]):
             assert after <= before + 1, f"{p}: h{before} jumps to h{after}"
-
-
-def test_feedback_card_two_has_one_tap_link_the_phone():
-    # Brand Studio, 25 Oct 2026: the email and phone .tap links sat on
-    # consecutive lines on a phone, their 44px tap boxes overlapped and
-    # tapping the email dialled the phone. The address is plain text; the
-    # "Contact Pink" button is the mailto. Exactly one inline .tap link in
-    # card 2, and it is the tel: one. (Rendered overlap check: see PR notes.)
-    text = (ROOT / "feedback" / "index.html").read_text(encoding="utf-8")
-    cards = re.findall(r"<article class=\"card\">(.*?)</article>", text, re.S)
-    assert len(cards) == 2
-    card2 = cards[1]
-    taps = re.findall(r"<a\b[^>]*class=\"[^\"]*\btap\b[^\"]*\"[^>]*>", card2)
-    assert len(taps) == 1, taps
-    assert 'href="tel:+61735446386"' in taps[0], taps
-    assert "mailto:" not in taps[0]
-    # the plain-text address is still shown, and the button is still the only mailto in the card
-    assert "email admin@pinktax.com.au or call" in re.sub(r"<[^>]+>", "", card2)
-    assert card2.count("mailto:") == 1
-    assert re.search(r'<a class="btn btn-primary" href="mailto:admin@pinktax\.com\.au\?subject=Feedback%20for%20Pink">Contact Pink</a>', card2)
-    assert "amelia@" not in text
-
-
-def test_feedback_tap_links_use_text_hugging_ring_and_padded_hit_area():
-    # Brand Studio round 4 (REVIEW4 section 4): the focus ring hugs the link text
-    # (0px onto the line above) while a ::after box supplies the >=44px hit area,
-    # mostly below the text. Page-scoped only; shared styles.css is untouched.
-    text = (ROOT / "feedback" / "index.html").read_text(encoding="utf-8")
-    style = re.sub(r"\s+", "", re.search(r"<style>(.*?)</style>", text, re.S).group(1))
-    assert (
-        '.page.tap{position:relative;display:inline;padding:0;margin:0;white-space:nowrap;'
-        'color:var(--ink);text-decoration:underline;text-underline-offset:3px}'
-    ) in style
-    assert '.page.tap::after{content:"";position:absolute;left:0;right:0;top:-6px;bottom:-20px}' in style
-    assert ".page.tap:focus-visible{outline-offset:0}" in style
-    # the old padded-box rules (ring struck through the line above) are gone
-    assert "padding:13px0" not in style and "margin:-13px0" not in style
-    assert "outline-offset:-2px" not in style
-    assert ".tap:focus-visible" not in (ROOT / "styles.css").read_text(encoding="utf-8")
