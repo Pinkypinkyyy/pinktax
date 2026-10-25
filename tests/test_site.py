@@ -740,11 +740,19 @@ def test_feedback_card_two_has_one_tap_link_the_phone():
     assert "amelia@" not in text
 
 
-def test_feedback_tel_link_focus_ring_offset_is_page_scoped():
-    # Brand Studio round 3 optional polish (REVIEW3 section 6): pull the tel link's focus
-    # ring in by 2px. Page-scoped rule only; shared styles.css is untouched.
+def test_feedback_tap_links_use_text_hugging_ring_and_padded_hit_area():
+    # Brand Studio round 4 (REVIEW4 section 4): the focus ring hugs the link text
+    # (0px onto the line above) while a ::after box supplies the >=44px hit area,
+    # mostly below the text. Page-scoped only; shared styles.css is untouched.
     text = (ROOT / "feedback" / "index.html").read_text(encoding="utf-8")
-    style = re.search(r"<style>(.*?)</style>", text, re.S).group(1)
-    assert ".page.tap:focus-visible{outline-offset:-2px}" in re.sub(r"\s+", "", style)
+    style = re.sub(r"\s+", "", re.search(r"<style>(.*?)</style>", text, re.S).group(1))
+    assert (
+        '.page.tap{position:relative;display:inline;padding:0;margin:0;white-space:nowrap;'
+        'color:var(--ink);text-decoration:underline;text-underline-offset:3px}'
+    ) in style
+    assert '.page.tap::after{content:"";position:absolute;left:0;right:0;top:-6px;bottom:-20px}' in style
+    assert ".page.tap:focus-visible{outline-offset:0}" in style
+    # the old padded-box rules (ring struck through the line above) are gone
+    assert "padding:13px0" not in style and "margin:-13px0" not in style
+    assert "outline-offset:-2px" not in style
     assert ".tap:focus-visible" not in (ROOT / "styles.css").read_text(encoding="utf-8")
-
