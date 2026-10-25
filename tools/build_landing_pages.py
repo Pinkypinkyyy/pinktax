@@ -242,7 +242,6 @@ PAGES = [
             ]),
             ("Where restaurants actually lose money", [
                 "<p>In our experience it is rarely one dramatic thing. It is shift design that puts staff on before the trade arrives, a menu that has not been recosted since the last supplier rise, waste that nobody measures because nobody owns it, and trading hours that cost more to keep open than they return. Each one is small. Together they are the difference between a profitable year and a tight one.</p>",
-                "<p>In one $1M venue those three ordinary causes came to about $70,000 a year. That is one engagement, not a promise. Your number will be different.</p>",
                 CHECK,
             ]),
             ("Working with Pink", [
@@ -374,7 +373,7 @@ PAGES = [
                 "<p>Depending on the business, the Hospitality Industry (General) Award 2020 or the Restaurant Industry Award 2020 may apply. Between them they carry casual loading, evening and weekend penalties, public holidays, split shifts, overtime and minimum engagement periods. Getting a classification wrong is not a rounding error, because it repeats every pay run until someone catches it.</p>",
                 "<ul><li>Award interpretation and classification checked at setup, not assumed</li>"
                 "<li>Single Touch Payroll Phase 2 reporting on every run</li>"
-                "<li>Super guarantee at 12%, paid on time, because late super is not deductible</li>"
+                "<li>Super guarantee calculated at the current rate and prepared for payment by the due date where we have the information from you, because late super is not deductible</li>"
                 "<li>Leave and long service accruals kept on the books instead of appearing as a surprise</li>"
                 "<li>Termination pay, redundancy and final pay calculations when they come up</li></ul>",
             ]),

@@ -198,6 +198,12 @@ def test_contact_is_the_office_page():
     assert 'data-relay="contact-form"' in text, "contact form removed"
 
 
+def test_margin_faq_section_has_an_accessible_name():
+    # The FAQ has no visible heading (the "What venues say" heading went with the quote), so the section is named.
+    html = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
+    assert '<section class="wrap" style="padding:8px 20px 0" aria-label="Common questions">' in html
+
+
 def test_pages_equal_their_identity_rebuild():
     # identity.json is regenerated from the firm's canonical file. If it
     # changes and nobody reruns tools/build_landing_pages.py, this fails.
@@ -246,12 +252,81 @@ def test_counter_fallback_matches_target():
         assert shown == prefix + body, f"{shown!r} != {prefix + body!r}"
 
 
+def test_margin_faq_stacks_on_mobile_and_has_44px_rows():
+    # Brand Studio round 6: the two-column FAQ grid stacks on phones; summary rows are at least 44px tall (padding on the summary, not the details).
+    html = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
+    assert ('@media(max-width:640px){section.wrap > div[style*="grid-template-columns:1fr 1fr"]'
+            '{grid-template-columns:1fr !important;gap:0 !important}}') in html
+    assert re.search(r"(?m)^details\{[^}]*padding:0\}$", html)
+    assert re.search(r"(?m)^summary\{[^}]*padding:18px 0\}$", html)
+    assert "details{border-bottom:1px solid var(--line);padding:18px 0}" not in html
+    # an open row keeps its old spacing: 12px summary to text, 18px text to rule
+    assert "details p{margin:12px 0 18px;" in html and "details[open] summary{padding-bottom:0}" in html
+
+
 def test_stars_are_svg_not_glyphs():
     # Neither Montserrat nor Manrope contains U+2605, so the character would
     # render in a system fallback face.
     html = (ROOT / "index.html").read_text(encoding="utf-8")
     assert "★" not in html
     assert html.count('<svg class="stars"') == 3
+
+
+def test_seventy_thousand_claim_is_gone_from_site_and_source():
+    # PD decision, 25 Oct 2026: the "$70,000 a year in one $1M venue" figure is withdrawn entirely.
+    # No allowance for a "worked example" or any labelled illustration, on any page or in the generator.
+    files = [p for p in ROOT.rglob("*") if p.is_file() and ".git" not in p.parts and "tests" not in p.parts
+             and p.suffix in (".html", ".js", ".json", ".xml", ".txt", ".md", ".py", ".css", ".yml")]
+    assert files
+    figure = re.compile(
+        r"(?<![\d,.])\$?\s?70,000(?![\d,])|(?<![\d,.])70000(?!\d)|(?<![\d,.])\$?70\s?k\b|(?<!\d)70[ \u00a0]000(?!\d)"
+        r"|\$70(?![\d,])|seventy[- ]thousand", re.I)
+    banned = [
+        r"found up to", r"in one \$1M venue", r"single \$1M venue", r"one \$1M", r"one venue and one engagement",
+        r"one engagement(?! letter)", r"came to us profitable", r"found leaking", r"one venue\. \$70",
+        r"what venues say", r"<blockquote class=\"quote\"", r"data-to=\"70000\"", r"\$1M venue",
+        r"worked example", r"illustration with invented figures", r"not a client result", r"7% leak",
+    ]
+    for p in files:
+        text = p.read_text(encoding="utf-8", errors="ignore")
+        for pat in banned:
+            assert not re.search(pat, text, re.I), f"{p.relative_to(ROOT)}: {pat}"
+        m = figure.search(text)
+        assert not m, f"{p.relative_to(ROOT)}: {m.group(0)}"
+    # the regex is precise: other figures are not the withdrawn claim
+    for hit in ("$70,000 a year", "70,000 a year", "$70K", "70k", "70000", "70 000", "$70 a day"):
+        assert figure.search(hit), hit
+    for fine in ("a $700,000 venue is $7,000 a year", "$170,000", "$1,070,000", "$7,000", "$700", "2070", "1,700,000"):
+        assert not figure.search(fine), fine
+
+
+def test_seventy_thousand_removal_leaves_clean_text():
+    home = (ROOT / "index.html").read_text(encoding="utf-8")
+    assert ('<p class="lead">For caf&eacute;s, restaurants, bars and multi-venue groups. Each month we review wages, food cost '
+            'and suppliers, while you can still act on them.</p>') in home
+    assert "<h2>Where a venue's margin can leak.</h2>" in home
+    assert "A worked example" not in home and "Found leaking" not in home and "data-to=\"70000\"" not in home
+    # PD, 25 Oct 2026: the "Three ordinary causes" h3 and its list are gone; only the H2 stays, and the
+    # one card left under it is a single full-width card (no empty second column)
+    assert "<h3>Three ordinary causes</h3>" not in home
+    assert "Food waste nobody was measuring" not in home and "Shift design that put staff on before" not in home
+    leak = home.split("<h2>Where a venue's margin can leak.</h2>", 1)[1].split("</section>", 1)[0]
+    assert '<div class="hire single">' in leak and leak.count("<article>") == 1 and "<h3>What we read, every month</h3>" in leak
+    assert ".hire.single{grid-template-columns:1fr}" in (ROOT / "styles.css").read_text(encoding="utf-8")
+    ra = (ROOT / "restaurant-accountant" / "index.html").read_text(encoding="utf-8")
+    assert "<h2>Where restaurants actually lose money</h2>" in ra
+    assert "Your number will be different" not in ra and "Your number will be different" not in home
+    gen = (ROOT / "tools" / "build_landing_pages.py").read_text(encoding="utf-8")
+    assert "Your number will be different" not in gen and "Where restaurants actually lose money" in gen
+
+
+def test_home_count_bar_stacks_below_860px():
+    # Brand Studio round 6: 3 equal cells at 861px and wider, a clean stack at 860px and below (no orphan cell).
+    css = (ROOT / "styles.css").read_text(encoding="utf-8")
+    assert "@media(max-width:860px){.counts{grid-template-columns:1fr;gap:18px}}" in css
+    assert "grid-template-columns:repeat(3,1fr)" in css.split(".counts{", 1)[1].split("}", 1)[0]
+    assert not re.search(r"max-width:(940|560)px\)\{\s*\.counts", css)
+    assert "repeat(2,1fr);gap:22px" not in css
 
 
 def test_no_synthesised_font_weights():
@@ -648,6 +723,152 @@ def test_paid_landing_page_feeds_both_platforms():
     # in the visitor's own mail client. If a FORM_ENDPOINT is ever wired, that
     # decision needs a human looking at where a venue's sales figure lands.
     assert "mailto:admin@pinktax.com.au" in lp, "lead fallback relay changed"
+
+
+TPB_COMPANY = "Pink Accounting &amp; Tax Solutions Pty Ltd, registered tax agent 26284368"
+# One place to swap the disclaimer text (identical constant in the other branch). Text is the
+# Tax Manager FINAL website disclaimer, /workspace/tax/web-disclaimer-FINAL-TM-2026-10-25.md,
+# character for character. Do not reword.
+FINAL_DISCLAIMER = (
+    "General information only, not advice for your situation. It is not personal financial product advice. "
+    "Pink Accounting & Tax Solutions Pty Ltd does not hold an Australian Financial Services Licence. "
+    "The ATO decides due dates, processing times, interest, penalties and outcomes, and these depend on your situation. "
+    "Pink can't control the ATO or other third parties. "
+    "Prices are current at the date of publication, and we confirm your fee in writing before we start. "
+    "Nothing on this page limits your rights under the Australian Consumer Law."
+)
+MERGED_DISCLAIMER = html.escape(FINAL_DISCLAIMER, quote=False)
+# earlier variants that must not come back
+DISCLAIMER_VARIANT_STRINGS = (
+    "is a registered tax agent (TPB",
+    "so we do not give financial product advice",
+    "which investments, super funds or SMSF to buy",
+    "does not take your circumstances into account",
+    "is not tax advice",
+    "not tax advice",
+    "It is not tax advice or personal financial product advice",
+)
+
+
+def test_margin_footer_has_one_merged_disclaimer():
+    # One merged disclaimer replaces the two overlapping footer lines on /margin/
+    # (same wording as /individuals/). The old lines must not come back.
+    t = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
+    foot = t[t.index("</main>"):] if "</main>" in t else t
+    merged = MERGED_DISCLAIMER
+    assert foot.count(merged) == 1
+    visible = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", re.sub(r"<script.*?</script>|<style.*?</style>", "", t, flags=re.S))))
+    assert visible.count(FINAL_DISCLAIMER) == 1, "final disclaimer exactly once"
+    for variant in DISCLAIMER_VARIANT_STRINGS:
+        assert variant not in t, variant
+    assert 'class="legal">' + TPB_COMPANY + '.<br>' + merged + "</div>" in foot
+    assert foot.count('<div class="legal">') == 1
+    assert "General information only, not advice." not in t
+    assert "Pink can't control the ATO, timing" not in t
+    assert "Fee examples are current" not in t
+
+
+def test_margin_page_text_size_and_tap_targets():
+    # /margin/ carries its own inline CSS (shared styles.css is not used by this page).
+    # Minimum text 14.4px (Brand Studio floor, 25 Oct 2026), footer and inline links at
+    # least 44px to tap, white-on-pink buttons use the deeper pink so contrast passes AA.
+    t = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
+    css = re.search(r"<style>(.*?)</style>", t, re.S).group(1)
+    for size in re.findall(r"font-size:\s*([\d.]+)px", css):
+        assert float(size) >= 14.4, size
+    # form fields show a visible focus outline, not only a border colour change
+    assert re.search(r"input:focus-visible,select:focus-visible,textarea:focus-visible\{outline:3px solid", css)
+    assert "footer a,.hint a,details p a{display:inline-flex" in css and "min-height:44px" in css
+    assert ".btn{display:inline-block;background:var(--accent-deep)" in css
+    assert ".legal{margin-top:12px;font-size:14.4px" in css
+
+
+def _tpb_number_is_company_only(t):
+    # 26284368 is the company's TPB number (Pink Accounting & Tax Solutions Pty Ltd).
+    # Huong Bui's own number is different, so no person's name may caption it.
+    for m in re.finditer("26284368", t):
+        near = t[max(0, m.start() - 150):m.end() + 150]
+        for person in ("Huong", "Pinky", "Bui", "founder", "person responsible"):
+            assert person not in near, (person, near)
+
+
+def test_margin_page_has_no_asic_registered_agent_line():
+    # "ASIC Registered Agent" (number 52580) is unverified and can read as a licence number.
+    t = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
+    assert "ASIC Registered Agent" not in t and "52580" not in t
+    assert "is not tax advice" not in t
+    assert TPB_COMPANY in t
+    assert t.count(TPB_COMPANY) >= 3  # footer, FAQ and trust strip all name the company
+    t_ui = t.split("<script>")[0]
+    assert "Registered Tax Agent 26284368" not in t_ui
+    _tpb_number_is_company_only(t)
+    disc = re.search(r'<div class="legal">.*?<br>(.*?)</div>', t, re.S).group(1)
+    assert "26284368" not in disc, "the TPB number sits in the footer only, not in the disclaimer"
+
+
+def test_margin_page_has_no_unscoped_fixed_fee_wording():
+    # "fixed" promised a flat price the page does not scope. Say what the monthly fee covers.
+    t = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
+    assert "fixed" not in t.lower()
+    assert t.count("monthly fee for the agreed scope") >= 4
+    assert "One monthly fee for the agreed scope." in t
+    assert "Monthly fee for the agreed scope, quoted before we start. No hourly billing" in t
+
+
+
+def _margin_text(h):
+    return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", h))).strip()
+
+
+def test_margin_ad_variant_eyebrow_names_the_company_with_the_tax_agent_number():
+    t = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
+    assert "tax:{e:'" + TPB_COMPANY + "'" in t
+    assert "e:'Registered Tax Agent" not in t
+    # the number is never shown without the company wording right beside it
+    for m in re.finditer(r"26284368", t):
+        assert "Pink Accounting &amp; Tax Solutions Pty Ltd, registered tax agent 26284368" in t[max(0, m.start() - 90):m.end()]
+
+
+def test_margin_plan_cards_no_prices_cta_and_layout():
+    # PD decision 25 Oct 2026: PR #13 wins, so no plan-card prices on /margin/.
+    # The price styling lives on branch later/margin-price-styling-2026-10-25.
+    t = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
+    section = t[t.index('<section class="price">'):t.index("</section>", t.index('<section class="price">'))]
+    cards = re.findall(r'<div class="tier[^"]*">(.*?)\n      </div>', section, re.S)
+    assert len(cards) == 2
+    names = ["Hospitality Margin Protection", "Weekly Visibility"]
+    scopes = [
+        ["We do the bookkeeping and payroll", "Monthly margin read, all four questions", "BAS, IAS, STP and year end", "Tax planning through the year"],
+        ["Weekly numbers, not monthly", "Wage % tracked against roster", "Everything in Margin Protection", "For venues mid-change"],
+    ]
+    hero_cta = re.search(r'<a class="btn" href="([^"]+)"', t).group(1)
+    # GMM wording (25 Oct 2026): the lead card keeps "Fee confirmed in writing before we start";
+    # the other card reads "You see the fee in writing before work begins". No mechanism named.
+    fees = ["Fee confirmed in writing before we start", "You see the fee in writing before work begins"]
+    for card, name, scope, fee in zip(cards, names, scopes, fees):
+        # order: plan name, fee line, 4-bullet scope list, CTA last
+        order = [card.index("<h3>"), card.index('class="per"'), card.index("<ul>"), card.index('class="tier-cta"')]
+        assert order == sorted(order)
+        assert "<h3>" + name + "</h3>" in card
+        assert '<div class="per">' + fee + '</div>' in card
+        assert "engagement letter" not in card
+        assert re.findall(r"<li>(.*?)</li>", card) == scope
+        cta = re.search(r'<a class="tier-cta" href="([^"]+)"[^>]*>Book a 15-minute call</a>', card)
+        assert cta and cta.group(1) == hero_cta
+        assert card.rstrip().endswith("</a>"), "CTA is the last element in the card"
+        # no dollar figures, GST pairs or per-month prices in a plan card
+        assert "$" not in card and "GST" not in card and "per month" not in card
+        assert 'class="amt"' not in card and 'price-line' not in card
+    assert "$" not in section, "no price figures anywhere in the plan section"
+    css = t[: t.index("</style>")]
+    assert not re.search(r"\.(amt|price-line|gst)\s*[{,.]|\.(amt|price-line|gst)\b(?!atic)", css)
+    assert re.search(r"\.tier \.per\{[^}]*font-size:14\.4px", css)
+    assert re.search(r"\.tier \.tier-cta\{[^}]*margin-top:auto[^}]*min-height:44px[^}]*font-size:16px;font-weight:700[^}]*text-decoration:underline", css)
+    assert re.search(r"\.tier\{[^}]*display:flex;flex-direction:column", css)
+    assert "a:focus-visible" in css
+    # two columns from 941px, one column at 940px and below
+    assert ".price .tiers{grid-template-columns:repeat(2,1fr)}" in css
+    assert "@media (max-width:940px){.tiers,.price .tiers{grid-template-columns:1fr}}" in css
 
 
 def test_identity_first_on_every_first_screen():
