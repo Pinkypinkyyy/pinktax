@@ -334,18 +334,27 @@ def test_switching_page_exists_and_is_linked():
 
 
 TPB_COMPANY = "Pink Accounting &amp; Tax Solutions Pty Ltd, registered tax agent 26284368"
-DISCLAIMER_LEAD = (
-    "General information only, not advice for your situation. "
-    "Pink Accounting &amp; Tax Solutions Pty Ltd is a registered tax agent (TPB 26284368) and "
-    "does not hold an Australian Financial Services Licence, so we do not give financial product advice "
-    "(for example, which investments, super funds or SMSF to buy). "
-)
-MERGED_DISCLAIMER = (
-    DISCLAIMER_LEAD
-    + "The ATO decides due dates, processing times, "
-    "interest, penalties and outcomes, and these depend on your situation. "
-    "Pink can't control the ATO or other third parties. Prices are current at the date of publication. "
+# One place to swap the disclaimer text (identical constant in the other branch). Text is the
+# Tax Manager FINAL website disclaimer, /workspace/tax/web-disclaimer-FINAL-TM-2026-10-25.md,
+# character for character. Do not reword.
+FINAL_DISCLAIMER = (
+    "General information only, not advice for your situation. It is not personal financial product advice. "
+    "Pink Accounting & Tax Solutions Pty Ltd does not hold an Australian Financial Services Licence. "
+    "The ATO decides due dates, processing times, interest, penalties and outcomes, and these depend on your situation. "
+    "Pink can't control the ATO or other third parties. "
+    "Prices are current at the date of publication, and we confirm your fee in writing before we start. "
     "Nothing on this page limits your rights under the Australian Consumer Law."
+)
+MERGED_DISCLAIMER = html.escape(FINAL_DISCLAIMER, quote=False)
+# earlier variants that must not come back
+DISCLAIMER_VARIANT_STRINGS = (
+    "is a registered tax agent (TPB",
+    "so we do not give financial product advice",
+    "which investments, super funds or SMSF to buy",
+    "does not take your circumstances into account",
+    "is not tax advice",
+    "not tax advice",
+    "It is not tax advice or personal financial product advice",
 )
 
 
@@ -375,6 +384,9 @@ def test_individuals_page_prices_and_disclaimer():
     assert '<span class="ptotal">From $451 incl. GST</span>' in main
     assert '<span class="ptotal">From $2,750 incl. GST per year</span>' in main
     assert 'class="disclaimer">' + MERGED_DISCLAIMER + "</p>" in main
+    assert _visible_text(t).count(FINAL_DISCLAIMER) == 1, "final disclaimer exactly once"
+    for variant in DISCLAIMER_VARIANT_STRINGS:
+        assert variant not in t, variant
     assert "<b>General information" not in main and "ATO decides" in main
     assert "can't control the ATO or other third parties" in main and "timing" not in text.lower().split("the ato decides")[1]
     assert 'href="/book/"' in main
@@ -457,7 +469,7 @@ def test_individuals_page_has_no_asic_registered_agent_line():
     _tpb_number_is_company_only(t)
     # the disclaimer does not repeat the fee-in-writing promise; the scope sentence carries it
     disc = re.search(r'<p class="disclaimer">(.*?)</p>', t, re.S).group(1)
-    assert "in writing" not in disc
+    assert "26284368" not in disc, "the TPB number sits in the footer only, not in the disclaimer"
 
 
 def test_individuals_page_one_phone_format_and_no_hours():
