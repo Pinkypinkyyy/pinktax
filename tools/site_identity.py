@@ -55,7 +55,6 @@ def org_node():
         "email": OFFICE["email"],
         "image": f"{ORIGIN}/assets/og.png",
         "logo": f"{ORIGIN}/assets/logo.png",
-        "priceRange": "$$",
         "knowsAbout": ["hospitality bookkeeping", "restaurant payroll", "cafe margins", "BAS", "GST"],
         "address": {
             "@type": "PostalAddress",
@@ -65,7 +64,6 @@ def org_node():
             "postalCode": OFFICE["postcode"],
             "addressCountry": OFFICE["country"],
         },
-        "areaServed": {"@type": "Country", "name": "Australia"},
         "openingHoursSpecification": {
             "@type": "OpeningHoursSpecification",
             "dayOfWeek": HOURS["days"],

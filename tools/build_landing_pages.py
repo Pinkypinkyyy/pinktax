@@ -13,6 +13,7 @@ Run from the repo root:  python3 tools/build_landing_pages.py
 """
 
 import re
+import subprocess
 from pathlib import Path
 
 import site_identity
@@ -530,6 +531,30 @@ PAGES = [
 ]
 
 
+def lastmod(loc, previous):
+    """Date of the last commit that touched the page, as YYYY-MM-DD.
+
+    Honest by construction: it moves only when the file does. Falls back to the
+    date already in sitemap.xml where git history is unavailable (a shallow CI
+    checkout), and to no lastmod at all rather than inventing one.
+    """
+    rel = "index.html" if loc == "/" else loc.strip("/") + "/index.html"
+    try:
+        shallow = subprocess.run(
+            ["git", "rev-parse", "--is-shallow-repository"],
+            cwd=ROOT, capture_output=True, text=True, timeout=20,
+        ).stdout.strip() != "false"
+        if shallow:  # a shallow clone dates every file with its one commit
+            return previous.get(loc, "")
+        out = subprocess.run(
+            ["git", "log", "-1", "--format=%cs", "--", rel],
+            cwd=ROOT, capture_output=True, text=True, timeout=20,
+        ).stdout.strip()
+    except Exception:
+        out = ""
+    return out or previous.get(loc, "")
+
+
 def main():
     site_identity.sync()
     built = [page(**spec) for spec in PAGES]
@@ -543,7 +568,14 @@ def main():
         if loc not in seen:
             seen.add(loc)
             ordered.append(loc)
-    body = "\n".join(f"  <url><loc>{ORIGIN}{loc}</loc></url>" for loc in ordered)
+    previous = {}
+    sm = ROOT / "sitemap.xml"
+    if sm.exists():
+        previous = dict(re.findall(r"<loc>https://pinktax\.com\.au(/[^<]*)</loc><lastmod>([^<]+)</lastmod>", sm.read_text(encoding="utf-8")))
+    body = "\n".join(
+        f"  <url><loc>{ORIGIN}{loc}</loc>" + (f"<lastmod>{d}</lastmod>" if (d := lastmod(loc, previous)) else "") + "</url>"
+        for loc in ordered
+    )
     (ROOT / "sitemap.xml").write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
