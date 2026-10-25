@@ -30,6 +30,44 @@ def test_book_page_has_one_intake_only():
     for name in ("revenue", "staff", "hurt", "position", "vision"):
         assert f'name="{name}"' not in text, f"{name} asked twice"
 
+# Tax Manager FINAL website disclaimer, /workspace/tax/web-disclaimer-FINAL-TM-2026-10-25.md,
+# character for character. Do not reword. (The same text is pinned by the /individuals/
+# and /margin/ tests in the PRs that own those pages.)
+FINAL_DISCLAIMER = (
+    "General information only, not advice for your situation. It is not personal financial product advice. "
+    "Pink Accounting & Tax Solutions Pty Ltd does not hold an Australian Financial Services Licence. "
+    "The ATO decides due dates, processing times, interest, penalties and outcomes, and these depend on your situation. "
+    "Pink can't control the ATO or other third parties. "
+    "Prices are current at the date of publication, and we confirm your fee in writing before we start. "
+    "Nothing on this page limits your rights under the Australian Consumer Law."
+)
+
+
+def _plain_text_for_disclaimer(fragment):
+    fragment = re.sub(r"<!--.*?-->", "", fragment, flags=re.S)
+    fragment = re.sub(r"<(?:style|script)\b.*?</(?:style|script)>", "", fragment, flags=re.S)
+    return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", fragment))).strip()
+
+
+def test_book_page_carries_the_final_disclaimer_once():
+    text = (ROOT / "book" / "index.html").read_text(encoding="utf-8")
+    assert _plain_text_for_disclaimer(text).count(FINAL_DISCLAIMER) == 1, "final disclaimer exactly once"
+    # it is one contiguous paragraph of its own, with no registration number inside it
+    paras = re.findall(r"<p>(.*?)</p>", text, re.S)
+    mine = [p for p in paras if FINAL_DISCLAIMER in html.unescape(p)]
+    assert len(mine) == 1 and html.unescape(mine[0]) == FINAL_DISCLAIMER, mine
+    assert "TPB" not in mine[0] and "26284368" not in mine[0]
+    # the earlier short variant must not come back
+    for variant in (
+        "General information only, not advice. Due dates",
+        "Due dates, processing times, interest and outcomes are decided by the ATO",
+        "Pink can't control them or third parties",
+        "is a registered tax agent (TPB",
+        "so we do not give financial product advice",
+        "not tax advice",
+    ):
+        assert variant not in text, variant
+
 
 def test_no_service_profit_offer():
     home = (ROOT / "index.html").read_text(encoding="utf-8")
@@ -198,6 +236,12 @@ def test_contact_is_the_office_page():
     assert 'data-relay="contact-form"' in text, "contact form removed"
 
 
+def test_margin_faq_section_has_an_accessible_name():
+    # The FAQ has no visible heading (the "What venues say" heading went with the quote), so the section is named.
+    html = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
+    assert '<section class="wrap" style="padding:8px 20px 0" aria-label="Common questions">' in html
+
+
 def test_pages_equal_their_identity_rebuild():
     # identity.json is regenerated from the firm's canonical file. If it
     # changes and nobody reruns tools/build_landing_pages.py, this fails.
@@ -252,6 +296,63 @@ def test_stars_are_svg_not_glyphs():
     html = (ROOT / "index.html").read_text(encoding="utf-8")
     assert "★" not in html
     assert html.count('<svg class="stars"') == 3
+
+
+def test_seventy_thousand_claim_is_gone_from_site_and_source():
+    # PD decision, 25 Oct 2026: the "$70,000 a year in one $1M venue" figure is withdrawn entirely.
+    # No allowance for a "worked example" or any labelled illustration, on any page or in the generator.
+    files = [p for p in ROOT.rglob("*") if p.is_file() and ".git" not in p.parts and "tests" not in p.parts
+             and p.suffix in (".html", ".js", ".json", ".xml", ".txt", ".md", ".py", ".css", ".yml")]
+    assert files
+    figure = re.compile(
+        r"(?<![\d,.])\$?\s?70,000(?![\d,])|(?<![\d,.])70000(?!\d)|(?<![\d,.])\$?70\s?k\b|(?<!\d)70[ \u00a0]000(?!\d)"
+        r"|\$70(?![\d,])|seventy[- ]thousand", re.I)
+    banned = [
+        r"found up to", r"in one \$1M venue", r"single \$1M venue", r"one \$1M", r"one venue and one engagement",
+        r"one engagement(?! letter)", r"came to us profitable", r"found leaking", r"one venue\. \$70",
+        r"what venues say", r"<blockquote class=\"quote\"", r"data-to=\"70000\"", r"\$1M venue",
+        r"worked example", r"illustration with invented figures", r"not a client result", r"7% leak",
+    ]
+    for p in files:
+        text = p.read_text(encoding="utf-8", errors="ignore")
+        for pat in banned:
+            assert not re.search(pat, text, re.I), f"{p.relative_to(ROOT)}: {pat}"
+        m = figure.search(text)
+        assert not m, f"{p.relative_to(ROOT)}: {m.group(0)}"
+    # the regex is precise: other figures are not the withdrawn claim
+    for hit in ("$70,000 a year", "70,000 a year", "$70K", "70k", "70000", "70 000", "$70 a day"):
+        assert figure.search(hit), hit
+    for fine in ("a $700,000 venue is $7,000 a year", "$170,000", "$1,070,000", "$7,000", "$700", "2070", "1,700,000"):
+        assert not figure.search(fine), fine
+
+
+def test_seventy_thousand_removal_leaves_clean_text():
+    home = (ROOT / "index.html").read_text(encoding="utf-8")
+    assert ('<p class="lead">For caf&eacute;s, restaurants, bars and multi-venue groups. Each month we review wages, food cost '
+            'and suppliers, while you can still act on them.</p>') in home
+    assert "<h2>Where a venue's margin can leak.</h2>" in home
+    assert "A worked example" not in home and "Found leaking" not in home and "data-to=\"70000\"" not in home
+    # PD, 25 Oct 2026: the "Three ordinary causes" h3 and its list are gone; only the H2 stays, and the
+    # one card left under it is a single full-width card (no empty second column)
+    assert "<h3>Three ordinary causes</h3>" not in home
+    assert "Food waste nobody was measuring" not in home and "Shift design that put staff on before" not in home
+    leak = home.split("<h2>Where a venue's margin can leak.</h2>", 1)[1].split("</section>", 1)[0]
+    assert '<div class="hire single">' in leak and leak.count("<article>") == 1 and "<h3>What we read, every month</h3>" in leak
+    assert ".hire.single{grid-template-columns:1fr}" in (ROOT / "styles.css").read_text(encoding="utf-8")
+    ra = (ROOT / "restaurant-accountant" / "index.html").read_text(encoding="utf-8")
+    assert "<h2>Where restaurants actually lose money</h2>" in ra
+    assert "Your number will be different" not in ra and "Your number will be different" not in home
+    gen = (ROOT / "tools" / "build_landing_pages.py").read_text(encoding="utf-8")
+    assert "Your number will be different" not in gen and "Where restaurants actually lose money" in gen
+
+
+def test_home_count_bar_stacks_below_860px():
+    # Brand Studio round 6: 3 equal cells at 861px and wider, a clean stack at 860px and below (no orphan cell).
+    css = (ROOT / "styles.css").read_text(encoding="utf-8")
+    assert "@media(max-width:860px){.counts{grid-template-columns:1fr;gap:18px}}" in css
+    assert "grid-template-columns:repeat(3,1fr)" in css.split(".counts{", 1)[1].split("}", 1)[0]
+    assert not re.search(r"max-width:(940|560)px\)\{\s*\.counts", css)
+    assert "repeat(2,1fr);gap:22px" not in css
 
 
 def test_no_synthesised_font_weights():
@@ -717,3 +818,98 @@ def test_headings_do_not_skip_a_level():
         levels = [int(m) for m in re.findall(r"<h([1-6])[ >]", p.read_text(encoding="utf-8"))]
         for before, after in zip(levels, levels[1:]):
             assert after <= before + 1, f"{p}: h{before} jumps to h{after}"
+
+
+# Review provenance (GMM write-up, 25 Oct 2026; PD decision): the home page once said
+# "5.0 from 32 reviews" from a hardcoded counter that went stale (35 by 23 Oct).
+# Policy: no review count anywhere on the site unless it was read live that day
+# and is dated. Nobody could verify one on 25 Oct, so no page states a count.
+NUMBER_WORDS = (
+    r"one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|"
+    r"fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|"
+    r"fifty|sixty|seventy|eighty|ninety|hundred|dozens?|hundreds"
+)
+_NUM = rf"(?:\d[\d,.]*\+?|(?:{NUMBER_WORDS})(?:[- ](?:{NUMBER_WORDS}))*)"
+REVIEW_COUNT_PATTERNS = (
+    # "32 reviews", "35 Google reviews", "thirty-five five-star reviews", "100+ ratings"
+    re.compile(rf"\b{_NUM}\s+(?:(?:five[- ]star|google)\s+)*(?:reviews?|ratings?)\b", re.I),
+    # "based on 32", "based on thirty-five"
+    re.compile(rf"\bbased on\s+{_NUM}\b", re.I),
+    # "5.0 (35)" and "(35 reviews)"
+    re.compile(r"\d\.\d\s*\(\s*\d[\d,]*\s*\)", re.I),
+)
+
+
+def review_count_hits(block_html, counters=True):
+    # Structured data that carries a count is checked on the raw source.
+    hits = re.findall(r"reviewCount|ratingCount", block_html, re.I)
+    text = re.sub(r"<(?:svg|script|style)\b.*?</(?:svg|script|style)>", " ", block_html, flags=re.S)
+    attrs = " ".join(re.findall(r'(?:content|aria-label|alt|title)="([^"]*)"', text))
+    # block-level tags end a sentence, so a number in one block (a tax agent number)
+    # cannot run into the next block's words ("26258598 Google rating")
+    visible = re.sub(r"</?(?:section|div|figure|figcaption|dl|dt|dd|p|li|ul|h[1-6]|blockquote|cite)\b[^>]*>", " | ", text)
+    visible = re.sub(r"<[^>]+>", " ", visible)
+    visible = html.unescape(re.sub(r"\s+", " ", visible + " " + attrs))
+    for rx in REVIEW_COUNT_PATTERNS[:3]:
+        hits += rx.findall(visible)
+    if counters:
+        # an animated counter left inside a reviews block is how "32" went stale
+        hits += re.findall(r"data-to=", text)
+    return hits
+
+
+def home_reviews_block():
+    text = (ROOT / "index.html").read_text(encoding="utf-8")
+    m = re.search(r'<section class="final proof">.*?</section>', text, re.S)
+    assert m, "home reviews block (section.final.proof) not found"
+    return m.group(0)
+
+
+def test_review_count_detector_catches_counts():
+    for bad in (
+        "Rated 5.0 from 32 reviews",
+        "<p>35 Google reviews</p>",
+        "<dd>5.0<small>35 Google reviews (as at 23 Oct 2026)</small></dd>",
+        "Rated 5.0 on Google: 35 Google reviews (as at 23 Oct 2026).",
+        "Based on 32 reviews",
+        "based on thirty-five ratings",
+        "<span>5.0 (35) reviews</span>",
+        "5.0 (35)",
+        "Thirty five reviews",
+        "<span class=\"tick\" data-to=\"32\">32</span> reviews",
+        "over 100+ reviews",
+        "<meta name=\"description\" content=\"Rated 5.0 from 35 reviews\">",
+        "<script type=\"application/ld+json\">{\"reviewCount\":35}</script>",
+        "twenty-three five-star reviews",
+    ):
+        assert review_count_hits(bad), bad
+    for ok in (
+        "Rated 5.0 on Google.",
+        "Three of our Google reviews, as written there. Read them all on Google.",
+        "Read our reviews on Google",
+        "Each month we review wages, food cost and suppliers.",
+        "Margin review, every Month",
+        "<span class=\"tick\" data-to=\"2400\">$2,400</span> a year",
+    ):
+        assert not review_count_hits(ok, counters=False), ok
+
+
+def test_home_reviews_block_states_no_review_count():
+    block = home_reviews_block()
+    assert "Rated 5.0 on Google." in block
+    assert review_count_hits(block) == [], review_count_hits(block)
+
+
+def test_no_page_states_a_review_count():
+    # Whole site, stats line and meta text included (PD decision, 25 Oct 2026).
+    for p in PAGES:
+        hits = review_count_hits(p.read_text(encoding="utf-8"), counters=False)
+        assert hits == [], f"{p.relative_to(ROOT)}: {hits}"
+
+
+def test_home_stats_line_rates_without_a_count():
+    text = (ROOT / "index.html").read_text(encoding="utf-8")
+    m = re.search(r"<dt>Google rating</dt>\s*<dd>(.*?)</dd>", text, re.S)
+    assert m, "Google rating stat missing"
+    assert re.sub(r"<[^>]+>", " ", m.group(1)).split()[0] == "5.0"
+    assert review_count_hits(m.group(0)) == [], m.group(0)
