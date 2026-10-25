@@ -242,7 +242,6 @@ PAGES = [
             ]),
             ("Where restaurants actually lose money", [
                 "<p>In our experience it is rarely one dramatic thing. It is shift design that puts staff on before the trade arrives, a menu that has not been recosted since the last supplier rise, waste that nobody measures because nobody owns it, and trading hours that cost more to keep open than they return. Each one is small. Together they are the difference between a profitable year and a tight one.</p>",
-                "<p>In one $1M venue those three ordinary causes came to about $70,000 a year. That is one engagement, not a promise. Your number will be different.</p>",
                 CHECK,
             ]),
             ("Working with Pink", [
@@ -535,7 +534,7 @@ def main():
     built = [page(**spec) for spec in PAGES]
     locs = [
         "/", "/system/", "/why-pink/", "/book/", "/contact/", "/margin-check/",
-        "/switching/", "/working-with-us/", "/privacy/", "/terms/", "/feedback/",
+        "/switching/", "/individuals/", "/working-with-us/", "/privacy/", "/terms/", "/feedback/",
         "/restaurant-cafe-bookkeeping-brendale/", "/accountant-brendale/",
     ] + [f"/{slug}/" for slug in built]
     seen, ordered = set(), []
