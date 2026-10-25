@@ -30,6 +30,44 @@ def test_book_page_has_one_intake_only():
     for name in ("revenue", "staff", "hurt", "position", "vision"):
         assert f'name="{name}"' not in text, f"{name} asked twice"
 
+# Tax Manager FINAL website disclaimer, /workspace/tax/web-disclaimer-FINAL-TM-2026-10-25.md,
+# character for character. Do not reword. (The same text is pinned by the /individuals/
+# and /margin/ tests in the PRs that own those pages.)
+FINAL_DISCLAIMER = (
+    "General information only, not advice for your situation. It is not personal financial product advice. "
+    "Pink Accounting & Tax Solutions Pty Ltd does not hold an Australian Financial Services Licence. "
+    "The ATO decides due dates, processing times, interest, penalties and outcomes, and these depend on your situation. "
+    "Pink can't control the ATO or other third parties. "
+    "Prices are current at the date of publication, and we confirm your fee in writing before we start. "
+    "Nothing on this page limits your rights under the Australian Consumer Law."
+)
+
+
+def _plain_text_for_disclaimer(fragment):
+    fragment = re.sub(r"<!--.*?-->", "", fragment, flags=re.S)
+    fragment = re.sub(r"<(?:style|script)\b.*?</(?:style|script)>", "", fragment, flags=re.S)
+    return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", fragment))).strip()
+
+
+def test_book_page_carries_the_final_disclaimer_once():
+    text = (ROOT / "book" / "index.html").read_text(encoding="utf-8")
+    assert _plain_text_for_disclaimer(text).count(FINAL_DISCLAIMER) == 1, "final disclaimer exactly once"
+    # it is one contiguous paragraph of its own, with no registration number inside it
+    paras = re.findall(r"<p>(.*?)</p>", text, re.S)
+    mine = [p for p in paras if FINAL_DISCLAIMER in html.unescape(p)]
+    assert len(mine) == 1 and html.unescape(mine[0]) == FINAL_DISCLAIMER, mine
+    assert "TPB" not in mine[0] and "26284368" not in mine[0]
+    # the earlier short variant must not come back
+    for variant in (
+        "General information only, not advice. Due dates",
+        "Due dates, processing times, interest and outcomes are decided by the ATO",
+        "Pink can't control them or third parties",
+        "is a registered tax agent (TPB",
+        "so we do not give financial product advice",
+        "not tax advice",
+    ):
+        assert variant not in text, variant
+
 
 def test_no_service_profit_offer():
     home = (ROOT / "index.html").read_text(encoding="utf-8")
