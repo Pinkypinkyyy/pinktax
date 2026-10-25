@@ -650,75 +650,6 @@ def test_paid_landing_page_feeds_both_platforms():
     assert "mailto:admin@pinktax.com.au" in lp, "lead fallback relay changed"
 
 
-def test_identity_first_on_every_first_screen():
-    # HB 24 Sep 2026: people must know us as accountants, bookkeepers and tax
-    # agents first, then hospitality. The ad-matched line sits under the H1.
-    trust = "Accountants, bookkeepers and tax agents for hospitality."
-    for rel in ("index.html", "margin/index.html"):
-        text = (ROOT / rel).read_text(encoding="utf-8")
-        h1 = re.search(r"<h1[^>]*>(.*?)</h1>", text, re.S).group(1)
-        assert h1 == "Accountants, bookkeepers and tax agents for hospitality", rel
-        # The H1 says who we are, so the line under the buttons carries the offer.
-        assert 'class="trust-line">Accountants, bookkeepers and tax agents for hospitality, plus tax returns' in text, rel
-    margin = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
-    assert 'class="hook" id="hl"' in margin, "ad message match must target the hook, not the H1"
-    for p in PAGES:
-        if p in STUBS:
-            continue
-        text = p.read_text(encoding="utf-8")
-        assert "BAS &amp; tax agent" not in text and "BAS & tax agent" not in text, p
-        if 'class="phone"' in text:
-            assert 'class="call-icon"' in text, f"{p}: no tap-to-call"
-
-
-def test_guide_pages_carry_the_trust_line():
-    for slug in ("cafe-accountant", "restaurant-accountant", "hospitality-bookkeeping", "hospitality-payroll"):
-        text = (ROOT / slug / "index.html").read_text(encoding="utf-8")
-        assert 'class="trust-line"' in text, slug
-
-
-def test_hospitality_only_and_food_cost_said_right():
-    why = (ROOT / "why-pink" / "index.html").read_text(encoding="utf-8")
-    assert "beyond hospitality" not in why
-    food = (ROOT / "restaurant-food-cost-percentage" / "index.html").read_text(encoding="utf-8")
-    assert "It is purchases divided by sales" not in food
-
-
-def test_booking_button_on_the_first_screen_of_money_pages():
-    book = (ROOT / "book" / "index.html").read_text(encoding="utf-8")
-    assert book.index('data-event="book-calendar"') < book.index("What happens on the call")
-    margin = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
-    assert margin.index('data-ev="cta_top"') < margin.index('<ul class="ticks">')
-
-
-def test_ad_page_counts_a_lead_only_when_it_was_sent():
-    # 24 Sep 2026: the /margin/ form had no endpoint, opened a mail app and
-    # still told the visitor "your details are with us" and fired a Lead.
-    m = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
-    assert "FORM_ENDPOINT: 'https://formsubmit.co/ajax/admin@pinktax.com.au'" in m
-    assert "setTimeout(done" not in m and "catch(function(){ done(); })" not in m
-    assert "String(j.success)==='false'" in m and 'id="sendFail"' in m
-    assert "offshore" not in m
-
-
-def test_no_implied_contrast_lines():
-    for rel in ("index.html", "contact/index.html", "switching/index.html", "why-pink/index.html", "margin/index.html", "restaurant-accountant/index.html"):
-        text = (ROOT / rel).read_text(encoding="utf-8").lower()
-        for phrase in ("ticket queue", "a queue", "easier than staying put", "not a service", "honest tiering"):
-            assert phrase not in text, (rel, phrase)
-
-
-
-def test_headings_do_not_skip_a_level():
-    # Lighthouse 24 Sep 2026: footer h4 after a page h2 skipped a level.
-    for p in PAGES:
-        if p in STUBS:
-            continue
-        levels = [int(m) for m in re.findall(r"<h([1-6])[ >]", p.read_text(encoding="utf-8"))]
-        for before, after in zip(levels, levels[1:]):
-            assert after <= before + 1, f"{p}: h{before} jumps to h{after}"
-
-
 TPB_COMPANY = "Pink Accounting &amp; Tax Solutions Pty Ltd, registered tax agent 26284368"
 # One place to swap the disclaimer text (identical constant in the other branch). Text is the
 # Tax Manager FINAL website disclaimer, /workspace/tax/web-disclaimer-FINAL-TM-2026-10-25.md,
@@ -805,3 +736,73 @@ def test_margin_page_has_no_unscoped_fixed_fee_wording():
     assert t.count("monthly fee for the agreed scope") >= 4
     assert "One monthly fee for the agreed scope." in t
     assert "Monthly fee for the agreed scope, quoted before we start. No hourly billing" in t
+
+
+
+def test_identity_first_on_every_first_screen():
+    # HB 24 Sep 2026: people must know us as accountants, bookkeepers and tax
+    # agents first, then hospitality. The ad-matched line sits under the H1.
+    trust = "Accountants, bookkeepers and tax agents for hospitality."
+    for rel in ("index.html", "margin/index.html"):
+        text = (ROOT / rel).read_text(encoding="utf-8")
+        h1 = re.search(r"<h1[^>]*>(.*?)</h1>", text, re.S).group(1)
+        assert h1 == "Accountants, bookkeepers and tax agents for hospitality", rel
+        # The H1 says who we are, so the line under the buttons carries the offer.
+        assert 'class="trust-line">Accountants, bookkeepers and tax agents for hospitality, plus tax returns' in text, rel
+    margin = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
+    assert 'class="hook" id="hl"' in margin, "ad message match must target the hook, not the H1"
+    for p in PAGES:
+        if p in STUBS:
+            continue
+        text = p.read_text(encoding="utf-8")
+        assert "BAS &amp; tax agent" not in text and "BAS & tax agent" not in text, p
+        if 'class="phone"' in text:
+            assert 'class="call-icon"' in text, f"{p}: no tap-to-call"
+
+
+def test_guide_pages_carry_the_trust_line():
+    for slug in ("cafe-accountant", "restaurant-accountant", "hospitality-bookkeeping", "hospitality-payroll"):
+        text = (ROOT / slug / "index.html").read_text(encoding="utf-8")
+        assert 'class="trust-line"' in text, slug
+
+
+def test_hospitality_only_and_food_cost_said_right():
+    why = (ROOT / "why-pink" / "index.html").read_text(encoding="utf-8")
+    assert "beyond hospitality" not in why
+    food = (ROOT / "restaurant-food-cost-percentage" / "index.html").read_text(encoding="utf-8")
+    assert "It is purchases divided by sales" not in food
+
+
+def test_booking_button_on_the_first_screen_of_money_pages():
+    book = (ROOT / "book" / "index.html").read_text(encoding="utf-8")
+    assert book.index('data-event="book-calendar"') < book.index("What happens on the call")
+    margin = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
+    assert margin.index('data-ev="cta_top"') < margin.index('<ul class="ticks">')
+
+
+def test_ad_page_counts_a_lead_only_when_it_was_sent():
+    # 24 Sep 2026: the /margin/ form had no endpoint, opened a mail app and
+    # still told the visitor "your details are with us" and fired a Lead.
+    m = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
+    assert "FORM_ENDPOINT: 'https://formsubmit.co/ajax/admin@pinktax.com.au'" in m
+    assert "setTimeout(done" not in m and "catch(function(){ done(); })" not in m
+    assert "String(j.success)==='false'" in m and 'id="sendFail"' in m
+    assert "offshore" not in m
+
+
+def test_no_implied_contrast_lines():
+    for rel in ("index.html", "contact/index.html", "switching/index.html", "why-pink/index.html", "margin/index.html", "restaurant-accountant/index.html"):
+        text = (ROOT / rel).read_text(encoding="utf-8").lower()
+        for phrase in ("ticket queue", "a queue", "easier than staying put", "not a service", "honest tiering"):
+            assert phrase not in text, (rel, phrase)
+
+
+
+def test_headings_do_not_skip_a_level():
+    # Lighthouse 24 Sep 2026: footer h4 after a page h2 skipped a level.
+    for p in PAGES:
+        if p in STUBS:
+            continue
+        levels = [int(m) for m in re.findall(r"<h([1-6])[ >]", p.read_text(encoding="utf-8"))]
+        for before, after in zip(levels, levels[1:]):
+            assert after <= before + 1, f"{p}: h{before} jumps to h{after}"
