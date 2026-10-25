@@ -210,6 +210,40 @@ def test_pages_equal_their_identity_rebuild():
         assert site_identity.apply(text, rel) == text, f"{rel} is out of step with identity.json"
 
 
+# margin/ is changed by its own PR (#17), which carries the same removal and its own
+# test; drop this exemption once #17 is merged.
+ASIC_EXEMPT = {"margin/index.html"}
+
+
+def test_no_page_names_an_asic_registered_agent():
+    # "ASIC Registered Agent 52580" was never verified and can read as a licence number.
+    for p in PAGES:
+        rel = p.relative_to(ROOT).as_posix()
+        if rel in ASIC_EXEMPT:
+            continue
+        t = p.read_text(encoding="utf-8")
+        assert "ASIC Registered Agent" not in t, rel
+        assert "ASIC registered agent" not in t, rel
+        assert "52580" not in t, rel
+    gen = (ROOT / "tools" / "build_landing_pages.py").read_text(encoding="utf-8")
+    assert "ASIC Registered Agent" not in gen and "{ASIC}" not in gen
+
+
+def test_company_tax_agent_number_never_captions_a_person():
+    # 26284368 is Pink Accounting & Tax Solutions Pty Ltd (company). Huong Bui's own
+    # TPB number is 26258598 (TPB register, checked 23 Oct 2026).
+    for p in PAGES:
+        rel = p.relative_to(ROOT).as_posix()
+        t = p.read_text(encoding="utf-8")
+        for m in re.finditer("26284368", t):
+            # the caption is the phrase just before the number, back to the last separator
+            caption = re.split(r'[·<>{}"]|\. ', t[max(0, m.start() - 150):m.start()])[-1]
+            for person in ("Huong", "Pinky", "Bui", "founder", "person responsible", "numbers,"):
+                assert person not in caption, f"{rel}: {person!r} captions the company's 26284368: {caption!r}"
+        for m in re.finditer("26258598", t):
+            assert "Huong" in t[max(0, m.start() - 800):m.end()], f"{rel}: 26258598 is Huong's own number and must be captioned with her name"
+
+
 def test_booking_click_fires_book_click():
     # Intake finishes on Microsoft Bookings, which we cannot observe. The
     # click onto the calendar is the last event we own, so it is the primary
