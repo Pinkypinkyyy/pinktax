@@ -162,6 +162,43 @@
     } catch (err) {}
   });
 
+  // Lead source. The forms used to post only what the visitor typed, so the
+  // enquiry email could not say which ad, search or share brought them (the
+  // paid page /margin/ was the only place that kept UTMs). This remembers the
+  // first marketing touch of the browser session and adds it to the relay
+  // post. Fields: UTM source, medium, campaign, term, content, the Google and
+  // Meta click ids, the landing path and the referring site's host. Nothing
+  // the visitor typed and no full URLs; first touch wins within a session.
+  //
+  // Ready to enable, not live: flip ATTRIBUTION_ENABLED to true once the
+  // privacy policy says the enquiry email carries the visitor's campaign
+  // source (Pinky / legal decision, see seo-audit-2026-10-25.md).
+  var ATTRIBUTION_ENABLED = false;
+  var ATTR_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "gclid", "fbclid"];
+  function attribution() {
+    var out = {};
+    if (!ATTRIBUTION_ENABLED) return out;
+    try {
+      var stored = sessionStorage.getItem("pinkAttr");
+      if (stored) out = JSON.parse(stored) || {};
+      if (!out.landing_page) {
+        var q = new URLSearchParams(window.location.search);
+        ATTR_KEYS.forEach(function (k) {
+          var v = q.get(k);
+          if (v) out[k] = String(v).slice(0, 200);
+        });
+        out.landing_page = window.location.pathname;
+        var ref = "";
+        try { ref = document.referrer ? new URL(document.referrer).hostname : ""; } catch (e) {}
+        if (ref && ref !== window.location.hostname) out.referrer = ref;
+        sessionStorage.setItem("pinkAttr", JSON.stringify(out));
+      }
+    } catch (err) {}
+    return out;
+  }
+  window.pinkAttribution = attribution;
+  attribution();
+
   // Enquiry relays. Any form carrying data-relay posts to the firm mailbox
   // and counts as a lead, so the contact page and the margin check share one
   // tested path instead of two. The value of data-relay is the GA4 method.
@@ -208,7 +245,7 @@
       fetch("https://formsubmit.co/ajax/admin@pinktax.com.au", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify(data)
+        body: JSON.stringify(Object.assign({}, data, attribution()))
       })
         .then(function (res) {
           if (!res.ok) throw new Error("send-failed");
