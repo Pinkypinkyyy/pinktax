@@ -242,7 +242,6 @@ PAGES = [
             ]),
             ("Where restaurants actually lose money", [
                 "<p>In our experience it is rarely one dramatic thing. It is shift design that puts staff on before the trade arrives, a menu that has not been recosted since the last supplier rise, waste that nobody measures because nobody owns it, and trading hours that cost more to keep open than they return. Each one is small. Together they are the difference between a profitable year and a tight one.</p>",
-                "<p>Worked example, not a client result. Illustration with invented figures: in a venue turning over $1M, a 7% leak is $70,000 a year. Your number will be different.</p>",
                 CHECK,
             ]),
             ("Working with Pink", [
