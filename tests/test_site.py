@@ -719,22 +719,29 @@ def test_headings_do_not_skip_a_level():
             assert after <= before + 1, f"{p}: h{before} jumps to h{after}"
 
 
+DISCLAIMER_LEAD = (
+    "General information only, not advice for your situation. "
+    "Pink Accounting &amp; Tax Solutions Pty Ltd is a registered tax agent (TPB 26284368) and "
+    "does not hold an Australian Financial Services Licence, so we do not give financial product advice "
+    "(for example, which investments, super funds or SMSF to buy). "
+)
+
+
 def test_margin_footer_has_one_merged_disclaimer():
     # One merged disclaimer replaces the two overlapping footer lines on /margin/
     # (same wording as /individuals/). The old lines must not come back.
     t = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
     foot = t[t.index("</main>"):] if "</main>" in t else t
     merged = (
-        "General information only. It is not tax advice or personal financial product advice, "
-        "and it does not take your circumstances into account. Pink Accounting &amp; Tax Solutions Pty Ltd "
-        "does not hold an Australian Financial Services Licence. The ATO decides due dates, processing times, "
+        DISCLAIMER_LEAD
+        + "The ATO decides due dates, processing times, "
         "interest, penalties and outcomes, and these depend on your situation. "
         "Pink can't control the ATO or other third parties. Prices are current at the date of publication, "
         "and we confirm your fee in writing before we start. "
         "Nothing on this page limits your rights under the Australian Consumer Law."
     )
     assert foot.count(merged) == 1
-    assert 'class="legal">Registered Tax Agent 26284368. ASIC Registered Agent 52580.<br>' + merged + "</div>" in foot
+    assert 'class="legal">Registered Tax Agent 26284368.<br>' + merged + "</div>" in foot
     assert foot.count('<div class="legal">') == 1
     assert "General information only, not advice." not in t
     assert "Pink can't control the ATO, timing" not in t
@@ -749,6 +756,14 @@ def test_margin_page_text_size_and_tap_targets():
     css = re.search(r"<style>(.*?)</style>", t, re.S).group(1)
     for size in re.findall(r"font-size:\s*([\d.]+)px", css):
         assert float(size) >= 14, size
-    assert "footer a,.hint a{display:inline-flex" in css and "min-height:44px" in css
+    assert "footer a,.hint a,details p a{display:inline-flex" in css and "min-height:44px" in css
     assert ".btn{display:inline-block;background:var(--accent-deep)" in css
     assert ".legal{margin-top:12px;font-size:14.4px" in css
+
+
+def test_margin_page_has_no_asic_registered_agent_line():
+    # "ASIC Registered Agent" (number 52580) is unverified and can read as a licence number.
+    t = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
+    assert "ASIC Registered Agent" not in t and "52580" not in t
+    assert "is not tax advice" not in t
+    assert "Registered Tax Agent 26284368" in t
