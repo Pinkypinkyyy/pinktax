@@ -344,10 +344,10 @@ def test_individuals_page_prices_and_disclaimer():
     assert 'canonical" href="https://pinktax.com.au/individuals/"' in t
     assert "/individuals/" in (ROOT / "sitemap.xml").read_text(encoding="utf-8")
     main = t[t.index('<main id="main">'):t.index("</main>")]
-    assert sorted(set(re.findall(r"\$[\d,]+", main))) == ["$2,500", "$410"], "only the two from-prices may appear"
-    assert "From $410 <small>+ GST</small>" in main
-    assert "From $2,500 <small>+ GST per year</small>" in main
-    assert "incl" not in main.lower() and "inc gst" not in main.lower()
+    assert sorted(set(re.findall(r"\$[\d,]+", main))) == ["$2,500", "$2,750", "$41", "$410", "$451"], "only the two from-prices (with their GST figures) may appear"
+    assert "From $451 <small>incl. GST ($410 + $41 GST)</small>" in main
+    assert "From $2,500 + GST per year ($2,750 incl. GST)" in main
+    assert "From $451 incl. GST ($410 + $41 GST)" in t and "($2,750 incl. GST)" in t.split("<main")[0]
     assert "We confirm your fee in writing before we start." in main
     assert (
         "General information only, not advice. The ATO decides due dates, processing times, "
