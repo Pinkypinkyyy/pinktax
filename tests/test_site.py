@@ -215,6 +215,14 @@ def test_pages_equal_their_identity_rebuild():
 ASIC_EXEMPT = {"margin/index.html"}
 
 
+def test_identity_file_carries_no_asic_agent_number():
+    # Canonical copy (Pink-Accounting-Automation scripts/brand/pink-identity.json) dropped
+    # asic_agent_number 52580 on 25 Oct 2026; this site copy is byte-identical to it.
+    ident = json.loads((ROOT / "identity.json").read_text(encoding="utf-8"))
+    assert "asic_agent_number" not in ident["legal"]
+    assert "52580" not in (ROOT / "identity.json").read_text(encoding="utf-8")
+
+
 def test_no_page_names_an_asic_registered_agent():
     # "ASIC Registered Agent 52580" was never verified and can read as a licence number.
     for p in PAGES:
