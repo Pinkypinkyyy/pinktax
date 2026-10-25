@@ -535,7 +535,7 @@ def main():
     built = [page(**spec) for spec in PAGES]
     locs = [
         "/", "/system/", "/why-pink/", "/book/", "/contact/", "/margin-check/",
-        "/switching/", "/working-with-us/", "/privacy/", "/terms/", "/feedback/",
+        "/switching/", "/individuals/", "/working-with-us/", "/privacy/", "/terms/", "/feedback/",
         "/restaurant-cafe-bookkeeping-brendale/", "/accountant-brendale/",
     ] + [f"/{slug}/" for slug in built]
     seen, ordered = set(), []

@@ -333,6 +333,34 @@ def test_switching_page_exists_and_is_linked():
     assert "/switching/" in (ROOT / "index.html").read_text(encoding="utf-8")
 
 
+def test_individuals_page_prices_and_disclaimer():
+    # HELD FOR PINKY. Only two prices may appear on this page, both as
+    # "from", ex GST; the fee is confirmed in writing; the ATO disclaimer is
+    # printed in full; the booking button uses the existing /book/ page and
+    # no third-party booking or pricing link is embedded.
+    f = ROOT / "individuals" / "index.html"
+    assert f.exists()
+    t = f.read_text(encoding="utf-8")
+    assert 'canonical" href="https://pinktax.com.au/individuals/"' in t
+    assert "/individuals/" in (ROOT / "sitemap.xml").read_text(encoding="utf-8")
+    main = t[t.index('<main id="main">'):t.index("</main>")]
+    assert sorted(set(re.findall(r"\$[\d,]+", main))) == ["$2,500", "$410"], "only the two from-prices may appear"
+    assert "From $410 <small>+ GST</small>" in main
+    assert "From $2,500 <small>+ GST per year</small>" in main
+    assert "incl" not in main.lower() and "inc gst" not in main.lower()
+    assert "We confirm your fee in writing before we start." in main
+    assert (
+        "General information only, not advice. The ATO decides due dates, processing times, "
+        "interest, penalties and outcomes, and these depend on your situation. "
+        "Pink can't control the ATO, timing or other third parties."
+    ) in main
+    assert 'href="/book/"' in main
+    for bad in ("seamlss", "leadconnector", "guarantee", "refund", "within 24", "turnaround"):
+        assert bad not in t.lower(), bad
+    assert "<h1>Tax returns for individuals and sole traders</h1>" in main
+    assert 'class="trust-line">Accountants, bookkeepers and tax agents for hospitality, plus tax returns for individuals and sole traders. Pink Accounting &amp; Tax Solutions Pty Ltd, registered tax agent 26284368.' in main
+
+
 def test_assets():
     assert (ROOT / "assets" / "logo.png").exists()
     assert (ROOT / "assets" / "logo-white.png").exists()
