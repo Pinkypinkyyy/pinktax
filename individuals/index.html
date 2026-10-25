@@ -35,9 +35,11 @@
     body.individuals .hero-ink .btn-primary:hover{background:#FBF8F4;color:#0E0E12}
     body.individuals .tiers{grid-template-columns:repeat(2,minmax(0,1fr));max-width:820px}
     body.individuals .tier .tprice{margin:10px 0 4px;line-height:1.25}
-    body.individuals .tier .tprice .ptotal{display:block;font-family:var(--display);font-weight:700;font-size:1.5rem;color:var(--ink)}
+    body.individuals .tier .tprice .ptotal{display:block;font-family:var(--display);font-weight:700;font-size:1.75rem;line-height:1.2;color:var(--ink);overflow-wrap:anywhere}
     body.individuals .tier .tprice .pbreak{display:block;font-size:.9rem;color:var(--soft);margin-top:2px}
+    body.individuals .tier{display:flex;flex-direction:column}
     body.individuals .tier p.tdesc{font-size:.9rem}
+    body.individuals .tier .tcta{margin-top:auto;padding-top:18px;font-weight:700;font-size:1rem;color:var(--ink);text-decoration:underline;text-underline-offset:3px}
     body.individuals .disclaimer{max-width:820px;margin:24px 0 0;font-size:.9rem;font-weight:400;line-height:1.6;color:var(--soft)}
     body.individuals .skip{min-height:44px;display:flex;align-items:center}
     body.individuals .brand{min-height:44px}
@@ -97,8 +99,8 @@
       <div class="wrap">
         <h2>What it costs</h2>
         <div class="tiers">
-          <a class="tier" href="/book/"><span class="tname">Individuals</span><p class="tprice"><span class="ptotal">From $451 incl. GST</span> <span class="pbreak">($410 + $41 GST)</span></p><p class="tdesc">Preparation, correspondence and lodgement of your individual tax return. Your fee depends on your situation.</p></a>
-          <a class="tier" href="/book/"><span class="tname">Sole traders</span><p class="tprice"><span class="ptotal">From $2,750 incl. GST per year</span> <span class="pbreak">($2,500 + $250 GST)</span></p><p class="tdesc">We confirm exactly what is included in writing before we start.</p><!-- SCOPE-PENDING: one scope sentence for the sole-trader price (what the year covers) is awaited from the Tax Manager / CFO. NOT live text. Do not publish the sentence until it is supplied and add no other service claims unless confirmed. The sole-trader price wording also awaits CFO confirmation. --></a>
+          <a class="tier" href="/book/"><span class="tname">Individuals</span><p class="tprice"><span class="ptotal">From $451 incl. GST</span> <span class="pbreak">($410 + $41 GST)</span></p><p class="tdesc">to prepare and lodge one individual tax return for one financial year. Extra items such as capital gains, foreign income, rental property, business income or earlier years can add to the fee, and we confirm your fee in writing before we start.</p><span class="tcta">Book a 15-minute call</span></a>
+          <a class="tier" href="/book/"><span class="tname">Sole traders</span><p class="tprice"><span class="ptotal">From $2,750 incl. GST per year</span> <span class="pbreak">($2,500 + $250 GST)</span></p><p class="tdesc">for sole trader end-of-year services. What is included depends on your business, and we confirm exactly what is included, and what would cost extra, in writing before we start.</p><span class="tcta">Book a 15-minute call</span></a>
         </div>
         <p class="disclaimer">General information only. It is not tax advice or personal financial product advice, and it does not take your circumstances into account. Pink Accounting &amp; Tax Solutions Pty Ltd does not hold an Australian Financial Services Licence. The ATO decides due dates, processing times, interest, penalties and outcomes, and these depend on your situation. Pink can't control the ATO or other third parties. Prices are current at the date of publication, and we confirm your fee in writing before we start. Nothing on this page limits your rights under the Australian Consumer Law.</p>
       </div>

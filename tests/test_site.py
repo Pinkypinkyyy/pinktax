@@ -369,8 +369,6 @@ def test_individuals_page_prices_and_disclaimer():
     # total price is the most prominent part: breakdown is in the smaller element
     assert '<span class="ptotal">From $451 incl. GST</span>' in main
     assert '<span class="ptotal">From $2,750 incl. GST per year</span>' in main
-    # the fee-in-writing sentence appears once, inside the merged disclaimer
-    assert text.lower().count("confirm your fee in writing") == 1
     assert 'class="disclaimer">' + MERGED_DISCLAIMER + "</p>" in main
     assert "<b>General information" not in main and "ATO decides" in main
     assert "can't control the ATO or other third parties" in main and "timing" not in text.lower().split("the ato decides")[1]
@@ -387,15 +385,51 @@ def test_individuals_page_prices_and_disclaimer():
     assert "Pty Ltd" in main_live
 
 
-def test_individuals_page_scope_placeholder_is_not_live_text():
-    # The scope sentence for "$2,500 + GST per year" is pending from the Tax
-    # Manager / CFO. The marker lives in an HTML comment only; no visible
-    # placeholder text may reach the page.
+INDIVIDUALS_SCOPE = (
+    "From $451 incl. GST ($410 + $41 GST) to prepare and lodge one individual tax return for one financial year. "
+    "Extra items such as capital gains, foreign income, rental property, business income or earlier years "
+    "can add to the fee, and we confirm your fee in writing before we start."
+)
+SOLE_TRADER_SCOPE = (
+    "From $2,750 incl. GST per year ($2,500 + $250 GST) for sole trader end-of-year services. "
+    "What is included depends on your business, and we confirm exactly what is included, "
+    "and what would cost extra, in writing before we start."
+)
+CANT_CONTROL = (
+    "The ATO decides due dates, processing times, interest, penalties and outcomes, and these depend on your situation. "
+    "Pink can't control the ATO or other third parties."
+)
+
+
+def _card_text(main, name):
+    m = re.search(r'<a class="tier" href="/book/"><span class="tname">' + name + r"</span>(.*?)</a>", main, re.S)
+    assert m, name
+    return _visible_text(m.group(1))
+
+
+def test_individuals_page_scope_sentences_word_for_word():
+    # Scope sentences settled (Tax Manager v2 option A, CFO pass) in
+    # web-scope-sentences-2026-10-25.md. Option B is not allowed: no
+    # inclusions (BAS, bookkeeping, payroll, advice) beyond these sentences.
     t = (ROOT / "individuals" / "index.html").read_text(encoding="utf-8")
-    assert "<!-- SCOPE-PENDING:" in t
+    main = t[t.index('<main id="main">'):t.index("</main>")]
+    cta = "Book a 15-minute call"
+    assert _card_text(main, "Individuals") == INDIVIDUALS_SCOPE + " " + cta
+    assert _card_text(main, "Sole traders") == SOLE_TRADER_SCOPE + " " + cta
+    assert main.count('class="tcta">' + cta + "</span>") == 2
+    # the standing can't-control wording is on the page verbatim (inside the merged disclaimer)
+    assert CANT_CONTROL in _visible_text(main)
+    # no pending marker anywhere in the served HTML, no visible placeholder text
+    assert "SCOPE-PENDING" not in t and "<!--" not in t
     live = _visible_text(t)
-    for bad in ("SCOPE-PENDING", "[", "]", "Tax Manager", "TBC", "TODO", "placeholder"):
+    for bad in ("[", "]", "Tax Manager", "TBC", "TODO", "placeholder", "CONFIRM"):
         assert bad not in live, bad
+    # no claims beyond the settled sentences (option B items)
+    cards = (_card_text(main, "Individuals") + " " + _card_text(main, "Sole traders")).lower()
+    for bad in ("bas", "bookkeeping", "payroll", "advice", "gst lodg", "guarantee", "bookkeeper"):
+        assert re.search(r"\b" + bad, cards) is None, bad
+    for bad in ("flat", "fixed", "free", "unlimited"):
+        assert re.search(r"\b" + bad + r"\b", cards) is None, bad
 
 
 def test_individuals_page_one_phone_format_and_no_hours():
@@ -416,6 +450,7 @@ def test_individuals_page_readability_and_footer():
     assert "min-height:44px" in css and "width:44px;height:44px" in css
     assert "body.individuals .hero-ink{background:#0E0E12" in css
     assert "repeat(2,minmax(0,1fr))" in css
+    assert re.search(r"\.ptotal\{[^}]*font-size:1\.75rem", css), "price total must be 28px or more"
     footer = t[t.index('<footer class="foot">'):t.index("</footer>")]
     blurb = re.search(r'<p class="blurb">(.*?)</p>', footer).group(1)
     assert "across Australia" not in blurb and "individuals and sole traders" in blurb
