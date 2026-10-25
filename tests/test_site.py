@@ -717,3 +717,69 @@ def test_headings_do_not_skip_a_level():
         levels = [int(m) for m in re.findall(r"<h([1-6])[ >]", p.read_text(encoding="utf-8"))]
         for before, after in zip(levels, levels[1:]):
             assert after <= before + 1, f"{p}: h{before} jumps to h{after}"
+
+
+# Review provenance (GMM write-up, 25 Oct 2026): the home page once said "5.0 from
+# 32 reviews" from a hardcoded counter that went stale (35 by 23 Oct). The
+# reviews block says "Rated 5.0 on Google." and must never state a count.
+NUMBER_WORDS = (
+    r"one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|"
+    r"fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|"
+    r"fifty|sixty|seventy|eighty|ninety|hundred|dozens?|hundreds"
+)
+REVIEW_COUNT_PATTERNS = (
+    re.compile(rf"\b(?:\d[\d,.]*\+?|(?:{NUMBER_WORDS})(?:[- ](?:{NUMBER_WORDS}))*)\s+(?:(?:five[- ]star|google)\s+)?reviews?\b", re.I),
+    re.compile(rf"\bbased on\s+(?:\d|(?:{NUMBER_WORDS})\b)", re.I),
+    re.compile(r"\b\d[\d,]*\s*\)?\s*(?:total\s+)?reviews?\b", re.I),
+    re.compile(r"\bdata-to=", re.I),
+)
+
+
+def review_count_hits(block_html):
+    text = re.sub(r"<svg.*?</svg>", " ", block_html, flags=re.S)
+    visible = re.sub(r"<[^>]+>", " ", text)
+    visible = html.unescape(re.sub(r"\s+", " ", visible))
+    hits = []
+    for rx in REVIEW_COUNT_PATTERNS:
+        if rx.pattern.endswith("data-to="):
+            found = rx.findall(text)
+        else:
+            found = rx.findall(visible)
+        hits += found
+    return hits
+
+
+def home_reviews_block():
+    text = (ROOT / "index.html").read_text(encoding="utf-8")
+    m = re.search(r'<section class="final proof">.*?</section>', text, re.S)
+    assert m, "home reviews block (section.final.proof) not found"
+    return m.group(0)
+
+
+def test_review_count_detector_catches_counts():
+    for bad in (
+        "Rated 5.0 from 32 reviews",
+        "<p>35 Google reviews</p>",
+        "Based on 32 reviews",
+        "based on thirty-five ratings",
+        "<span>5.0 (35) reviews</span>",
+        "Thirty five reviews",
+        "<span class=\"tick\" data-to=\"32\">32</span> reviews",
+        "over 100+ reviews",
+    ):
+        assert review_count_hits(bad), bad
+    for ok in (
+        "Rated 5.0 on Google.",
+        "Three of our Google reviews, as written there. Read them all on Google.",
+        "Read our reviews on Google",
+    ):
+        assert not review_count_hits(ok), ok
+
+
+def test_home_reviews_block_states_no_review_count():
+    block = home_reviews_block()
+    assert "Rated 5.0 on Google." in block
+    assert "Three of our Google reviews, as written there. Read them all on Google." in block
+    assert "Word for word" not in block and "Every one is public" not in block
+    assert review_count_hits(block) == [], review_count_hits(block)
+
