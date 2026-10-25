@@ -739,6 +739,52 @@ def test_margin_page_has_no_unscoped_fixed_fee_wording():
 
 
 
+def _margin_text(h):
+    return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", h))).strip()
+
+
+def test_margin_ad_variant_eyebrow_names_the_company_with_the_tax_agent_number():
+    t = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
+    assert "tax:{e:'" + TPB_COMPANY + "'" in t
+    assert "e:'Registered Tax Agent" not in t
+    # the number is never shown without the company wording right beside it
+    for m in re.finditer(r"26284368", t):
+        assert "Pink Accounting &amp; Tax Solutions Pty Ltd, registered tax agent 26284368" in t[max(0, m.start() - 90):m.end()]
+
+
+def test_margin_plan_cards_price_cta_and_layout():
+    t = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
+    section = t[t.index('<section class="price">'):t.index("</section>", t.index('<section class="price">'))]
+    cards = re.findall(r'<div class="tier[^"]*">(.*?)\n      </div>', section, re.S)
+    assert len(cards) == 2
+    names = ["Hospitality Margin Protection", "Weekly Visibility"]
+    amounts = ["$990", "$1,950"]
+    hero_cta = re.search(r'<a class="btn" href="([^"]+)"', t).group(1)
+    for card, name, amt in zip(cards, names, amounts):
+        # order: plan name, price line (amount + GST + per month), scope list, CTA last
+        order = [card.index("<h3>"), card.index('class="price-line"'), card.index("<ul>"), card.index('class="tier-cta"')]
+        assert order == sorted(order)
+        assert "<h3>" + name + "</h3>" in card
+        assert re.search(r'<span class="amt">' + re.escape(amt) + r' <span class="gst">\+ GST</span></span> <span class="per">per month</span>', card)
+        cta = re.search(r'<a class="tier-cta" href="([^"]+)"[^>]*>Book a 15-minute call</a>', card)
+        assert cta and cta.group(1) == hero_cta
+        assert card.rstrip().endswith("</a>"), "CTA is the last element in the card"
+    # every dollar figure in the price section carries "+ GST"
+    for m in re.finditer(r"\$[\d,]+", _margin_text(section)):
+        assert re.match(r"\s?\+ GST", _margin_text(section)[m.end():m.end() + 8]), m.group(0)
+    css = t[: t.index("</style>")]
+    assert re.search(r"\.tier \.amt\{[^}]*white-space:nowrap[^}]*font-weight:700[^}]*font-size:28px[^}]*line-height:1\.1[^}]*color:var\(--ink\)", css)
+    assert re.search(r"\.tier \.amt \.gst\{[^}]*font-size:16px;font-weight:600;color:var\(--ink\)", css)
+    assert re.search(r"\.tier \.per\{[^}]*font-size:14\.4px", css)
+    assert re.search(r"\.tier \.tier-cta\{[^}]*margin-top:auto[^}]*min-height:44px[^}]*font-size:16px;font-weight:700[^}]*text-decoration:underline", css)
+    assert re.search(r"\.tier\{[^}]*display:flex;flex-direction:column", css)
+    assert "font-size:27px" not in css
+    assert "a:focus-visible" in css
+    # two columns from 941px, one column at 940px and below
+    assert ".price .tiers{grid-template-columns:repeat(2,1fr)}" in css
+    assert "@media (max-width:940px){.tiers,.price .tiers{grid-template-columns:1fr}}" in css
+
+
 def test_identity_first_on_every_first_screen():
     # HB 24 Sep 2026: people must know us as accountants, bookkeepers and tax
     # agents first, then hospitality. The ad-matched line sits under the H1.
