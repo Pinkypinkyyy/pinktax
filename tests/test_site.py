@@ -717,3 +717,25 @@ def test_headings_do_not_skip_a_level():
         levels = [int(m) for m in re.findall(r"<h([1-6])[ >]", p.read_text(encoding="utf-8"))]
         for before, after in zip(levels, levels[1:]):
             assert after <= before + 1, f"{p}: h{before} jumps to h{after}"
+
+
+def test_feedback_card_two_has_one_tap_link_the_phone():
+    # Brand Studio, 25 Oct 2026: the email and phone .tap links sat on
+    # consecutive lines on a phone, their 44px tap boxes overlapped and
+    # tapping the email dialled the phone. The address is plain text; the
+    # "Contact Pink" button is the mailto. Exactly one inline .tap link in
+    # card 2, and it is the tel: one. (Rendered overlap check: see PR notes.)
+    text = (ROOT / "feedback" / "index.html").read_text(encoding="utf-8")
+    cards = re.findall(r"<article class=\"card\">(.*?)</article>", text, re.S)
+    assert len(cards) == 2
+    card2 = cards[1]
+    taps = re.findall(r"<a\b[^>]*class=\"[^\"]*\btap\b[^\"]*\"[^>]*>", card2)
+    assert len(taps) == 1, taps
+    assert 'href="tel:+61735446386"' in taps[0], taps
+    assert "mailto:" not in taps[0]
+    # the plain-text address is still shown, and the button is still the only mailto in the card
+    assert "email admin@pinktax.com.au or call" in re.sub(r"<[^>]+>", "", card2)
+    assert card2.count("mailto:") == 1
+    assert re.search(r'<a class="btn btn-primary" href="mailto:admin@pinktax\.com\.au\?subject=Feedback%20for%20Pink">Contact Pink</a>', card2)
+    assert "amelia@" not in text
+
