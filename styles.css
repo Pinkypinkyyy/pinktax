@@ -741,7 +741,7 @@ a:focus-visible,button:focus-visible,video:focus-visible,summary:focus-visible{
   padding:clamp(26px,3vw,38px) 0;
 }
 .counts{
-  display:grid;grid-template-columns:repeat(4,1fr);
+  display:grid;grid-template-columns:repeat(3,1fr);
   gap:clamp(18px,2.4vw,34px);margin:0;
 }
 .counts > div{
