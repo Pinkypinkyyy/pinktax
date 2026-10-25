@@ -254,6 +254,47 @@ def test_stars_are_svg_not_glyphs():
     assert html.count('<svg class="stars"') == 3
 
 
+def test_seventy_thousand_claim_is_gone_from_site_and_source():
+    # CFO: "$70,000 a year in one $1M venue" is not verified (GMM note, 25 Oct 2026).
+    # Only the labelled illustration may carry the figure, and never as a result.
+    label = "Worked example, not a client result. Illustration with invented figures"
+    files = [p for p in ROOT.rglob("*") if p.is_file() and ".git" not in p.parts and "tests" not in p.parts
+             and p.suffix in (".html", ".js", ".json", ".xml", ".txt", ".md", ".py", ".css", ".yml")]
+    assert files
+    figure = re.compile(r"70,000|70000|70k|70 000|\$70(?![\d,])", re.I)
+    banned = [
+        r"found up to", r"in one \$1M venue", r"single \$1M venue", r"one \$1M", r"one venue and one engagement",
+        r"one engagement(?! letter)", r"came to us profitable", r"found leaking", r"one venue\. \$70",
+        r"what venues say", r"<blockquote class=\"quote\"", r"data-to=\"70000\"", r"\$1M venue",
+    ]
+    for p in files:
+        text = p.read_text(encoding="utf-8", errors="ignore")
+        for pat in banned:
+            assert not re.search(pat, text, re.I), f"{p.relative_to(ROOT)}: {pat}"
+        for m in figure.finditer(text):
+            assert label in text[max(0, m.start() - 260):m.start()], f"{p.relative_to(ROOT)}: unlabelled {m.group(0)}"
+            assert "7% leak" in text[max(0, m.start() - 60):m.start()], f"{p.relative_to(ROOT)}: {m.group(0)}"
+    for p in (ROOT / "index.html", ROOT / "restaurant-accountant" / "index.html", ROOT / "tools" / "build_landing_pages.py"):
+        assert label in p.read_text(encoding="utf-8")
+    assert "$70" not in (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
+
+
+def test_seventy_thousand_replacement_wording_is_gmm_exact():
+    label = "Worked example, not a client result. Illustration with invented figures: "
+    home = (ROOT / "index.html").read_text(encoding="utf-8")
+    assert label + "in a venue turning over $1M, a 7% leak is $70,000 a year, from shift design, food waste and trading hours nobody had costed." in home
+    assert "<h2>Where a venue's margin can leak: three ordinary causes.</h2>" in home
+    assert "<h3>A worked example</h3>" in home
+    assert ("a venue turning over about $1M a year can look profitable on paper and still be short of cash. Reading the month rather than the year, "
+            "a 7% leak is $70,000 a year, from shift design that put staff on before the trade arrived, food waste nobody was measuring, "
+            "and trading hours that cost more to stay open than they bring in. Your number will be different.</p>") in home
+    assert "Found leaking" not in home and 'data-to="70000"' not in home
+    assert home.count("$70,000") == 2
+    ra = (ROOT / "restaurant-accountant" / "index.html").read_text(encoding="utf-8")
+    assert "<p>" + label + "in a venue turning over $1M, a 7% leak is $70,000 a year. Your number will be different.</p>" in ra
+    assert ra.count("$70,000") == 1
+
+
 def test_no_synthesised_font_weights():
     # Only weights actually fetched from Google may be used, or the browser
     # fakes the face and the text reads as a different font.
@@ -750,7 +791,10 @@ def review_count_hits(block_html, counters=True):
     hits = re.findall(r"reviewCount|ratingCount", block_html, re.I)
     text = re.sub(r"<(?:svg|script|style)\b.*?</(?:svg|script|style)>", " ", block_html, flags=re.S)
     attrs = " ".join(re.findall(r'(?:content|aria-label|alt|title)="([^"]*)"', text))
-    visible = re.sub(r"<[^>]+>", " ", text)
+    # block-level tags end a sentence, so a number in one block (a tax agent number)
+    # cannot run into the next block's words ("26258598 Google rating")
+    visible = re.sub(r"</?(?:section|div|figure|figcaption|dl|dt|dd|p|li|ul|h[1-6]|blockquote|cite)\b[^>]*>", " | ", text)
+    visible = re.sub(r"<[^>]+>", " ", visible)
     visible = html.unescape(re.sub(r"\s+", " ", visible + " " + attrs))
     for rx in REVIEW_COUNT_PATTERNS[:3]:
         hits += rx.findall(visible)
