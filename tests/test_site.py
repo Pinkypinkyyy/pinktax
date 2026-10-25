@@ -717,3 +717,95 @@ def test_headings_do_not_skip_a_level():
         levels = [int(m) for m in re.findall(r"<h([1-6])[ >]", p.read_text(encoding="utf-8"))]
         for before, after in zip(levels, levels[1:]):
             assert after <= before + 1, f"{p}: h{before} jumps to h{after}"
+
+
+# Review provenance (GMM write-up, 25 Oct 2026; PD decision): the home page once said
+# "5.0 from 32 reviews" from a hardcoded counter that went stale (35 by 23 Oct).
+# Policy: no review count anywhere on the site unless it was read live that day
+# and is dated. Nobody could verify one on 25 Oct, so no page states a count.
+NUMBER_WORDS = (
+    r"one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|"
+    r"fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|"
+    r"fifty|sixty|seventy|eighty|ninety|hundred|dozens?|hundreds"
+)
+_NUM = rf"(?:\d[\d,.]*\+?|(?:{NUMBER_WORDS})(?:[- ](?:{NUMBER_WORDS}))*)"
+REVIEW_COUNT_PATTERNS = (
+    # "32 reviews", "35 Google reviews", "thirty-five five-star reviews", "100+ ratings"
+    re.compile(rf"\b{_NUM}\s+(?:(?:five[- ]star|google)\s+)*(?:reviews?|ratings?)\b", re.I),
+    # "based on 32", "based on thirty-five"
+    re.compile(rf"\bbased on\s+{_NUM}\b", re.I),
+    # "5.0 (35)" and "(35 reviews)"
+    re.compile(r"\d\.\d\s*\(\s*\d[\d,]*\s*\)", re.I),
+)
+
+
+def review_count_hits(block_html, counters=True):
+    # Structured data that carries a count is checked on the raw source.
+    hits = re.findall(r"reviewCount|ratingCount", block_html, re.I)
+    text = re.sub(r"<(?:svg|script|style)\b.*?</(?:svg|script|style)>", " ", block_html, flags=re.S)
+    attrs = " ".join(re.findall(r'(?:content|aria-label|alt|title)="([^"]*)"', text))
+    visible = re.sub(r"<[^>]+>", " ", text)
+    visible = html.unescape(re.sub(r"\s+", " ", visible + " " + attrs))
+    for rx in REVIEW_COUNT_PATTERNS[:3]:
+        hits += rx.findall(visible)
+    if counters:
+        # an animated counter left inside a reviews block is how "32" went stale
+        hits += re.findall(r"data-to=", text)
+    return hits
+
+
+def home_reviews_block():
+    text = (ROOT / "index.html").read_text(encoding="utf-8")
+    m = re.search(r'<section class="final proof">.*?</section>', text, re.S)
+    assert m, "home reviews block (section.final.proof) not found"
+    return m.group(0)
+
+
+def test_review_count_detector_catches_counts():
+    for bad in (
+        "Rated 5.0 from 32 reviews",
+        "<p>35 Google reviews</p>",
+        "<dd>5.0<small>35 Google reviews (as at 23 Oct 2026)</small></dd>",
+        "Rated 5.0 on Google: 35 Google reviews (as at 23 Oct 2026).",
+        "Based on 32 reviews",
+        "based on thirty-five ratings",
+        "<span>5.0 (35) reviews</span>",
+        "5.0 (35)",
+        "Thirty five reviews",
+        "<span class=\"tick\" data-to=\"32\">32</span> reviews",
+        "over 100+ reviews",
+        "<meta name=\"description\" content=\"Rated 5.0 from 35 reviews\">",
+        "<script type=\"application/ld+json\">{\"reviewCount\":35}</script>",
+        "twenty-three five-star reviews",
+    ):
+        assert review_count_hits(bad), bad
+    for ok in (
+        "Rated 5.0 on Google.",
+        "Three of our Google reviews, as written there. Read them all on Google.",
+        "Read our reviews on Google",
+        "Each month we review wages, food cost and suppliers.",
+        "Margin review, every Month",
+        "<span class=\"tick\" data-to=\"70000\">$70,000</span> a year",
+    ):
+        assert not review_count_hits(ok, counters=False), ok
+
+
+def test_home_reviews_block_states_no_review_count():
+    block = home_reviews_block()
+    assert "Rated 5.0 on Google." in block
+    assert review_count_hits(block) == [], review_count_hits(block)
+
+
+def test_no_page_states_a_review_count():
+    # Whole site, stats line and meta text included (PD decision, 25 Oct 2026).
+    for p in PAGES:
+        hits = review_count_hits(p.read_text(encoding="utf-8"), counters=False)
+        assert hits == [], f"{p.relative_to(ROOT)}: {hits}"
+
+
+def test_home_stats_line_rates_without_a_count():
+    text = (ROOT / "index.html").read_text(encoding="utf-8")
+    m = re.search(r"<dt>Google rating</dt>\s*<dd>(.*?)</dd>", text, re.S)
+    assert m, "Google rating stat missing"
+    assert re.sub(r"<[^>]+>", " ", m.group(1)).split()[0] == "5.0"
+    assert review_count_hits(m.group(0)) == [], m.group(0)
