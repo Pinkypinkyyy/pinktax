@@ -437,6 +437,14 @@ def test_individuals_page_scope_sentences_word_for_word():
         assert re.search(r"\b" + bad + r"\b", cards) is None, bad
 
 
+def test_individuals_page_has_no_asic_registered_agent_line():
+    # "ASIC Registered Agent" (number 52580) is unverified and can read as a licence number.
+    t = (ROOT / "individuals" / "index.html").read_text(encoding="utf-8")
+    assert "ASIC Registered Agent" not in t and "52580" not in t
+    assert "is not tax advice" not in t
+    assert "Registered Tax Agent No. 26284368" in t
+
+
 def test_individuals_page_one_phone_format_and_no_hours():
     t = (ROOT / "individuals" / "index.html").read_text(encoding="utf-8")
     live = _visible_text(t)
@@ -851,11 +859,3 @@ def test_headings_do_not_skip_a_level():
         levels = [int(m) for m in re.findall(r"<h([1-6])[ >]", p.read_text(encoding="utf-8"))]
         for before, after in zip(levels, levels[1:]):
             assert after <= before + 1, f"{p}: h{before} jumps to h{after}"
-
-
-def test_individuals_page_has_no_asic_registered_agent_line():
-    # "ASIC Registered Agent" (number 52580) is unverified and can read as a licence number.
-    t = (ROOT / "individuals" / "index.html").read_text(encoding="utf-8")
-    assert "ASIC Registered Agent" not in t and "52580" not in t
-    assert "is not tax advice" not in t
-    assert "Registered Tax Agent No. 26284368" in t
