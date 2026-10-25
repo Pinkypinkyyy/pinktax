@@ -403,12 +403,12 @@ def test_individuals_page_prices_and_disclaimer():
 
 
 INDIVIDUALS_SCOPE = (
-    "From $451 incl. GST ($410 + $41 GST) to prepare and lodge one individual tax return for one financial year. "
+    "From $451 incl. GST ($410 + $41 GST) This price is for preparing and lodging one individual tax return for one financial year. "
     "Extra items such as capital gains, foreign income, rental property, business income or earlier years "
     "can add to the fee, and we confirm your fee in writing before we start."
 )
 SOLE_TRADER_SCOPE = (
-    "From $2,750 incl. GST per year ($2,500 + $250 GST) for sole trader end-of-year services. "
+    "From $2,750 incl. GST per year ($2,500 + $250 GST) This price is for sole trader end-of-year services. "
     "What is included depends on your business, and we confirm exactly what is included, "
     "and what would cost extra, in writing before we start."
 )
@@ -456,6 +456,31 @@ def _tpb_number_is_company_only(t):
         near = t[max(0, m.start() - 150):m.end() + 150]
         for person in ("Huong", "Pinky", "Bui", "founder", "person responsible"):
             assert person not in near, (person, near)
+
+
+def test_individuals_page_every_price_has_gst_treatment_and_proper_sentences():
+    # Every dollar figure on the page (visible text and meta descriptions) is
+    # followed by "incl. GST", "+ GST", or the explicit breakdown "+ $N GST" / "GST".
+    t = (ROOT / "individuals" / "index.html").read_text(encoding="utf-8")
+    texts = [_visible_text(t)] + re.findall(r'<meta [^>]*content="([^"]*)"', t)
+    seen = 0
+    for txt in texts:
+        for m in re.finditer(r"\$[\d,]+", txt):
+            seen += 1
+            after = txt[m.end():m.end() + 16]
+            assert re.match(r"\s?(incl\. GST|\+ GST|\+ \$[\d,]+ GST|GST)", after), (m.group(0), after)
+    assert seen >= 8
+    # the sentence after the price breakdown starts with a capital letter, not a dangling "to ..."
+    main = t[t.index('<main id="main">'):t.index("</main>")]
+    descs = re.findall(r'<p class="tdesc">(.*?)</p>', main, re.S)
+    assert len(descs) == 2
+    for d in descs:
+        assert d[0].isupper(), d[:30]
+    assert '<p class="tdesc">This price is for preparing and lodging one individual tax return for one financial year.' in main
+    assert '<p class="tdesc">This price is for sole trader end-of-year services.' in main
+    assert not re.search(r'<p class="tdesc">(to|for) ', main)
+    # price amount look: 28px, 700, line-height 1.1, ink colour (not pink)
+    assert re.search(r"\.ptotal\{[^}]*font-weight:700[^}]*font-size:1\.75rem[^}]*line-height:1\.1[^}]*color:var\(--ink\)", t)
 
 
 def test_individuals_page_has_no_asic_registered_agent_line():
