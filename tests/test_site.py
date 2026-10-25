@@ -294,11 +294,13 @@ def test_seventy_thousand_removal_leaves_clean_text():
             'and suppliers, while you can still act on them.</p>') in home
     assert "<h2>Where a venue's margin can leak: three ordinary causes.</h2>" in home
     assert "A worked example" not in home and "Found leaking" not in home and "data-to=\"70000\"" not in home
-    # the three causes stay, in the words already on the page
-    assert ("<h3>Three ordinary causes</h3>\n            <ul>\n"
-            "              <li>Shift design that put staff on before the trade arrived</li>\n"
-            "              <li>Food waste nobody was measuring</li>\n"
-            "              <li>Trading hours that cost more to stay open than they bring in</li>\n            </ul>") in home
+    # PD, 25 Oct 2026: the "Three ordinary causes" h3 and its list are gone; only the H2 stays, and the
+    # one card left under it is a single full-width card (no empty second column)
+    assert "<h3>Three ordinary causes</h3>" not in home
+    assert "Food waste nobody was measuring" not in home and "Shift design that put staff on before" not in home
+    leak = home.split("<h2>Where a venue's margin can leak: three ordinary causes.</h2>", 1)[1].split("</section>", 1)[0]
+    assert '<div class="hire single">' in leak and leak.count("<article>") == 1 and "<h3>What we read, every month</h3>" in leak
+    assert ".hire.single{grid-template-columns:1fr}" in (ROOT / "styles.css").read_text(encoding="utf-8")
     ra = (ROOT / "restaurant-accountant" / "index.html").read_text(encoding="utf-8")
     assert "<h2>Where restaurants actually lose money</h2>" in ra
     assert "Your number will be different" not in ra and "Your number will be different" not in home
