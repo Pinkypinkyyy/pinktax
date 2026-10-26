@@ -717,3 +717,46 @@ def test_headings_do_not_skip_a_level():
         levels = [int(m) for m in re.findall(r"<h([1-6])[ >]", p.read_text(encoding="utf-8"))]
         for before, after in zip(levels, levels[1:]):
             assert after <= before + 1, f"{p}: h{before} jumps to h{after}"
+
+
+def test_enquiry_forms_ask_the_business_and_refuse_made_up_phones():
+    # Blueprint Step 3 (HB 11 Oct 2026). Three of four web enquiries in three
+    # weeks were fraud; one came through the contact form with 0400 123 456 as
+    # the mobile, venue "Something else" and no business named. Every lead form
+    # now asks for the business, and the shared relay refuses a made-up number.
+    contact = (ROOT / "contact" / "index.html").read_text(encoding="utf-8")
+    start = contact.index('id="enquiryForm"')
+    form = contact[start:contact.index("</form>", start)]
+    for field in ('name="business"', 'name="venue" required', 'name="turnover" required',
+                  'name="staff" required', 'name="software"', "data-phone"):
+        assert field in form, field
+    assert "<option>Something else</option>" not in form.split('name="software"')[0], "vague business type is back"
+    # The enquiry flow reads fields in this posting order (PinkLeadVerify.FORM_FIELD_ORDER).
+    order = [form.index(f'name="{key}"') for key in
+             ("name", "business", "email", "mobile", "venue", "turnover", "staff", "software", "message")]
+    assert order == sorted(order), "field order no longer matches the enquiry flow"
+    for rel in ("index.html", "margin-check/index.html"):
+        text = (ROOT / rel).read_text(encoding="utf-8")
+        start = text.index('id="pmcLead"')
+        lead = text[start:text.index("</form>", start)]
+        for field in ('name="business"', 'name="venue" required', "data-phone"):
+            assert field in lead, (rel, field)
+        assert "only the five boxes below are sent" in lead, rel
+        assert 'name="turnover"' not in lead, f"{rel}: the margin check sends no money figures, not even a band"
+    nav = (ROOT / "nav.js").read_text(encoding="utf-8")
+    assert "function phoneLooksReal" in nav
+    assert '"0400123456"' in nav
+    assert "setCustomValidity" in nav and "shownAt < 4000" in nav
+    ok = contact[contact.index('id="enquiryOk"'):]
+    assert 'href="/book/"' in ok.split("</div>")[0], "thank-you message lost its booking link"
+
+
+def test_consent_boxes_wait_for_the_lawyer_and_pinky():
+    # The consent tick boxes and their wording are with the lawyer
+    # (Pink-Accounting-Automation docs/client-onboarding/
+    # Pink_Enquiry_Form_Consent_Wording_for_Lawyer_2026-10-13.docx). Nothing
+    # goes live until Pinky signs that document off; update this test then.
+    for p in PAGES:
+        text = p.read_text(encoding="utf-8")
+        for name in ("calls", "updates", "consentwording"):
+            assert f'name="{name}"' not in text, (p, name)

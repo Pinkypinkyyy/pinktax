@@ -166,10 +166,34 @@
   // and counts as a lead, so the contact page and the margin check share one
   // tested path instead of two. The value of data-relay is the GA4 method.
   //
-  // What a relay form may carry: a name, an email, a phone number, a venue
+  // What a relay form may carry: a name, a business name, an email, a phone
+  // number, the type of business, a turnover band, a staff band, the software
   // and a message. Nothing else. A venue's takings and wages never go through
   // a third-party relay — the margin check keeps those in the browser.
+  //
+  // A real number we can call back. Three of four web enquiries in the three
+  // weeks to 11 Oct 2026 were fraud, one with 0400 123 456 as the mobile. The
+  // enquiry flow applies the same test (PinkLeadVerify.placeholder_phone).
+  function phoneLooksReal(raw) {
+    var d = String(raw || "").replace(/\D/g, "");
+    if (d.indexOf("61") === 0 && d.length === 11) d = "0" + d.slice(2);
+    if (!/^0[2-478]\d{8}$/.test(d)) return false;
+    var tail = d.slice(2);
+    var distinct = {};
+    for (var i = 0; i < tail.length; i++) distinct[tail.charAt(i)] = true;
+    if (Object.keys(distinct).length <= 2) return false;
+    if ("0123456789012345678".indexOf(tail) >= 0 || "9876543210987654321".indexOf(tail) >= 0) return false;
+    return ["0400123456", "0412345678", "0423456789", "0412341234"].indexOf(d) < 0;
+  }
+
   document.querySelectorAll("form[data-relay]").forEach(function (form) {
+    var shownAt = Date.now();
+    var phone = form.querySelector("[data-phone]");
+    if (phone) {
+      phone.addEventListener("input", function () {
+        phone.setCustomValidity("");
+      });
+    }
     var ok = document.getElementById(form.getAttribute("data-ok") || "");
     var method = form.getAttribute("data-relay") || "enquiry-form";
     var subject = form.getAttribute("data-subject") || "Pink Accounting enquiry";
@@ -192,6 +216,13 @@
       e.preventDefault();
       var trap = form.querySelector("[name=_gotcha]");
       if (trap && trap.value) return;
+      // Filled and sent in under four seconds is a script, not a person.
+      if (Date.now() - shownAt < 4000) return;
+      if (phone && !phoneLooksReal(phone.value)) {
+        phone.setCustomValidity("Please enter an Australian number we can call you back on.");
+        phone.reportValidity();
+        return;
+      }
       var btn = form.querySelector("button[type=submit]");
       var label = btn ? btn.textContent : "";
       if (btn) {
