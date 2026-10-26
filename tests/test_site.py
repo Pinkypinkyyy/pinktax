@@ -125,12 +125,12 @@ def test_schema_org_node_matches_identity():
         assert n["email"] == office["email"], rel
         assert n["address"] == {
             "@type": "PostalAddress",
-            "streetAddress": office["street"],
             "addressLocality": office["locality"],
             "addressRegion": office["region"],
             "postalCode": office["postcode"],
             "addressCountry": office["country"],
         }, rel
+        assert "streetAddress" not in n["address"], rel
         hours = n["openingHoursSpecification"]
         assert hours["dayOfWeek"] == office["hours"]["days"], rel
         assert (hours["opens"], hours["closes"]) == (office["hours"]["opens"], office["hours"]["closes"]), rel
@@ -170,13 +170,12 @@ def test_cross_link_line_once_per_page():
 
 
 def test_address_written_one_way_only():
-    # Google compares the site against the profile and directories character
-    # by character, slash included. Footer and schema come from identity.json.
-    street = IDENTITY["office"]["street"]
-    form = re.compile(r"Shop 15A\s*[,/]?\s*18\s*[-–]\s*22 Kremzow R(?:oa)?d")
-    for p in PAGES:
-        for m in form.finditer(p.read_text(encoding="utf-8")):
-            assert m.group(0) == street, f"{p.relative_to(ROOT)}: {m.group(0)!r}"
+    # The street is not published. Locality, state, postcode and country stay.
+    banned = ("Kremzow", "Shop 15A", "18-22", "streetAddress")
+    for p in PAGES + [ROOT / "identity.json"]:
+        text = p.read_text(encoding="utf-8")
+        for word in banned:
+            assert word not in text, f"{p.relative_to(ROOT)}: {word}"
 
 
 def test_contact_is_the_office_page():
