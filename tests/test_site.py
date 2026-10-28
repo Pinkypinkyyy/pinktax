@@ -135,6 +135,8 @@ def test_schema_org_node_matches_identity():
         assert hours["dayOfWeek"] == office["hours"]["days"], rel
         assert (hours["opens"], hours["closes"]) == (office["hours"]["opens"], office["hours"]["closes"]), rel
         assert IDENTITY["google_profile"]["maps_url"] in n["sameAs"], rel
+        for profile in IDENTITY["service_lines"]["hospitality"]["profiles"]:
+            assert profile["url"] in n["sameAs"], rel
         trades = IDENTITY["service_lines"]["trades"]
         assert {"@type": "AccountingService", "name": trades["service_name"], "url": trades["site"]} in n["department"], rel
 
@@ -167,6 +169,23 @@ def test_cross_link_line_once_per_page():
         assert text.count(line) == 1, f"{p}: cross-link line differs from identity.json"
         foot = text[text.rindex("<footer"):text.rindex("</footer>")]
         assert line in foot, f"{p}: cross-link must sit in the footer"
+
+
+def test_social_line_once_per_page():
+    # The firm's own Facebook and Instagram, linked from every footer. No UTM:
+    # the firm's UTM standard tags links into our pages, not links out to Meta.
+    profiles = IDENTITY["service_lines"]["hospitality"]["profiles"]
+    assert [p["name"] for p in profiles] == ["Facebook", "Instagram"]
+    for p in PAGES:
+        if p in STUBS:
+            continue  # redirect stubs have no footer
+        text = p.read_text(encoding="utf-8")
+        assert text.count('data-identity="social"') == 1, p
+        foot = text[text.rindex("<footer"):text.rindex("</footer>")]
+        for profile in profiles:
+            assert "utm_" not in profile["url"], profile["url"]
+            link = f'<a href="{profile["url"]}" rel="noopener">{profile["name"]}</a>'
+            assert link in foot, f"{p}: {profile['name']} link must sit in the footer"
 
 
 def test_address_written_one_way_only():

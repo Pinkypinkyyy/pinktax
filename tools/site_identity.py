@@ -10,7 +10,7 @@ rewrites the identity-owned parts of each page in place and leaves every other
 byte alone:
 
   * the AccountingService JSON-LD node (home and /contact/)
-  * the one cross-link line at the foot of every page
+  * the social line and the one cross-link line at the foot of every page
   * the footer office address
   * the office and two-doors blocks on /contact/, between identity markers
 
@@ -33,9 +33,11 @@ HOURS = OFFICE["hours"]
 LEGAL = ID["legal"]
 TRADES = ID["service_lines"]["trades"]
 XLINK = ID["cross_links"]["on_hospitality_site"]
+PROFILES = ID["service_lines"]["hospitality"]["profiles"]
 
 LD = re.compile(r'(<script type="application/ld\+json">\s*)(\{"@context":"https://schema\.org","@type":"AccountingService".*?\})(\s*</script>)', re.S)
 SISTER = re.compile(r'[ \t]*<p class="sister-line"[^>]*>.*?</p>\n')
+SOCIAL = re.compile(r'[ \t]*<p class="social-line"[^>]*>.*?</p>\n')
 ADDR = re.compile(r'(<p class="addr"[^>]*>).*?(</p>)', re.S)
 
 
@@ -75,7 +77,7 @@ def org_node():
         "founder": {"@type": "Person", "name": "Huong Bui"},
         "taxID": LEGAL["abn"].replace(" ", ""),
         "identifier": LEGAL["tax_agent_number"],
-        "sameAs": [ID["google_profile"]["maps_url"]],
+        "sameAs": [ID["google_profile"]["maps_url"]] + [p["url"] for p in PROFILES],
         "department": [{"@type": "AccountingService", "name": TRADES["service_name"], "url": TRADES["site"]}],
     }
 
@@ -85,6 +87,11 @@ def sister_line():
         f'<p class="sister-line" data-identity="cross-link">{e(XLINK["text"])} '
         f'<a href="{e(XLINK["href"])}">{e(XLINK["link_text"])}</a></p>'
     )
+
+
+def social_line():
+    links = " and ".join(f'<a href="{e(p["url"])}" rel="noopener">{e(p["name"])}</a>' for p in PROFILES)
+    return f'<p class="social-line" data-identity="social">Follow {e(ID["public_name"])} on {links}</p>'
 
 
 def office_block():
@@ -122,14 +129,15 @@ def apply(text, rel):
     town = f'{OFFICE["locality"]} {OFFICE["region"]} {OFFICE["postcode"]}'
     text = ADDR.sub(lambda m: f'{m.group(1)}{e(OFFICE["street"])}<br>{e(town)}{m.group(2)}', text)
 
-    # One cross-link line, last thing inside the footer's wrap.
-    text = SISTER.sub("", text)
+    # The social line, then one cross-link line, last things inside the footer's wrap.
+    text = SOCIAL.sub("", SISTER.sub("", text))
     end = text.rfind("</footer>")
     if end >= 0:
         close = text.rfind("</div>", 0, end)
         line_start = text.rfind("\n", 0, close) + 1
-        indent = text[line_start:close]
-        text = text[:line_start] + indent + "  " + sister_line() + "\n" + text[line_start:]
+        indent = text[line_start:close] + "  "
+        lines = indent + social_line() + "\n" + indent + sister_line() + "\n"
+        text = text[:line_start] + lines + text[line_start:]
 
     if rel == "contact/index.html":
         text = fill(text, "office", office_block())

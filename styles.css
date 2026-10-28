@@ -317,6 +317,8 @@ h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.12;letter-spac
 .foot a:hover{color:#fff}
 .foot .legal{margin-top:40px;padding-top:18px;border-top:1px solid rgba(255,255,255,.18);font-size:.85rem;color:rgba(255,255,255,.62);line-height:1.7}
 .foot .legal a{display:inline;color:#fff;text-decoration:underline;text-underline-offset:3px}
+.foot .social-line{margin-top:10px;font-size:.8rem;color:rgba(255,255,255,.55)}
+.foot .social-line a{display:inline;padding:0;color:rgba(255,255,255,.7);text-decoration:underline;text-underline-offset:3px}
 .foot .sister-line{margin-top:10px;font-size:.8rem;color:rgba(255,255,255,.55)}
 .foot .sister-line a{display:inline;padding:0;color:rgba(255,255,255,.7);text-decoration:underline;text-underline-offset:3px}
 
