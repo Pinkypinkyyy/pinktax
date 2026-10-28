@@ -217,6 +217,12 @@ def test_contact_is_the_office_page():
     assert 'data-relay="contact-form"' in text, "contact form removed"
 
 
+def test_margin_faq_section_has_an_accessible_name():
+    # The FAQ has no visible heading (the "What venues say" heading went with the quote), so the section is named.
+    html = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
+    assert '<section class="wrap" style="padding:8px 20px 0" aria-label="Common questions">' in html
+
+
 def test_pages_equal_their_identity_rebuild():
     # identity.json is regenerated from the firm's canonical file. If it
     # changes and nobody reruns tools/build_landing_pages.py, this fails.
@@ -265,12 +271,81 @@ def test_counter_fallback_matches_target():
         assert shown == prefix + body, f"{shown!r} != {prefix + body!r}"
 
 
+def test_margin_faq_stacks_on_mobile_and_has_44px_rows():
+    # Brand Studio round 6: the two-column FAQ grid stacks on phones; summary rows are at least 44px tall (padding on the summary, not the details).
+    html = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
+    assert ('@media(max-width:640px){section.wrap > div[style*="grid-template-columns:1fr 1fr"]'
+            '{grid-template-columns:1fr !important;gap:0 !important}}') in html
+    assert re.search(r"(?m)^details\{[^}]*padding:0\}$", html)
+    assert re.search(r"(?m)^summary\{[^}]*padding:18px 0\}$", html)
+    assert "details{border-bottom:1px solid var(--line);padding:18px 0}" not in html
+    # an open row keeps its old spacing: 12px summary to text, 18px text to rule
+    assert "details p{margin:12px 0 18px;" in html and "details[open] summary{padding-bottom:0}" in html
+
+
 def test_stars_are_svg_not_glyphs():
     # Neither Montserrat nor Manrope contains U+2605, so the character would
     # render in a system fallback face.
     html = (ROOT / "index.html").read_text(encoding="utf-8")
     assert "★" not in html
     assert html.count('<svg class="stars"') == 3
+
+
+def test_seventy_thousand_claim_is_gone_from_site_and_source():
+    # PD decision, 25 Oct 2026: the "$70,000 a year in one $1M venue" figure is withdrawn entirely.
+    # No allowance for a "worked example" or any labelled illustration, on any page or in the generator.
+    files = [p for p in ROOT.rglob("*") if p.is_file() and ".git" not in p.parts and "tests" not in p.parts
+             and p.suffix in (".html", ".js", ".json", ".xml", ".txt", ".md", ".py", ".css", ".yml")]
+    assert files
+    figure = re.compile(
+        r"(?<![\d,.])\$?\s?70,000(?![\d,])|(?<![\d,.])70000(?!\d)|(?<![\d,.])\$?70\s?k\b|(?<!\d)70[ \u00a0]000(?!\d)"
+        r"|\$70(?![\d,])|seventy[- ]thousand", re.I)
+    banned = [
+        r"found up to", r"in one \$1M venue", r"single \$1M venue", r"one \$1M", r"one venue and one engagement",
+        r"one engagement(?! letter)", r"came to us profitable", r"found leaking", r"one venue\. \$70",
+        r"what venues say", r"<blockquote class=\"quote\"", r"data-to=\"70000\"", r"\$1M venue",
+        r"worked example", r"illustration with invented figures", r"not a client result", r"7% leak",
+    ]
+    for p in files:
+        text = p.read_text(encoding="utf-8", errors="ignore")
+        for pat in banned:
+            assert not re.search(pat, text, re.I), f"{p.relative_to(ROOT)}: {pat}"
+        m = figure.search(text)
+        assert not m, f"{p.relative_to(ROOT)}: {m.group(0)}"
+    # the regex is precise: other figures are not the withdrawn claim
+    for hit in ("$70,000 a year", "70,000 a year", "$70K", "70k", "70000", "70 000", "$70 a day"):
+        assert figure.search(hit), hit
+    for fine in ("a $700,000 venue is $7,000 a year", "$170,000", "$1,070,000", "$7,000", "$700", "2070", "1,700,000"):
+        assert not figure.search(fine), fine
+
+
+def test_seventy_thousand_removal_leaves_clean_text():
+    home = (ROOT / "index.html").read_text(encoding="utf-8")
+    assert ('<p class="lead">For caf&eacute;s, restaurants, bars and multi-venue groups. Each month we review wages, food cost '
+            'and suppliers, while you can still act on them.</p>') in home
+    assert "<h2>Where a venue's margin can leak.</h2>" in home
+    assert "A worked example" not in home and "Found leaking" not in home and "data-to=\"70000\"" not in home
+    # PD, 25 Oct 2026: the "Three ordinary causes" h3 and its list are gone; only the H2 stays, and the
+    # one card left under it is a single full-width card (no empty second column)
+    assert "<h3>Three ordinary causes</h3>" not in home
+    assert "Food waste nobody was measuring" not in home and "Shift design that put staff on before" not in home
+    leak = home.split("<h2>Where a venue's margin can leak.</h2>", 1)[1].split("</section>", 1)[0]
+    assert '<div class="hire single">' in leak and leak.count("<article>") == 1 and "<h3>What we read, every month</h3>" in leak
+    assert ".hire.single{grid-template-columns:1fr}" in (ROOT / "styles.css").read_text(encoding="utf-8")
+    ra = (ROOT / "restaurant-accountant" / "index.html").read_text(encoding="utf-8")
+    assert "<h2>Where restaurants actually lose money</h2>" in ra
+    assert "Your number will be different" not in ra and "Your number will be different" not in home
+    gen = (ROOT / "tools" / "build_landing_pages.py").read_text(encoding="utf-8")
+    assert "Your number will be different" not in gen and "Where restaurants actually lose money" in gen
+
+
+def test_home_count_bar_stacks_below_860px():
+    # Brand Studio round 6: 3 equal cells at 861px and wider, a clean stack at 860px and below (no orphan cell).
+    css = (ROOT / "styles.css").read_text(encoding="utf-8")
+    assert "@media(max-width:860px){.counts{grid-template-columns:1fr;gap:18px}}" in css
+    assert "grid-template-columns:repeat(3,1fr)" in css.split(".counts{", 1)[1].split("}", 1)[0]
+    assert not re.search(r"max-width:(940|560)px\)\{\s*\.counts", css)
+    assert "repeat(2,1fr);gap:22px" not in css
 
 
 def test_no_synthesised_font_weights():

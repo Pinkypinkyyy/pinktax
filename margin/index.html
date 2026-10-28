@@ -142,12 +142,14 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent)}
 .quote cite{display:block;margin-top:8px;font-style:normal;font-size:14px;font-weight:700;color:var(--muted)}
 
 /* faq */
-details{border-bottom:1px solid var(--line);padding:18px 0}
-summary{font-weight:700;cursor:pointer;list-style:none;font-size:17px}
+details{border-bottom:1px solid var(--line);padding:0}
+summary{font-weight:700;cursor:pointer;list-style:none;font-size:17px;padding:18px 0}
 summary::-webkit-details-marker{display:none}
 summary::after{content:"+";float:right;color:var(--accent);font-weight:800}
 details[open] summary::after{content:"–"}
-details p{margin:12px 0 0;color:var(--muted)}
+details p{margin:12px 0 18px;color:var(--muted)}
+details[open] summary{padding-bottom:0}
+@media(max-width:640px){section.wrap > div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr !important;gap:0 !important}}
 
 /* final + footer */
 .final{background:var(--ink);color:#fff;padding:56px 0;margin-top:56px;text-align:center}
@@ -273,25 +275,20 @@ footer a{color:var(--muted);text-decoration:underline}
     <div class="tiers">
       <div class="tier tier--pick">
         <h3>Hospitality Margin Protection</h3>
-        <div class="amt">$990 <span style="font-size:15px;font-weight:600">+ GST</span></div>
-        <div class="per">per month</div>
+        <div class="per">Fee confirmed in writing before we start</div>
         <ul><li>We do the bookkeeping and payroll</li><li>Monthly margin read, all four questions</li><li>BAS, IAS, STP and year end</li><li>Tax planning through the year</li></ul>
       </div>
       <div class="tier">
         <h3>Weekly Visibility</h3>
-        <div class="amt">$1,950 <span style="font-size:15px;font-weight:600">+ GST</span></div>
-        <div class="per">per month</div>
+        <div class="per">You see the fee in writing before work begins</div>
         <ul><li>Weekly numbers, not monthly</li><li>Wage % tracked against roster</li><li>Everything in Margin Protection</li><li>For venues mid-change</li></ul>
       </div>
     </div>
-    <p class="hint" style="margin-top:22px">Multi-venue groups from $3,500 + GST per month, by application. Fees are not contingent on any tax outcome.</p>
+    <p class="hint" style="margin-top:22px">Multi-venue groups by application. Fees are not contingent on any tax outcome.</p>
   </div>
 </section>
 
-<section class="wrap" style="padding:8px 20px 0">
-  <h2>What venues say</h2>
-  <blockquote class="quote">We found up to $70,000 a year leaving a single site through three ordinary things: shift design that put staff on before the trade arrived, food waste nobody was measuring, and trading hours that cost more to stay open than they brought in.
-    <cite>That is one venue and one engagement, not a promise. Your number will be different. The way we find it will not.</cite></blockquote>
+<section class="wrap" style="padding:8px 20px 0" aria-label="Common questions">
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:26px">
     <div>
       <details open><summary>Do you only work with hospitality?</summary><p>For the monthly margin work, yes. Cafés, restaurants, bars, takeaway and multi-site groups. The compliance side we do for other small businesses too.</p></details>
