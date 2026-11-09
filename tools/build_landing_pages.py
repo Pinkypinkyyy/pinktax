@@ -239,7 +239,7 @@ PAGES = [
                 "<li>Payroll run against the award, with wages read as a share of sales, not in isolation</li>"
                 "<li>A margin review that names the line that moved and what it is worth over a year</li>"
                 "<li>BAS and IAS prepared from books that are already reconciled</li>"
-                "<li>Tax planning before 30 June, while there is still something to plan</li></ul>",
+                "<li>Tax planning before 30 June, ahead of your company and trust returns</li></ul>",
                 PLAN_LODGED,
             ]),
             ("Where restaurants actually lose money", [
