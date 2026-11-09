@@ -197,6 +197,7 @@ def page(slug, title, desc, h1, lead, sections, faqs, related):
   </main>
 {footer}
   <script src="/track.js?v={ver['track']}"></script>
+  <script src="/utm.js"></script>
   <script src="/nav.js?v={ver['nav']}"></script>
 </body>
 </html>
@@ -209,6 +210,7 @@ def page(slug, title, desc, h1, lead, sections, faqs, related):
 
 CHECK = '<p><a href="/margin-check/">Run the 60-second Margin Check</a> on your own figures. It runs in your browser, and nothing is sent unless you choose to send it.</p>'
 PLAN = '<p><a href="/#pink-pricing">Hospitality Margin Protection</a> is our core monthly plan. It carries the bookkeeping, payroll for up to five staff and BAS oversight underneath the monthly margin review.</p>'
+PLAN_LODGED = '<p><a href="/#pink-pricing">Hospitality Margin Protection</a> is our core monthly plan. Underneath the monthly margin review sit bookkeeping, payroll for up to five staff, and your BAS and IAS prepared and lodged by Pink as your registered tax agent.</p>'
 
 R_ACCT = ("restaurant-accountant", "Restaurant accountant", "What a specialist actually does for a restaurant.")
 R_CAFE = ("cafe-accountant", "Cafe accountant", "Small tickets, high volume, thin margin.")
@@ -238,7 +240,7 @@ PAGES = [
                 "<li>A margin review that names the line that moved and what it is worth over a year</li>"
                 "<li>BAS and IAS prepared from books that are already reconciled</li>"
                 "<li>Tax planning before 30 June, while there is still something to plan</li></ul>",
-                PLAN,
+                PLAN_LODGED,
             ]),
             ("Where restaurants actually lose money", [
                 "<p>In our experience it is rarely one dramatic thing. It is shift design that puts staff on before the trade arrives, a menu that has not been recosted since the last supplier rise, waste that nobody measures because nobody owns it, and trading hours that cost more to keep open than they return. Each one is small. Together they are the difference between a profitable year and a tight one.</p>",
@@ -278,7 +280,7 @@ PAGES = [
             ]),
             ("What you get from us", [
                 "<p>Books kept current from the POS and the bank, payroll run against the award, a monthly review that tells you what moved, and the compliance handled underneath it.</p>",
-                PLAN,
+                PLAN_LODGED,
             ]),
         ],
         faqs=[
@@ -319,7 +321,7 @@ PAGES = [
             ("Then the numbers get read", [
                 "<p>Clean books are the input, not the output. Every month we read them against the bands below and tell you what changed.</p>",
                 bands_table(),
-                PLAN,
+                PLAN_LODGED,
                 CHECK,
             ]),
         ],
@@ -384,7 +386,7 @@ PAGES = [
                 "<p>When wage cost runs hot, the cause is almost always structural rather than a rate problem: staff rostered before the trade arrives, too many hands on a shift that does not need them, or a split that would work better as two shorter shifts. We work it back to the roster rather than telling you to cut hours.</p>",
                 CHECK,
             ]),
-            ("What it costs", [PLAN]),
+            ("What it costs", [PLAN_LODGED]),
         ],
         faqs=[
             ("How many staff does the $990 plan cover?", "Payroll for up to five staff sits inside it. Beyond that we price the payroll separately so you are not paying for a tier you do not need."),
@@ -518,7 +520,7 @@ PAGES = [
                 "<li>Operators opening a second or third site</li></ul>",
                 "<p>We meet in Brendale, on site at your venue, or on a call. Most of the monthly work happens without you needing to be anywhere.</p>",
             ]),
-            ("What it costs", [PLAN, CHECK]),
+            ("What it costs", [PLAN_LODGED, CHECK]),
         ],
         faqs=[
             ("Do we have to be in Brisbane?", "No. The office is at Brendale and we work with venues across Australia. Brisbane and South East Queensland clients simply get the option of meeting in person."),
