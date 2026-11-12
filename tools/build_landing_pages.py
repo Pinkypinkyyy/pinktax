@@ -209,8 +209,8 @@ def page(slug, title, desc, h1, lead, sections, faqs, related):
 
 
 CHECK = '<p><a href="/margin-check/">Run the 60-second Margin Check</a> on your own figures. It runs in your browser, and nothing is sent unless you choose to send it.</p>'
-PLAN = '<p><a href="/#pink-pricing">Hospitality Margin Protection</a> is our core monthly plan. It carries the bookkeeping, payroll for up to five staff and BAS oversight underneath the monthly margin review.</p>'
-PLAN_LODGED = '<p><a href="/#pink-pricing">Hospitality Margin Protection</a> is our core monthly plan. Underneath the monthly margin review sit bookkeeping, payroll for up to five staff, and your BAS and IAS prepared and lodged by Pink as your registered tax agent.</p>'
+PLAN = '<p><a href="/#pink-pricing">Hospitality Margin Protection</a> is our core monthly plan. It carries the bookkeeping, payroll for up to five staff, BAS and IAS, financial statements, the business tax return, FBT, the ASIC annual review for one business entity, and up to two owners' individual tax returns underneath the monthly margin review. ASIC's own fees are paid by your company directly to ASIC.</p>'
+PLAN_LODGED = '<p><a href="/#pink-pricing">Hospitality Margin Protection</a> is our core monthly plan. Underneath the monthly margin review sit bookkeeping, payroll for up to five staff, BAS and IAS, financial statements, the business tax return, FBT, the ASIC annual review for one business entity, and up to two owners' individual tax returns, prepared and lodged by Pink as your registered tax agent. ASIC's own fees are paid by your company directly to ASIC.</p>'
 
 R_ACCT = ("restaurant-accountant", "Restaurant accountant", "What a specialist actually does for a restaurant.")
 R_CAFE = ("cafe-accountant", "Cafe accountant", "Small tickets, high volume, thin margin.")
@@ -389,7 +389,7 @@ PAGES = [
             ("What it costs", [PLAN_LODGED]),
         ],
         faqs=[
-            ("How many staff does the $990 plan cover?", "Payroll for up to five staff sits inside it. Beyond that we price the payroll separately so you are not paying for a tier you do not need."),
+            ("How many staff does the $990 plan cover?", "Payroll for up to five staff sits inside it. Above that, there is a set monthly fee per extra employee."),
             ("Can you fix historic underpayments?", "We can calculate the exposure and help you correct it. Whether and how you disclose it is a decision we walk through with you."),
             ("Do you do rosters?", "No, the roster is yours. We tell you what it cost and where the structure is expensive."),
         ],
