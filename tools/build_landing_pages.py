@@ -389,7 +389,7 @@ PAGES = [
             ("What it costs", [PLAN_LODGED]),
         ],
         faqs=[
-            ("How many staff does the $990 plan cover?", "Payroll for up to five staff sits inside it. Above that, there is a set monthly fee per extra employee."),
+            ("How many staff does the $990 plan cover?", "Payroll for up to five staff sits inside it. Above that, there is a fee of $25 + GST per extra employee per month, unless you move up to the higher tier."),
             ("Can you fix historic underpayments?", "We can calculate the exposure and help you correct it. Whether and how you disclose it is a decision we walk through with you."),
             ("Do you do rosters?", "No, the roster is yours. We tell you what it cost and where the structure is expensive."),
         ],
