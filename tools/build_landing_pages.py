@@ -209,8 +209,8 @@ def page(slug, title, desc, h1, lead, sections, faqs, related):
 
 
 CHECK = '<p><a href="/margin-check/">Run the 60-second Margin Check</a> on your own figures. It runs in your browser, and nothing is sent unless you choose to send it.</p>'
-PLAN = '<p><a href="/#pink-pricing">Hospitality Margin Protection</a> is our core monthly plan. It carries the bookkeeping, payroll for up to five staff, BAS and IAS, financial statements, the business tax return, FBT, the ASIC annual review for one business entity, and up to two owners' individual tax returns underneath the monthly margin review. ASIC's own fees are paid by your company directly to ASIC.</p>'
-PLAN_LODGED = '<p><a href="/#pink-pricing">Hospitality Margin Protection</a> is our core monthly plan. Underneath the monthly margin review sit bookkeeping, payroll for up to five staff, BAS and IAS, financial statements, the business tax return, FBT, the ASIC annual review for one business entity, and up to two owners' individual tax returns, prepared and lodged by Pink as your registered tax agent. ASIC's own fees are paid by your company directly to ASIC.</p>'
+PLAN = """<p><a href="/#pink-pricing">Hospitality Margin Protection</a> is our core monthly plan. It carries the bookkeeping, payroll for up to five staff, BAS and IAS, financial statements, the business tax return, FBT, the ASIC annual review for one business entity, and up to two owners' individual tax returns underneath the monthly margin review. ASIC's own fees are paid by your company directly to ASIC. Payroll above five staff is $25 + GST per extra employee per month, unless you move up to the higher tier. We review the plan once you reach 10 to 15 staff. Extra entities, and catch-up or very messy, high-volume files, are quoted once at the start. Weekly Visibility and Ready to Scale include payroll with no extra-employee charge.</p>"""
+PLAN_LODGED = """<p><a href="/#pink-pricing">Hospitality Margin Protection</a> is our core monthly plan. Underneath the monthly margin review sit bookkeeping, payroll for up to five staff, BAS and IAS, financial statements, the business tax return, FBT, the ASIC annual review for one business entity, and up to two owners' individual tax returns, prepared and lodged by Pink as your registered tax agent. ASIC's own fees are paid by your company directly to ASIC. Payroll above five staff is $25 + GST per extra employee per month, unless you move up to the higher tier. We review the plan once you reach 10 to 15 staff. Extra entities, and catch-up or very messy, high-volume files, are quoted once at the start. Weekly Visibility and Ready to Scale include payroll with no extra-employee charge.</p>"""
 
 R_ACCT = ("restaurant-accountant", "Restaurant accountant", "What a specialist actually does for a restaurant.")
 R_CAFE = ("cafe-accountant", "Cafe accountant", "Small tickets, high volume, thin margin.")
@@ -389,7 +389,7 @@ PAGES = [
             ("What it costs", [PLAN_LODGED]),
         ],
         faqs=[
-            ("How many staff does the $990 plan cover?", "Payroll for up to five staff sits inside it. Above that, there is a fee of $25 + GST per extra employee per month, unless you move up to the higher tier."),
+            ("How many staff does the $990 plan cover?", "Payroll for up to five staff sits inside Hospitality Margin Protection. Above that, there is a fee of $25 + GST per extra employee per month, unless you move up to the higher tier. We review the plan once you reach 10 to 15 staff. Weekly Visibility and Ready to Scale include payroll with no extra-employee charge."),
             ("Can you fix historic underpayments?", "We can calculate the exposure and help you correct it. Whether and how you disclose it is a decision we walk through with you."),
             ("Do you do rosters?", "No, the roster is yours. We tell you what it cost and where the structure is expensive."),
         ],
