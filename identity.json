@@ -1,6 +1,6 @@
 {
   "_rule": "Single source of truth for how Pink Accounting appears in public. Edit ONLY the canonical copy in Pinkypinkyyy/Pink-Accounting-Automation scripts/brand/pink-identity.json, then run scripts/brand/Invoke-PinkIdentityGuard.py --sync. Site copies are generated; site tests and the daily drift watch fail on any difference. HB 2026-09-24.",
-  "version": "2026-10-28.1",
+  "version": "2026-11-16.1",
   "public_name": "Pink Accounting",
   "legal": {
     "entity": "Pink Accounting & Tax Solutions Pty Ltd",
@@ -18,7 +18,7 @@
     "one_line": "Shop 15A/18-22 Kremzow Rd, Brendale QLD 4500",
     "phone_display": "(07) 3544 6386",
     "phone_e164": "+61735446386",
-    "email": "admin@pinktax.com.au",
+    "email": "hello@pinktax.com.au",
     "hours": {
       "days": [
         "Monday",
