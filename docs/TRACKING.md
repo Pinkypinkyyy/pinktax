@@ -26,12 +26,12 @@ Venue takings, wages and rent stay in the browser. The relay only sends name, em
 
 ## Lead relay
 
-Forms POST through `https://formsubmit.co/ajax/admin@pinktax.com.au`. FormSubmit is **per-origin**. `pinktax.com.au` has to be activated from a live-domain submission (an activation mail to admin@). If the relay returns `success: "false"`, the page does not thank the visitor or fire a conversion; it opens a mailto fallback instead.
+Forms POST through `https://formsubmit.co/ajax/hello@pinktax.com.au`. FormSubmit is **per-origin**. `pinktax.com.au` has to be activated from a live-domain submission (an activation mail to hello@). If the relay returns `success: "false"`, the page does not thank the visitor or fire a conversion; it opens a mailto fallback instead.
 
 ## After each deploy
 
 1. Submit the contact form and the Margin Check lead form from https://pinktax.com.au (not localhost).
-2. Confirm the mail arrives at admin@pinktax.com.au.
+2. Confirm the mail arrives at hello@pinktax.com.au.
 3. Click Book → Pick a time and confirm GA4 realtime shows `book_click`.
 4. Click the phone number and confirm `phone_click`.
 5. In GA4, mark `generate_lead`, `book_click` and `phone_click` as key events, then import them into Google Ads.
