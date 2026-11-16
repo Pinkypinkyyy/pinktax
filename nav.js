@@ -205,7 +205,7 @@
       data._template = "table";
       data._captcha = "false";
       data._subject = subject;
-      fetch("https://formsubmit.co/ajax/admin@pinktax.com.au", {
+      fetch("https://formsubmit.co/ajax/hello@pinktax.com.au", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify(data)
@@ -261,7 +261,7 @@
             })
             .join("\n");
           window.location.href =
-            "mailto:admin@pinktax.com.au?subject=" +
+            "mailto:hello@pinktax.com.au?subject=" +
             encodeURIComponent(subject) +
             "&body=" +
             encodeURIComponent(body);
