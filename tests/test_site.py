@@ -336,7 +336,7 @@ def test_margin_check_privacy_claim_is_exact():
     js = (ROOT / "margin-check.js").read_text(encoding="utf-8")
     # Opt-in send must stay a mailto: venue takings and wages should not be
     # posted through a third-party form relay.
-    assert "mailto:admin@pinktax.com.au" in js
+    assert "mailto:hello@pinktax.com.au" in js
     assert "formsubmit" not in js
 
 

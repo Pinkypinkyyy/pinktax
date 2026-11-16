@@ -86,7 +86,7 @@
         "",
         "Please call me about this.");
       send.setAttribute("href",
-        "mailto:admin@pinktax.com.au?subject=" + encodeURIComponent("Margin Check result") +
+        "mailto:hello@pinktax.com.au?subject=" + encodeURIComponent("Margin Check result") +
         "&body=" + encodeURIComponent(lines.join("\n")));
       send.hidden = false;
     }
