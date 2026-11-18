@@ -19,7 +19,7 @@ window.PINK_CFG = {
   ADS_ID:        'AW-XXXXXXXXXX',             // optional. Conversions already reach Ads via the GA4 import; this block no-ops while unset
   ADS_LABEL:     'XXXXXXXXXXXXXXXXXX',        // only needed if the AW- direct tag above is ever used instead of the GA4 import
   META_PIXEL_ID: '1237708438188688',          // "Pink Accounting's Pixel" - the dataset ad account 543906261707152 can actually use
-  FORM_ENDPOINT: 'https://formsubmit.co/ajax/admin@pinktax.com.au', // same tested relay as every other pinktax form
+  FORM_ENDPOINT: 'https://formsubmit.co/ajax/hello@pinktax.com.au', // same tested relay as every other pinktax form
   BOOKING_URL:   'https://api.leadconnectorhq.com/widget/bookings/call-with-pinky'
 };
 </script>
@@ -389,7 +389,7 @@ footer a{color:var(--muted);text-decoration:underline}
       var fail=document.getElementById('sendFail'); if(fail) fail.hidden=false;
       var btn=document.getElementById('submitBtn'); if(btn){ btn.disabled=false; btn.textContent='Request my 15 minutes'; }
       var body=Object.keys(d).filter(function(k){return k.charAt(0)!=='_'&&d[k];}).map(function(k){return k+': '+d[k];}).join('\n');
-      window.location.href='mailto:admin@pinktax.com.au?subject='+
+      window.location.href='mailto:hello@pinktax.com.au?subject='+
         encodeURIComponent('Website call request - '+(d.venue||d.name))+'&body='+encodeURIComponent(body);
     }
     d._template='table'; d._captcha='false'; d._subject='Website call request - '+(d.venue||d.name||'');

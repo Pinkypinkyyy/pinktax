@@ -12,6 +12,6 @@ Business name, legal entity, office, hours, Google profile and the cross-link to
 Hospitality only. The trades line, Service Profit (a Pink Accounting service), lives on https://www.serviceprofit.com.au/ and is named on this site only in the footer cross-link and the two-doors block on /contact/.
 
 Booking calendar: PinkAccountingTaxSolutionsClientBookings@pinktax.com.au  
-Enquiry form: formsubmit to admin@pinktax.com.au
+Enquiry form: formsubmit to hello@pinktax.com.au
 
 Entity: Pink Accounting & Tax Solutions Pty Ltd · ABN 51 682 301 891 · Registered Tax Agent 26284368

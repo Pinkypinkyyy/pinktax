@@ -666,7 +666,7 @@ def test_paid_landing_page_feeds_both_platforms():
     # Venue takings are collected on this page. The mailto fallback keeps them
     # in the visitor's own mail client. If a FORM_ENDPOINT is ever wired, that
     # decision needs a human looking at where a venue's sales figure lands.
-    assert "mailto:admin@pinktax.com.au" in lp, "lead fallback relay changed"
+    assert "mailto:hello@pinktax.com.au" in lp, "lead fallback relay changed"
 
 
 def test_identity_first_on_every_first_screen():
@@ -714,7 +714,7 @@ def test_ad_page_counts_a_lead_only_when_it_was_sent():
     # 24 Sep 2026: the /margin/ form had no endpoint, opened a mail app and
     # still told the visitor "your details are with us" and fired a Lead.
     m = (ROOT / "margin" / "index.html").read_text(encoding="utf-8")
-    assert "FORM_ENDPOINT: 'https://formsubmit.co/ajax/admin@pinktax.com.au'" in m
+    assert "FORM_ENDPOINT: 'https://formsubmit.co/ajax/hello@pinktax.com.au'" in m
     assert "setTimeout(done" not in m and "catch(function(){ done(); })" not in m
     assert "String(j.success)==='false'" in m and 'id="sendFail"' in m
     assert "offshore" not in m
