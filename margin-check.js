@@ -52,7 +52,7 @@
     var top = leaks[0];
     if (top.d > 0 && marginP < BENCH.margin.good) {
       $("pmc-hl-label").textContent = "Your most likely leak";
-      $("pmc-hl-text").textContent = top.msg + " — about $" + fmt(top.d) + "/yr above benchmark";
+      $("pmc-hl-text").textContent = top.msg + ", about $" + fmt(top.d) + "/yr above benchmark";
     } else if (marginP >= BENCH.margin.good && top.d <= 0) {
       $("pmc-hl-label").textContent = "Nice work";
       $("pmc-hl-text").textContent = "Your headline ratios are in range";
